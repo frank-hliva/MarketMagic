@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36301.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "MarketMagic", "MarketMagic\MarketMagic.fsproj", "{6882536D-CCBA-4948-96B1-1EB19E4C3472}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Lime", "Lime\Lime.fsproj", "{D37F8CD5-2F88-D9E6-121B-CEF4EC5F4CA7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6882536D-CCBA-4948-96B1-1EB19E4C3472}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6882536D-CCBA-4948-96B1-1EB19E4C3472}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6882536D-CCBA-4948-96B1-1EB19E4C3472}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6882536D-CCBA-4948-96B1-1EB19E4C3472}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D37F8CD5-2F88-D9E6-121B-CEF4EC5F4CA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D37F8CD5-2F88-D9E6-121B-CEF4EC5F4CA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D37F8CD5-2F88-D9E6-121B-CEF4EC5F4CA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D37F8CD5-2F88-D9E6-121B-CEF4EC5F4CA7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5F461BCB-BB0E-4179-9FCD-F358B4EEB1C4}
+	EndGlobalSection
+EndGlobal

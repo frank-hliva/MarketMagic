@@ -1,0 +1,11 @@
+x - 1. urobit jeden typ so vsetkym
+    x - jeden typ
+    x - jedna funkcia co vsetko precita
+    x - vsetky fieldy
+x - 2. zabranit viditelnosti veci co nechcem exportovat
+- 3. skombinovať s testovacími dátami
+    - prejdeme cyklom riadky DataTable.cells
+        - prejdeme vsetky columny DataTable
+            - zistime ci key v DataTable.columns je aj v UploadDataTable.columns
+                - ziskame hodnoty
+                    DataTable.cells[DataTable.columns[key]]

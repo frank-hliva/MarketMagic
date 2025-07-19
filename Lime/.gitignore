@@ -1,0 +1,54 @@
+# VS2022 / .NET / F# / C# / Avalonia / Julia
+## Build results
+bin/
+obj/
+[Ll]og/
+*.log
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## VS Code
+.vscode/
+.history/
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+*.nuspec
+
+## Rider
+.idea/
+
+## Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+## Others
+*.DS_Store
+*.vs/
+*.db
+*.pidb
+*.pdb
+*.cache
+*.tmp
+*.bak
+
+## Julia
+*.jl.cov
+*.jl.*
+.julia/
+.julia_history
+.julia_config
+Manifest.toml
+Project.toml
+
+## Avalonia
+AvaloniaResources/
