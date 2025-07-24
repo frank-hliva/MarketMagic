@@ -1,4 +1,4 @@
-include("eBay/UploadTemplate.jl")
+include("Ebay/UploadTemplate.jl")
 
 using .Ebay
 

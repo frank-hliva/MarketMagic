@@ -89,15 +89,16 @@ module UploadTemplate
     using .File
     using CSV
     using DataFrames
+    using .Ebay
 
-    function load(templateStream::IOStream)::Main.Ebay.UploadDataTable
+    function load(templateStream::IOStream)::Ebay.UploadDataTable
         seek(templateStream, 0)
         local columns = templateStream |> File.readColumns
         seek(templateStream, 0)
         local enumRows = templateStream |> File.readEnumRows
         local enumMap = Dict(enumRows |> File.parseAllEnums)
 
-        Main.Ebay.UploadDataTable(
+        Ebay.UploadDataTable(
             id = File.parseCategoryId(enumRows),
             columns = columns,
             enums = map(column -> begin
@@ -113,7 +114,7 @@ module UploadTemplate
         local numberOfNewRows = size(dataTable.cells, 1)
         local columnCount = length(uploadDataTable.columns)
 
-        local newUploadDataTable = Main.Ebay.UploadDataTable(
+        local newUploadDataTable = Ebay.UploadDataTable(
             id = uploadDataTable.id,
             columns = deepcopy(uploadDataTable.columns),
             enums = deepcopy(uploadDataTable.enums),
@@ -129,7 +130,7 @@ module UploadTemplate
         newUploadDataTable
     end
 
-    function save(outputStream::IOStream, uploadDataTable::Main.Ebay.UploadDataTable)
+    function save(outputStream::IOStream, uploadDataTable::Ebay.UploadDataTable)
         local dataFrame = DataFrame(
             uploadDataTable.cells, 
             uploadDataTable.columns
@@ -166,7 +167,7 @@ module ExportedData
             "Available quantity" => "*Quantity",
             "Format" => "*Format",
             "Condition" => "*ConditionID",
-            "eBay category 1 number" => "*Category",
+            "Ebay category 1 number" => "*Category",
 
             # Id numbers
             "Custom label (SKU)" => "CustomLabel",  # SKU id
@@ -190,7 +191,7 @@ module ExportedData
         end
     end
 
-    function load(exportedDataStream::IOStream, columnNameMapping::Columns.ColumnMapping)::Main.Ebay.DataTable
+    function load(exportedDataStream::IOStream, columnNameMapping::Columns.ColumnMapping)::Ebay.DataTable
         local dataFrame = CSV.read(
             exportedDataStream,
             DataFrame;
@@ -205,13 +206,13 @@ module ExportedData
             Columns.rename(columnNameMapping, dataFrame)
         end
         
-        Main.Ebay.DataTable(
+        Ebay.DataTable(
             columns = string.(names(dataFrame)),
             cells = Cells.removeNothing(Matrix(dataFrame))
         )
     end
 
-    function load(exportedDataStream::IOStream)::Main.Ebay.DataTable
+    function load(exportedDataStream::IOStream)::Ebay.DataTable
         load(exportedDataStream, Columns.commonMapping)
     end
 

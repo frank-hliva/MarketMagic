@@ -4,11 +4,11 @@ using ZMQ
 using JSON3
 using MLStyle
 
-include("eBay/UploadTemplate.jl")
+include("Ebay/UploadTemplate.jl")
 using .Ebay
 
 mutable struct ServerState
-    uploadDataTable::Union{Nothing, Main.Ebay.UploadDataTable}
+    uploadDataTable::Union{Nothing, Ebay.UploadDataTable}
 end
 
 const state = ServerState(nothing)
@@ -33,7 +33,7 @@ end
 function handleLoadUploadTemplate(path::String)
     try
         state.uploadDataTable = open(path) do templateStream
-            Main.Ebay.UploadTemplate.load(templateStream)
+            Ebay.UploadTemplate.load(templateStream)
         end
         return Dict(
             "success" => true,
@@ -57,10 +57,10 @@ function handleAddExportedData(path::String)
         end
 
         exportedData = open(path) do exportedDataStream
-            Main.Ebay.ExportedData.load(exportedDataStream)
+            Ebay.ExportedData.load(exportedDataStream)
         end
 
-        state.uploadDataTable = Main.Ebay.UploadTemplate.withCells(exportedData, state.uploadDataTable)
+        state.uploadDataTable = Ebay.UploadTemplate.withCells(exportedData, state.uploadDataTable)
         
         return Dict(
             "success" => true,
@@ -84,7 +84,7 @@ function handleSaveUploadTemplate(path::String)
         end
 
         open(path, "w") do outputStream
-            Main.Ebay.UploadTemplate.save(outputStream, state.uploadDataTable)
+            Ebay.UploadTemplate.save(outputStream, state.uploadDataTable)
         end
         
         return Dict(
