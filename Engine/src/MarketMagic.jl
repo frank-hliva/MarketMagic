@@ -1,5 +1,5 @@
 include("Ebay/UploadTemplate.jl")
-using Ebay
+using .Ebay
 
 # include("ZMQServer.jl")
 # using .ZMQServer
