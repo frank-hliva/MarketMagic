@@ -86,19 +86,18 @@ module UploadTemplate
         end
     end
 
-    using .File
     using CSV
     using DataFrames
-    using .Ebay
+    using .File
 
-    function load(templateStream::IOStream)::Ebay.UploadDataTable
+    function load(templateStream::IOStream)::UploadDataTable
         seek(templateStream, 0)
         local columns = templateStream |> File.readColumns
         seek(templateStream, 0)
         local enumRows = templateStream |> File.readEnumRows
         local enumMap = Dict(enumRows |> File.parseAllEnums)
 
-        Ebay.UploadDataTable(
+        UploadDataTable(
             id = File.parseCategoryId(enumRows),
             columns = columns,
             enums = map(column -> begin
@@ -109,12 +108,12 @@ module UploadTemplate
         )
     end
 
-    function withCells(dataTable::Ebay.DataTable, uploadDataTable::Ebay.UploadDataTable)::Ebay.UploadDataTable
+    function withCells(dataTable::Main.Ebay.DataTable, uploadDataTable::Main.Ebay.UploadDataTable)::Main.Ebay.UploadDataTable
         local lastRowIndex = size(uploadDataTable.cells, 1)
         local numberOfNewRows = size(dataTable.cells, 1)
         local columnCount = length(uploadDataTable.columns)
 
-        local newUploadDataTable = Ebay.UploadDataTable(
+        local newUploadDataTable = Main.Ebay.UploadDataTable(
             id = uploadDataTable.id,
             columns = deepcopy(uploadDataTable.columns),
             enums = deepcopy(uploadDataTable.enums),
@@ -130,7 +129,7 @@ module UploadTemplate
         newUploadDataTable
     end
 
-    function save(outputStream::IOStream, uploadDataTable::Ebay.UploadDataTable)
+    function save(outputStream::IOStream, uploadDataTable::Main.Ebay.UploadDataTable)
         local dataFrame = DataFrame(
             uploadDataTable.cells, 
             uploadDataTable.columns
