@@ -1,4 +1,4 @@
-﻿module MarketMagic.EBay.Api
+﻿module MarketMagic.Ebay.Api
 
 open System
 open NetMQ

@@ -1,6 +1,6 @@
 # MarketMagic
 
-A set of tools designed for bulk listing of items on eBay. \
+A set of tools designed for bulk listing of items on Ebay. \
 Version: *1.0.0*
 
 ## License:

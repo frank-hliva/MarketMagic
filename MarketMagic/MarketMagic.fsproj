@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="EBay.Api.UploadTemplate.fs" />
+    <Compile Include="Ebay.Api.UploadTemplate.fs" />
     <Compile Include="StringSplitConverter.fs" />
     <Compile Include="BasicViewModel.fs" />
     <Compile Include="TableViewModel.fs" />
@@ -100,7 +100,7 @@
     <None Include="Engine\Manifest.toml" />
     <None Include="Engine\Project.toml" />
     <None Include="Engine\readme.md" />
-    <None Include="Engine\src\EBay\DataTemplate.jl" />
+    <None Include="Engine\src\Ebay\DataTemplate.jl" />
     <None Include="Engine\src\MarketMagic.jl" />
   </ItemGroup>
 
