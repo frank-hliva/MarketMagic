@@ -8,7 +8,7 @@ include("eBay/UploadTemplate.jl")
 using .Ebay
 
 mutable struct ServerState
-    uploadDataTable::Union{Nothing, Ebay.UploadDataTable}
+    uploadDataTable::Union{Nothing, Main.Ebay.UploadDataTable}
 end
 
 const state = ServerState(nothing)
@@ -33,7 +33,7 @@ end
 function handleLoadUploadTemplate(path::String)
     try
         state.uploadDataTable = open(path) do templateStream
-            Ebay.UploadTemplate.load(templateStream)
+            Main.Ebay.UploadTemplate.load(templateStream)
         end
         return Dict(
             "success" => true,
@@ -57,10 +57,10 @@ function handleAddExportedData(path::String)
         end
 
         exportedData = open(path) do exportedDataStream
-            Ebay.ExportedData.load(exportedDataStream)
+            Main.Ebay.ExportedData.load(exportedDataStream)
         end
 
-        state.uploadDataTable = Ebay.UploadTemplate.withCells(exportedData, state.uploadDataTable)
+        state.uploadDataTable = Main.Ebay.UploadTemplate.withCells(exportedData, state.uploadDataTable)
         
         return Dict(
             "success" => true,
@@ -84,7 +84,7 @@ function handleSaveUploadTemplate(path::String)
         end
 
         open(path, "w") do outputStream
-            Ebay.UploadTemplate.save(outputStream, state.uploadDataTable)
+            Main.Ebay.UploadTemplate.save(outputStream, state.uploadDataTable)
         end
         
         return Dict(

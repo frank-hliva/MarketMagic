@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="EBay.Api.UploadTemplate.fs" />
     <Compile Include="StringSplitConverter.fs" />
     <Compile Include="BasicViewModel.fs" />
     <Compile Include="TableViewModel.fs" />

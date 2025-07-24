@@ -108,7 +108,7 @@ module UploadTemplate
         )
     end
 
-    function withCells(dataTable::Main.Ebay.DataTable, uploadDataTable::Main.Ebay.UploadDataTable)::Main.Ebay.UploadDataTable
+    function withCells(dataTable::Ebay.DataTable, uploadDataTable::Ebay.UploadDataTable)::Ebay.UploadDataTable
         local lastRowIndex = size(uploadDataTable.cells, 1)
         local numberOfNewRows = size(dataTable.cells, 1)
         local columnCount = length(uploadDataTable.columns)
