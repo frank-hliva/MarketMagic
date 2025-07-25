@@ -13,7 +13,7 @@ type StringExtensions () =
     [<Extension>]
     static member inline Turncate(str : string, maxLength : int, suffix : string) =
         if String.IsNullOrEmpty(str) || str.Length <= maxLength then str
-        else str.[0..maxLength - 1] + suffix
+        else str[0..maxLength - 1] + suffix
 
     [<Extension>]
     static member inline Turncate(str : string, maxLength : int) =
@@ -60,12 +60,12 @@ type StringExtensions () =
     [<Extension>]
     static member inline UpperCaseFirst(input : string) =
         if String.IsNullOrEmpty input then input
-        else input.[0..0].ToUpper() + input.[1..]
+        else input[0..0].ToUpper() + input[1..]
 
     [<Extension>]
     static member inline LowerCaseFirst(input : string) =
         if String.IsNullOrEmpty input then input
-        else input.[0..0].ToLower() + input.[1..]
+        else input[0..0].ToLower() + input[1..]
 
     [<Extension>]
     static member inline ToLines(input : string) =

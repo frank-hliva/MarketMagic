@@ -29,7 +29,7 @@ module private ListCells =
 
     let parseDistributionName (cells : string[]) =
         if cells.Length > 2
-        then cells.[..cells.Length - (2 + 1)]
+        then cells[..cells.Length - (2 + 1)]
         else cells
         |> fun x -> String.Join(" ", x)
 
