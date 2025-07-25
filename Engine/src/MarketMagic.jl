@@ -1,8 +1,8 @@
 include("Ebay/UploadTemplate.jl")
-using .Ebay
-
 include("ZMQServer.jl")
+
 using .ZMQServer
+using .Ebay
 
 function main()
     port = 5555

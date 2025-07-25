@@ -4,8 +4,8 @@ using ZMQ
 using JSON3
 using MLStyle
 
-include("Ebay/UploadTemplate.jl")
-using .Ebay
+# include("Ebay/UploadTemplate.jl")
+using Main.Ebay
 
 mutable struct ServerState
     uploadDataTable::Union{Nothing, Ebay.UploadDataTable}

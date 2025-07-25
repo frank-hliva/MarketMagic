@@ -90,14 +90,14 @@ module UploadTemplate
     using DataFrames
     using .File
 
-    function load(templateStream::IOStream)::UploadDataTable
+    function load(templateStream::IOStream)::Main.Ebay.UploadDataTable
         seek(templateStream, 0)
         local columns = templateStream |> File.readColumns
         seek(templateStream, 0)
         local enumRows = templateStream |> File.readEnumRows
         local enumMap = Dict(enumRows |> File.parseAllEnums)
 
-        UploadDataTable(
+        Main.Ebay.UploadDataTable(
             id = File.parseCategoryId(enumRows),
             columns = columns,
             enums = map(column -> begin

@@ -10,6 +10,7 @@ open System.Timers
 open System.Threading
 open Avalonia.Threading
 open Lime.Timing
+open MarketMagic.Ebay.Api
 
 type MainWindow () as this = 
     inherit Window ()
@@ -52,6 +53,9 @@ type MainWindow () as this =
         ()
 
     member private this.LoadData() =
+        let upload = UploadTemplate.load @"C:/Workspace/MarketMagic/Engine/data/template.csv"
+        let columns = UploadTemplate.fetch ()
+
         let columns = [| "A"; "B"; "C" |]
         let cells = [|
             [| "1"; "2"; "3" |]
