@@ -56,7 +56,7 @@ function handleAddExportedData(path::String)
             )
         end
 
-        exportedData = open(path) do exportedDataStream
+        local exportedData = open(path) do exportedDataStream
             Ebay.ExportedData.load(exportedDataStream)
         end
 

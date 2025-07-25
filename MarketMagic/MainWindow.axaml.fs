@@ -1,16 +1,19 @@
 namespace MarketMagic
 
-open Avalonia
-open Avalonia.Controls
-open Avalonia.Data
-open Avalonia.Markup.Xaml
 open System.Collections.Specialized
 open System.Collections.ObjectModel
 open System.Timers
 open System.Threading
+open Avalonia
+open Avalonia.Controls
+open Avalonia.Data
+open Avalonia.Markup.Xaml
 open Avalonia.Threading
 open Lime.Timing
-open MarketMagic.Ebay.Api
+open MarketMagic
+open MarketMagic.Ebay
+open MsBox.Avalonia
+open MsBox.Avalonia.Enums
 
 type MainWindow () as this = 
     inherit Window ()
@@ -21,7 +24,7 @@ type MainWindow () as this =
     do
         this.InitializeComponent()
         this.SetupDataGrid()
-        this.LoadData()
+        this.Opened.Add(this.HandleWindowOpened)
 
     member private this.InitializeComponent() =
 #if DEBUG
@@ -48,18 +51,29 @@ type MainWindow () as this =
                 )
             )
 
+    member private this.HandleWindowOpened(_) =
+        this.LoadData()
+        |> Async.AwaitTask
+        |> Async.StartImmediate
+
     member private this.UpdateDataGridCells() =
         dataGrid.ItemsSource <- viewModel.Cells
         ()
 
-    member private this.LoadData() =
-        let upload = UploadTemplate.load @"C:/Workspace/MarketMagic/Engine/data/template.csv"
-        let columns = UploadTemplate.fetch ()
+    member private this.LoadData() = task {
+        if (UploadTemplate.load @"C:/Workspace/MarketMagic/Engine/data/template.csv").Success then
+            if (UploadTemplate.addExportedData @"C:/Workspace/MarketMagic/Engine/data/active.csv").Success then
+                let response = UploadTemplate.fetch ()
+                viewModel.SetData(
+                    response.Data.columns,
+                    response.Data.cells
+                )
+            else
+                let! _ = this |> Dialogs.showError "Failed to load upload template."
+                ()
+        else
+            let! _ = this |> Dialogs.showError "Failed to load upload template." 
+            ()
+    }
 
-        let columns = [| "A"; "B"; "C" |]
-        let cells = [|
-            [| "1"; "2"; "3" |]
-            [| "4"; "5"; "6" |]
-        |]
-        
-        viewModel.SetData(columns, cells)
+

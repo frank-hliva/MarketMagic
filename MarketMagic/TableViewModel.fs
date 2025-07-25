@@ -27,7 +27,7 @@ type TableViewModel() =
             cells <- value
             this.OnPropertyChanged("Cells")
 
-    member this.SetData(columns: string[], cells: string[][]) =
+    member this.SetData(columns: string list, cells: string[][]) =
         this.Columns <- ObservableCollection<string>(columns)
         this.Cells <- ObservableCollection<string[]>(cells)
         ()

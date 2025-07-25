@@ -6,102 +6,20 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
+  <ItemGroup>
+    <AvaloniaXaml Remove="Engine\**" />
+    <EmbeddedResource Remove="Engine\**" />
+  </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Ebay.Api.UploadTemplate.fs" />
-    <Compile Include="StringSplitConverter.fs" />
+    <Compile Include="Ebay.UploadTemplate.fs" />
+    <Compile Include="Dialogs.fs" />
     <Compile Include="BasicViewModel.fs" />
     <Compile Include="TableViewModel.fs" />
+    <Compile Include="Backend.fs" />
     <Compile Include="MainWindow.axaml.fs" />
     <Compile Include="App.axaml.fs" />
     <Compile Include="Program.fs" />
-    <Content Include="Engine\.vs\MarketMagic\v17\DocumentLayout.backup.json" />
-    <Content Include="Engine\.vs\MarketMagic\v17\DocumentLayout.json" />
-    <Content Include="Engine\.vs\ProjectSettings.json" />
-    <Content Include="Engine\.vs\VSWorkspaceState.json" />
-    <Content Include="Engine\todo.txt" />
-    <None Include="Engine\.gitignore" />
-    <None Include="Engine\.gitlab-ci.yml" />
-    <None Include="Engine\.git\COMMIT_EDITMSG" />
-    <None Include="Engine\.git\config" />
-    <None Include="Engine\.git\description" />
-    <None Include="Engine\.git\FETCH_HEAD" />
-    <None Include="Engine\.git\HEAD" />
-    <None Include="Engine\.git\hooks\applypatch-msg.sample" />
-    <None Include="Engine\.git\hooks\commit-msg.sample" />
-    <None Include="Engine\.git\hooks\fsmonitor-watchman.sample" />
-    <None Include="Engine\.git\hooks\post-update.sample" />
-    <None Include="Engine\.git\hooks\pre-applypatch.sample" />
-    <None Include="Engine\.git\hooks\pre-commit.sample" />
-    <None Include="Engine\.git\hooks\pre-merge-commit.sample" />
-    <None Include="Engine\.git\hooks\pre-push.sample" />
-    <None Include="Engine\.git\hooks\pre-rebase.sample" />
-    <None Include="Engine\.git\hooks\pre-receive.sample" />
-    <None Include="Engine\.git\hooks\prepare-commit-msg.sample" />
-    <None Include="Engine\.git\hooks\push-to-checkout.sample" />
-    <None Include="Engine\.git\hooks\sendemail-validate.sample" />
-    <None Include="Engine\.git\hooks\update.sample" />
-    <None Include="Engine\.git\index" />
-    <None Include="Engine\.git\info\exclude" />
-    <None Include="Engine\.git\logs\HEAD" />
-    <None Include="Engine\.git\logs\refs\heads\main" />
-    <None Include="Engine\.git\logs\refs\remotes\origin\main" />
-    <None Include="Engine\.git\objects\08\aa20edcef06ecf5b8c5d68b2f4ee7b57ea4250" />
-    <None Include="Engine\.git\objects\12\34a167c2935a5c07a1febd6db82d6fd44be50f" />
-    <None Include="Engine\.git\objects\18\f14ea1972579ea6b5b1f23c0562eaa1a9b0484" />
-    <None Include="Engine\.git\objects\21\d27f227d0ad1ca99913d0b339bbea29bddcc02" />
-    <None Include="Engine\.git\objects\23\1acaf22a18480df30c794be718fb147d6f7863" />
-    <None Include="Engine\.git\objects\26\0ee61e13093aa6b1c12f402d930c9e14f932b0" />
-    <None Include="Engine\.git\objects\27\d8a1d8d873cbf0a3da32de61aa6a5988efce34" />
-    <None Include="Engine\.git\objects\31\2e375cc4d0893c335e0b0714b0fd47ed9482d4" />
-    <None Include="Engine\.git\objects\3f\c0bc9db312386697785c9b6378f4d091704883" />
-    <None Include="Engine\.git\objects\4b\825dc642cb6eb9a060e54bf8d69288fbee4904" />
-    <None Include="Engine\.git\objects\4b\82ccd91497ddfae84cad2e96937791d7e06a24" />
-    <None Include="Engine\.git\objects\52\97f6d18e487183003d8b3db11d101fd03a4fb7" />
-    <None Include="Engine\.git\objects\60\9cca977f356863a7c2cfc298a3e3f54b6e6ef5" />
-    <None Include="Engine\.git\objects\71\29c6215ddc580b569af2a9e52973d5eee888e7" />
-    <None Include="Engine\.git\objects\71\9cd032b3dfebad1e36231137dc2ffef42998bb" />
-    <None Include="Engine\.git\objects\77\7fc75ad8359b9fad721cb60f6fbc4cb56133a2" />
-    <None Include="Engine\.git\objects\82\14e88463a9c7bcaab6941e6dd82adf155f4c88" />
-    <None Include="Engine\.git\objects\82\c19847e45cfc9f1c1617ab546a8b46992cac68" />
-    <None Include="Engine\.git\objects\89\50f0ade06a95bdb86f4da42255a8e340f04d2a" />
-    <None Include="Engine\.git\objects\93\ee9d8be72d2363e2689fbcb862cff34557d679" />
-    <None Include="Engine\.git\objects\94\f0f42fb98fa9b8d0630253051cd445a7ddac48" />
-    <None Include="Engine\.git\objects\a6\fc62f7b6bb866a9bfc4fa1672960015b72e689" />
-    <None Include="Engine\.git\objects\a9\0b6fd73c5326d324dd66522b7e533a36dbe7ff" />
-    <None Include="Engine\.git\objects\b0\f891d4d61604808e0c93fe2f7bc2dc2d5ad31c" />
-    <None Include="Engine\.git\objects\b2\70bd11c6af8c0434203bc3ced59b69dd7ca563" />
-    <None Include="Engine\.git\objects\b6\4bf365e59258e09d99d1c0945346f0ad18cbcc" />
-    <None Include="Engine\.git\objects\bd\cc068173b3e4d4df403ad1d4522fb85e3c814d" />
-    <None Include="Engine\.git\objects\c1\9dca9cb029085d64fdeff0c22c6cc2cf664ef4" />
-    <None Include="Engine\.git\objects\c9\8c0c58480e4f592e3094cde575b5b259a51b5c" />
-    <None Include="Engine\.git\objects\ca\4ad6ef70211e7085af5ccb7784696d1867953a" />
-    <None Include="Engine\.git\objects\d2\604abddf23d01f96d081aeb6896f74ef0449de" />
-    <None Include="Engine\.git\objects\d5\661bb1232edaac8df03990eef0dab38796808e" />
-    <None Include="Engine\.git\objects\d5\8238b14a605bf96797a64fb4915d93d4287ffb" />
-    <None Include="Engine\.git\objects\d6\178ead71549263fcf44ed9cb3be39d7dc51a71" />
-    <None Include="Engine\.git\objects\d7\73b7c68f5e617af719736154f71992a1cc04a8" />
-    <None Include="Engine\.git\objects\d9\ad0d82fae02cfcf9bae890b8ae58e5256cca1c" />
-    <None Include="Engine\.git\objects\e6\9de29bb2d1d6434b8b29ae775ad8c2e48c5391" />
-    <None Include="Engine\.git\objects\f3\cab9f701e5cbeef210212614684397535d3a87" />
-    <None Include="Engine\.git\objects\f6\7c2a97694750c6429af102439378c0a4ad006c" />
-    <None Include="Engine\.git\objects\f8\2075cec11387560016aada9d3894c326a23651" />
-    <None Include="Engine\.git\objects\fb\b565ed671ff5aca911260b3f84eecf07de3611" />
-    <None Include="Engine\.git\objects\fc\909215226e02852715a769929b196694135ea3" />
-    <None Include="Engine\.git\ORIG_HEAD" />
-    <None Include="Engine\.git\refs\heads\main" />
-    <None Include="Engine\.git\refs\remotes\origin\main" />
-    <None Include="Engine\.vs\MarketMagic\FileContentIndex\63787e7c-7f99-452e-9880-189cda01981b.vsidx" />
-    <None Include="Engine\.vs\MarketMagic\FileContentIndex\e3c1df1f-1ce2-4dea-a25d-2305da1878df.vsidx" />
-    <None Include="Engine\.vs\slnx.sqlite" />
-    <None Include="Engine\data\active.csv" />
-    <None Include="Engine\data\template.csv" />
-    <None Include="Engine\LICENSE.md" />
-    <None Include="Engine\Manifest.toml" />
-    <None Include="Engine\Project.toml" />
-    <None Include="Engine\readme.md" />
-    <None Include="Engine\src\Ebay\DataTemplate.jl" />
-    <None Include="Engine\src\MarketMagic.jl" />
   </ItemGroup>
 
   <ItemGroup>
@@ -112,6 +30,8 @@
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.2" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.2" />
+    <PackageReference Include="MessageBox.Avalonia" Version="3.2.0" />
+    <PackageReference Include="MessageBox.Avalonia.Markdown" Version="3.2.0" />
     <PackageReference Include="NetMQ" Version="4.0.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>

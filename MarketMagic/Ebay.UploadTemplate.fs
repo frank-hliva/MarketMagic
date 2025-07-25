@@ -1,10 +1,18 @@
-﻿module MarketMagic.Ebay.Api
+﻿module MarketMagic.Ebay
 
 open System
 open NetMQ
 open NetMQ.Sockets
 open FSharp.Data
 open Lime
+
+type UploadDataTable = 
+    {
+        id : int64
+        columns : string list
+        enums : Map<string, string list>
+        cells : string[][]
+    }
 
 let [<Literal>] serverAddress = "tcp://localhost:5555"
 
@@ -35,7 +43,8 @@ module UploadTemplate =
         |> sendCommand<CommandMessageResponse>
 
     let fetch () =
-        """{"command":"fetchUploadTemplate"}""" |> sendCommand<CommandDataResponse<obj>>
+        """{"command":"fetchUploadTemplate"}"""
+        |> sendCommand<CommandDataResponse<UploadDataTable>>
 
     let addExportedData (path : string) =
         sprintf """{"command":"addExportedData","path":"%s"}""" path

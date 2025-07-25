@@ -26,7 +26,6 @@
         </Grid.RowDefinitions>
         <StackPanel
             Orientation="Horizontal"
-            Background="Red"
         >
             
         </StackPanel>
@@ -37,6 +36,7 @@
             GridLinesVisibility="All"
             BorderThickness="1"
             BorderBrush="Gray"
+            IsReadOnly="False"
         />
     </Grid>
 </Window>

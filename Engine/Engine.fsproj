@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include=".gitignore" />
+    <None Include="API_DOCUMENTATION.md" />
+    <None Include="data\active.csv" />
+    <None Include="data\template.csv" />
+    <None Include="Manifest.toml" />
+    <None Include="Project.toml" />
+    <None Include="src\Ebay\UploadTemplate.jl" />
+    <None Include="src\MarketMagic.jl" />
+    <None Include="src\ZMQServer.jl" />
+    <None Include="test\test.jl" />
+    <None Include="test\testClient.jl" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="10.0.100-beta.25358.103" />
+  </ItemGroup>
+
+</Project>

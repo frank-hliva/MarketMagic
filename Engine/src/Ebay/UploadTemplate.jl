@@ -190,7 +190,7 @@ module ExportedData
         end
     end
 
-    function load(exportedDataStream::IOStream, columnNameMapping::Columns.ColumnMapping)::Ebay.DataTable
+    function load(exportedDataStream::IOStream, columnNameMapping::Columns.ColumnMapping)::Main.Ebay.DataTable
         local dataFrame = CSV.read(
             exportedDataStream,
             DataFrame;
@@ -205,13 +205,13 @@ module ExportedData
             Columns.rename(columnNameMapping, dataFrame)
         end
         
-        Ebay.DataTable(
+        Main.Ebay.DataTable(
             columns = string.(names(dataFrame)),
             cells = Cells.removeNothing(Matrix(dataFrame))
         )
     end
 
-    function load(exportedDataStream::IOStream)::Ebay.DataTable
+    function load(exportedDataStream::IOStream)::Main.Ebay.DataTable
         load(exportedDataStream, Columns.commonMapping)
     end
 
