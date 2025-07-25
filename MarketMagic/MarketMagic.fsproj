@@ -15,6 +15,7 @@
     <Compile Include="Ebay.UploadTemplate.fs" />
     <Compile Include="Dialogs.fs" />
     <Compile Include="BasicViewModel.fs" />
+    <Compile Include="RowViewModel.fs" />
     <Compile Include="TableViewModel.fs" />
     <Compile Include="Backend.fs" />
     <Compile Include="MainWindow.axaml.fs" />

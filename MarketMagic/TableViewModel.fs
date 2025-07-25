@@ -13,7 +13,7 @@ type TableViewModel() =
     inherit BasicViewModel()
     
     let mutable columns = ObservableCollection<string>()
-    let mutable cells = ObservableCollection<string[]>()
+    let mutable cells = ObservableCollection<RowViewModel>()
 
     member this.Columns 
         with get() = columns
@@ -29,6 +29,6 @@ type TableViewModel() =
 
     member this.SetData(columns: string list, cells: string[][]) =
         this.Columns <- ObservableCollection<string>(columns)
-        this.Cells <- ObservableCollection<string[]>(cells)
+        this.Cells <- cells |> Seq.map RowViewModel |> ObservableCollection<RowViewModel>
         ()
 
