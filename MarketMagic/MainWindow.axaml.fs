@@ -24,6 +24,12 @@ type MainWindow (viewModel : TableViewModel, appConfigProvider : IAppConfigProvi
 
     let mutable dataGrid: DataGrid = null
 
+    let showFailedToLoadUploadTemplate () = 
+        Dialogs.Unit.showError "Failed to load upload template." self
+
+    let showFailedToLoadExportedData () = 
+        Dialogs.Unit.showError "Failed to load exported data." self
+
     do
         self.InitializeComponent()
         self.SetupDataGrid()
@@ -64,20 +70,22 @@ type MainWindow (viewModel : TableViewModel, appConfigProvider : IAppConfigProvi
         ()
 
     member private self.LoadData() = task {
-        let path = appConfig.TryGet<string>("UploadTemplate.Source.Path")
-        if (UploadTemplate.load @"C:/Workspace/MarketMagic/Engine/data/template.csv").Success then
-            if (UploadTemplate.addExportedData @"C:/Workspace/MarketMagic/Engine/data/active.csv").Success then
+        match appConfig.TryGet<string>("UploadTemplate.Source.Path") with
+        | Some uploadTemplatePath ->
+            if (UploadTemplate.load uploadTemplatePath).Success then
+                match appConfig.TryGet<string>("UploadTemplate.ExportedData.Path") with
+                | Some exportedDataPath ->
+                    if (UploadTemplate.addExportedData exportedDataPath).Success then
+                        ()
+                    else do! showFailedToLoadUploadTemplate()
+                | _ -> ()
                 let response = UploadTemplate.fetch ()
                 viewModel.SetData(
                     response.Data.columns,
                     response.Data.cells
                 )
-            else
-                let! _ = self |> Dialogs.showError "Failed to load upload template."
-                ()
-        else
-            let! _ = self |> Dialogs.showError "Failed to load upload template." 
-            ()
+            else do! showFailedToLoadUploadTemplate()
+        | _ -> do! showFailedToLoadUploadTemplate()
     }
 
     member private self.OpenButton_Click(sender: obj, event: RoutedEventArgs) =
