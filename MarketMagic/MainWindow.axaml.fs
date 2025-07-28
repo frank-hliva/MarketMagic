@@ -17,7 +17,7 @@ open MsBox.Avalonia.Enums
 open Avalonia.Interactivity
 open System
 
-type MainWindow (viewModel : TableViewModel) as self = 
+type MainWindow (viewModel : TableViewModel, appConfigProvider : AppConfigProvider) as self = 
     inherit Window ()
 
     let mutable dataGrid: DataGrid = null
