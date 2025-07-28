@@ -30,6 +30,13 @@ type MainWindow (viewModel : TableViewModel, appConfigProvider : IAppConfigProvi
     let showFailedToLoadExportedData () = 
         Dialogs.Unit.showError "Failed to load exported data." self
 
+    let displayDataInTable() =
+        let response = UploadTemplate.fetch ()
+        viewModel.SetData(
+            response.Data.columns,
+            response.Data.cells
+        )
+
     do
         self.InitializeComponent()
         self.SetupDataGrid()
@@ -76,14 +83,9 @@ type MainWindow (viewModel : TableViewModel, appConfigProvider : IAppConfigProvi
                 match appConfig.TryGet<string>("UploadTemplate.ExportedData.Path") with
                 | Some exportedDataPath ->
                     if (UploadTemplate.addExportedData exportedDataPath).Success then
-                        ()
+                        displayDataInTable()
                     else do! showFailedToLoadUploadTemplate()
-                | _ -> ()
-                let response = UploadTemplate.fetch ()
-                viewModel.SetData(
-                    response.Data.columns,
-                    response.Data.cells
-                )
+                | _ -> displayDataInTable()
             else do! showFailedToLoadUploadTemplate()
         | _ -> do! showFailedToLoadUploadTemplate()
     }
