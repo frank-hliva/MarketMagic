@@ -5,6 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:MarketMagic"
     xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
     mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
     x:Class="MarketMagic.MainWindow"
     x:DataType="local:TableViewModel"
@@ -18,6 +19,12 @@
             <Setter Property="Foreground" Value="Black"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
+        <Style Selector="StackPanel Button">
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="Width" Value="48"/>
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
     </Window.Styles>
     <Grid>
         <Grid.RowDefinitions>
@@ -26,8 +33,17 @@
         </Grid.RowDefinitions>
         <StackPanel
             Orientation="Horizontal"
+            Margin="2"
         >
-            
+            <Button Click="OpenButton_Click">
+                <svg:Svg Path="avares://MarketMagic/img/folder.svg" Width="36" Height="36" ToolTip.Tip="Open template" />
+            </Button>
+            <Button Click="InsertButton_Click">
+                <svg:Svg Path="avares://MarketMagic/img/plus.svg" Width="36" Height="36" ToolTip.Tip="Insert existing items" />
+            </Button>
+            <Button Click="SaveButton_Click">
+                <svg:Svg Path="avares://MarketMagic/img/download.svg" Width="36" Height="36" ToolTip.Tip="Save template" />
+            </Button>
         </StackPanel>
         <DataGrid
             Grid.Row="1"

@@ -1,0 +1,46 @@
+﻿namespace MarketMagic
+
+open System
+open System.Reflection
+open System.IO
+open System.IO.Compression
+
+module Directories =
+    let homeDir = Environment.GetFolderPath Environment.SpecialFolder.UserProfile
+
+module MarketMagicApp =
+    let (/+) (path1 : string) (path2 : string) = Path.Join(path1, path2)
+
+    let name = Assembly.GetExecutingAssembly().GetName().Name
+
+    let execPath = Assembly.GetExecutingAssembly().Location
+
+    let directory = execPath |> Path.GetDirectoryName
+
+    let private checkDirectory dir =
+        if not <| Directory.Exists dir then Directory.CreateDirectory dir |> ignore
+        dir
+
+    let private toSubDirectory (subDirectoryName : string) =
+        Directories.homeDir /+ subDirectoryName /+ name |> checkDirectory
+
+    let configDir = ".config" |> toSubDirectory
+    let shareDir = ".local" /+ "share" |> toSubDirectory
+
+    let toConfigPath path = configDir /+ path
+    let toSharedPath path = shareDir /+ path
+
+    let appConfig = toConfigPath "Application.config.toml"
+
+    let setupTarget = shareDir
+
+    let unzipFile (destPath: string) (zipFilePath: string) =
+        if not (Directory.Exists(destPath)) then
+            Directory.CreateDirectory(destPath) |> ignore
+        ZipFile.ExtractToDirectory(zipFilePath, destPath)
+
+    let setup () =
+        let setupFilePath = directory /+ "Setup.zip"
+        if File.Exists setupFilePath then
+            setupFilePath |> unzipFile setupTarget
+            File.Delete setupFilePath

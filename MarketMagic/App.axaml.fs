@@ -3,17 +3,28 @@ namespace MarketMagic
 open Avalonia
 open Avalonia.Controls.ApplicationLifetimes
 open Avalonia.Markup.Xaml
+open Microsoft.Extensions.DependencyInjection
+open System
+open System.IO
+open MarketMagic
+
 
 type App() =
     inherit Application()
 
-    override this.Initialize() =
-            AvaloniaXamlLoader.Load(this)
+    let serviceProvider =
+        ServiceCollection()
+            .RegisterCommonServices()
+            .BuildServiceProvider()
 
-    override this.OnFrameworkInitializationCompleted() =
-        match this.ApplicationLifetime with
+    member self.ServiceProvider = serviceProvider
+
+    override self.Initialize() =
+        AvaloniaXamlLoader.Load(self)
+
+    override self.OnFrameworkInitializationCompleted() =
+        match self.ApplicationLifetime with
         | :? IClassicDesktopStyleApplicationLifetime as desktop ->
-             desktop.MainWindow <- MainWindow()
+            desktop.MainWindow <- serviceProvider.GetRequiredService<MainWindow>()
         | _ -> ()
-
         base.OnFrameworkInitializationCompleted()

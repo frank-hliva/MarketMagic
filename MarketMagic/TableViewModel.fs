@@ -15,20 +15,24 @@ type TableViewModel() =
     let mutable columns = ObservableCollection<string>()
     let mutable cells = ObservableCollection<RowViewModel>()
 
-    member this.Columns 
+    member self.Columns 
         with get() = columns
         and set(value) = 
             columns <- value
-            this.OnPropertyChanged("Columns")
+            self.OnPropertyChanged("Columns")
     
-    member this.Cells 
+    member self.Cells 
         with get() = cells
         and set(value) = 
             cells <- value
-            this.OnPropertyChanged("Cells")
+            self.OnPropertyChanged("Cells")
 
-    member this.SetData(columns: string list, cells: string[][]) =
-        this.Columns <- ObservableCollection<string>(columns)
-        this.Cells <- cells |> Seq.map RowViewModel |> ObservableCollection<RowViewModel>
-        ()
-
+    member self.SetData(columns: string list, cells: string[,]) =
+        self.Columns <- ObservableCollection<string>(columns)
+        let rowCount = cells.GetLength(0)
+        let columnCount = cells.GetLength(1)
+        self.Cells <-
+            [for y in 0 .. rowCount - 1 ->
+                [| for x in 0 .. columnCount - 1 -> cells[y, x] |]
+                |> RowViewModel
+            ] |> ObservableCollection

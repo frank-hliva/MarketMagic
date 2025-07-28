@@ -11,7 +11,7 @@ open Avalonia
 let buildAvaloniaApp () = 
     AppBuilder
         .Configure<App>()
-        .UsePlatformDetect()
+        .UsePlatformDetect() 
         .WithInterFont()
         .LogToTrace(areas = Array.empty)
 

@@ -14,34 +14,34 @@ open MarketMagic
 open MarketMagic.Ebay
 open MsBox.Avalonia
 open MsBox.Avalonia.Enums
+open Avalonia.Interactivity
 
-type MainWindow () as this = 
+type MainWindow (viewModel : TableViewModel) as self = 
     inherit Window ()
 
-    let viewModel = TableViewModel()
     let mutable dataGrid: DataGrid = null
 
     do
-        this.InitializeComponent()
-        this.SetupDataGrid()
-        this.Opened.Add(this.HandleWindowOpened)
+        self.InitializeComponent()
+        self.SetupDataGrid()
+        self.Opened.Add(self.HandleWindowOpened)
 
-    member private this.InitializeComponent() =
+    member private self.InitializeComponent() =
 #if DEBUG
-        this.AttachDevTools()
+        self.AttachDevTools()
 #endif
-        this.DataContext <- viewModel
-        AvaloniaXamlLoader.Load(this)
-        dataGrid <- this.FindControl<DataGrid>("UploadTable")
+        self.DataContext <- viewModel
+        AvaloniaXamlLoader.Load(self)
+        dataGrid <- self.FindControl<DataGrid>("UploadTable")
 
-    member private this.SetupDataGrid() =
+    member private self.SetupDataGrid() =
         viewModel.PropertyChanged.Add(fun args ->
             match args.PropertyName with
-            | "Columns" -> this.UpdateDataGridColumns()
+            | "Columns" -> self.UpdateDataGridColumns()
             | _ -> ()
         )
 
-    member private this.UpdateDataGridColumns() =
+    member private self.UpdateDataGridColumns() =
         dataGrid.Columns.Clear()
         for i in 0 .. viewModel.Columns.Count - 1 do
             dataGrid.Columns.Add(
@@ -51,16 +51,16 @@ type MainWindow () as this =
                 )
             )
 
-    member private this.HandleWindowOpened(_) =
-        this.LoadData()
+    member private self.HandleWindowOpened(_) =
+        self.LoadData()
         |> Async.AwaitTask
         |> Async.StartImmediate
 
-    member private this.UpdateDataGridCells() =
+    member private self.UpdateDataGridCells() =
         dataGrid.ItemsSource <- viewModel.Cells
         ()
 
-    member private this.LoadData() = task {
+    member private self.LoadData() = task {
         if (UploadTemplate.load @"C:/Workspace/MarketMagic/Engine/data/template.csv").Success then
             if (UploadTemplate.addExportedData @"C:/Workspace/MarketMagic/Engine/data/active.csv").Success then
                 let response = UploadTemplate.fetch ()
@@ -69,11 +69,18 @@ type MainWindow () as this =
                     response.Data.cells
                 )
             else
-                let! _ = this |> Dialogs.showError "Failed to load upload template."
+                let! _ = self |> Dialogs.showError "Failed to load upload template."
                 ()
         else
-            let! _ = this |> Dialogs.showError "Failed to load upload template." 
+            let! _ = self |> Dialogs.showError "Failed to load upload template." 
             ()
     }
 
+    member private self.OpenButton_Click(sender: obj, event: RoutedEventArgs) =
+        ()
 
+    member private self.InsertButton_Click(sender: obj, event: RoutedEventArgs) =
+        ()
+
+    member private self.SaveButton_Click(sender: obj, event: RoutedEventArgs) =
+        ()

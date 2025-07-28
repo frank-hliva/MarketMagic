@@ -14,8 +14,8 @@ type RowViewModel(cells: string[]) =
 
     let mutable cellValues = cells
 
-    member this.Item
+    member self.Item
         with get(i) = cellValues[i]
         and set(i) value =
             cellValues[i] <- value
-            this.OnPropertyChanged($"Item[{i}]")
+            self.OnPropertyChanged($"Item[{i}]")

@@ -3,9 +3,17 @@ x - 1. urobit jeden typ so vsetkym
     x - jedna funkcia co vsetko precita
     x - vsetky fieldy
 x - 2. zabranit viditelnosti veci co nechcem exportovat
-- 3. skombinovať s testovacími dátami
-    - prejdeme cyklom riadky DataTable.cells
-        - prejdeme vsetky columny DataTable
-            - zistime ci key v DataTable.columns je aj v UploadDataTable.columns
-                - ziskame hodnoty
-                    DataTable.cells[DataTable.columns[key]]
+x - 3. skombinovať s testovacími dátami
+    x - prejdeme cyklom riadky DataTable.cells
+        x - prejdeme vsetky columny DataTable
+            x - zistime ci key v DataTable.columns je aj v UploadDataTable.columns
+                x - ziskame hodnoty
+                    x - DataTable.cells[DataTable.columns[key]]
+x - cells ako 2D array
+- json nahradit MessagePackom
+- toolbar
+    - button pre nacitanie loadUploadTemplate
+        - ikonka
+        - dialog
+    - button pre nacitanie addExportedData
+    - button pre nacitanie saveUploadTemplate

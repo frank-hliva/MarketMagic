@@ -11,22 +11,22 @@ type UploadDataTable =
         id : int64
         columns : string list
         enums : Map<string, string list>
-        cells : string[][]
+        cells : string[,]
     }
 
 let [<Literal>] serverAddress = "tcp://localhost:5555"
 
 type CommandResponse(success : bool) = 
-    member r.Success = success
+    member self.Success = success
 
 type CommandMessageResponse(success : bool, message : string, error : string) = 
     inherit CommandResponse(success)
-    member r.Message = message
-    member r.Error = error
+    member self.Message = message
+    member self.Error = error
 
 type CommandDataResponse<'t>(success : bool, data : 't) = 
     inherit CommandResponse(success)
-    member r.Data = data
+    member self.Data = data
 
 let private sendCommand<'t> (json : string) =
     use client = new RequestSocket()
