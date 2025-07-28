@@ -10,9 +10,9 @@ open System.Collections.Generic
 type IAppConfigProvider =
     abstract member Config : TomlTable
 
-type AppConfigProvider(configPath: string) =
+type AppConfigProvider() =
     let config =
-        configPath
+        MarketMagicApp.appConfig
         |> File.ReadAllText
         |> Toml.ToModel
 
@@ -25,13 +25,25 @@ type AppConfigProvider(configPath: string) =
 type TomlTableExtensions() =
 
     [<Extension>]
-    static member TryGet<'t>(self: TomlTable, key: string) : 't option =
+    static member private TryGetItem<'t>(self: TomlTable, key: string) : 't option =
         match self.TryGetValue(key) with
         | true, value ->
             match box value with
             | :? 't as typed -> Some typed
             | _ -> None
         | _ -> None
+
+    [<Extension>]
+    static member TryGet<'t> (self: TomlTable, path: string) : 't option =
+        let rec loop (tbl: TomlTable) (ps: string list) =
+            match ps with
+            | [] -> None
+            | [last] -> tbl.TryGetItem<'t>(last)
+            | hd :: tl ->
+                match tbl.TryGetItem<TomlTable>(hd) with
+                | Some subtbl -> loop subtbl tl
+                | None -> None
+        path.Split '.' |> List.ofArray |> loop self
 
     [<Extension>]
     static member Get<'t>(self: TomlTable, key: string) : 't =

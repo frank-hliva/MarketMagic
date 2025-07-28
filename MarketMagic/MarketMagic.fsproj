@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="AppConfigProvider.fs" />
     <Compile Include="MarketMagicApp.fs" />
+    <Compile Include="AppConfigProvider.fs" />
     <Compile Include="Ebay.UploadTemplate.fs" />
     <Compile Include="Dialogs.fs" />
     <Compile Include="BasicViewModel.fs" />

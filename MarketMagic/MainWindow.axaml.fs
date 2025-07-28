@@ -17,8 +17,10 @@ open MsBox.Avalonia.Enums
 open Avalonia.Interactivity
 open System
 
-type MainWindow (viewModel : TableViewModel, appConfigProvider : AppConfigProvider) as self = 
+type MainWindow (viewModel : TableViewModel, appConfigProvider : IAppConfigProvider) as self = 
     inherit Window ()
+
+    let appConfig = appConfigProvider.Config
 
     let mutable dataGrid: DataGrid = null
 
@@ -62,6 +64,7 @@ type MainWindow (viewModel : TableViewModel, appConfigProvider : AppConfigProvid
         ()
 
     member private self.LoadData() = task {
+        let path = appConfig.TryGet<string>("UploadTemplate.Source.Path")
         if (UploadTemplate.load @"C:/Workspace/MarketMagic/Engine/data/template.csv").Success then
             if (UploadTemplate.addExportedData @"C:/Workspace/MarketMagic/Engine/data/active.csv").Success then
                 let response = UploadTemplate.fetch ()
