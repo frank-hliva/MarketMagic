@@ -15,6 +15,7 @@ open MarketMagic.Ebay
 open MsBox.Avalonia
 open MsBox.Avalonia.Enums
 open Avalonia.Interactivity
+open System
 
 type MainWindow (viewModel : TableViewModel) as self = 
     inherit Window ()
@@ -51,7 +52,7 @@ type MainWindow (viewModel : TableViewModel) as self =
                 )
             )
 
-    member private self.HandleWindowOpened(_) =
+    member private self.HandleWindowOpened(event : EventArgs) =
         self.LoadData()
         |> Async.AwaitTask
         |> Async.StartImmediate
