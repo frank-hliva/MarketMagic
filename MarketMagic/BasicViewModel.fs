@@ -11,7 +11,7 @@ open System.Runtime.CompilerServices
 
 [<AbstractClass>]
 type BasicViewModel() as self =
-    let propertyChangedEvent = new Event<_, _>()
+    let propertyChangedEvent = Event<PropertyChangedEventHandler, PropertyChangedEventArgs>()
 
     let iNotifyPropertyChanged = self :> INotifyPropertyChanged
 
