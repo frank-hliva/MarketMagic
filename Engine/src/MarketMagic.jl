@@ -5,7 +5,7 @@ using .ZMQServer
 using .Ebay
 
 function main()
-    port = 5555
+    port = 7333
     
     if length(ARGS) >= 1
         try

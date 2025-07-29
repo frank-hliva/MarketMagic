@@ -13,6 +13,7 @@ type ServiceCollectionExtensions() =
             .AddSingleton<AppConfig>(fun serviceProvider ->
                 serviceProvider.GetRequiredService<IAppConfigProvider>().Config
             )
+            .AddSingleton<EngineConfig>()
             .AddSingleton<Engine>()
             .AddSingleton<TableViewModel>()
             .AddSingleton<MainWindow>()

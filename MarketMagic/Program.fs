@@ -20,7 +20,7 @@ let main argv =
         ServiceCollection()
             .RegisterCommonServices()
             .BuildServiceProvider()    
-    if serviceProvider.GetRequiredService<Engine>().Start().WaitForReady 5000 then
+    if serviceProvider.GetRequiredService<Engine>().Start().WaitForReady() then
         printfn "Backend is ready. Starting frontend..."
         buildAvaloniaApp(serviceProvider)
             .StartWithClassicDesktopLifetime(argv)

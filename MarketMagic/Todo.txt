@@ -1,1 +1,3 @@
-﻿- dat do konfigu "tcp://localhost:5555"
+﻿x - dat do konfigu "tcp://localhost:5555"
+- commit
+- MarketMagic.jl ma tiez precitat port z Application.config.toml

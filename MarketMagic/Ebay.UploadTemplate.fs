@@ -39,17 +39,17 @@ let private sendCommand<'t> (json : string) =
 module UploadTemplate =
 
     let load (path : string) =
-        sprintf "{\"command\":\"loadUploadTemplate\",\"path\":\"%s\"}" path
+        sprintf """{"command": "loadUploadTemplate", "path": "%s"}""" path
         |> sendCommand<CommandMessageResponse>
 
     let fetch () =
-        """{"command":"fetchUploadTemplate"}"""
+        """{"command": "fetchUploadTemplate"}"""
         |> sendCommand<CommandDataResponse<UploadDataTable>>
 
     let addExportedData (path : string) =
-        sprintf """{"command":"addExportedData","path":"%s"}""" path
+        sprintf """{"command": "addExportedData", "path":"%s"}""" path
         |> sendCommand<CommandMessageResponse>
 
     let save (path : string) =
-        sprintf """{"command":"saveUploadTemplate","path":"%s"}""" path
+        sprintf """{"command": "saveUploadTemplate", "path": "%s"}""" path
         |> sendCommand

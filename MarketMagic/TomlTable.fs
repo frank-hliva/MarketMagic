@@ -16,7 +16,11 @@ type TomlTableExtensions() =
         | true, value ->
             match box value with
             | :? 't as typed -> Some typed
-            | _ -> None
+            | objValue ->
+                try
+                    Convert.ChangeType(objValue, typeof<'t>) :?> 't |> Some
+                with _ ->
+                    None
         | _ -> None
 
     [<Extension>]
