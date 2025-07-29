@@ -4,12 +4,12 @@ open System
 open System.Reflection
 open System.IO
 open System.IO.Compression
+open Lime
 
 module Directories =
     let homeDir = Environment.GetFolderPath Environment.SpecialFolder.UserProfile
 
 module MarketMagicApp =
-    let (/+) (path1 : string) (path2 : string) = Path.Join(path1, path2)
 
     let name = Assembly.GetExecutingAssembly().GetName().Name
 

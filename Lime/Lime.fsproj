@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Ops.fs" />
     <Compile Include="String.fs" />
     <Compile Include="JSON.fs" />
     <Compile Include="Timing.fs" />

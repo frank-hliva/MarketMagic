@@ -127,7 +127,14 @@ type MainWindow (viewModel : TableViewModel, appConfigProvider : IAppConfigProvi
         } |> ignore
 
     member private self.InsertDataButton_Click(sender: obj, event: RoutedEventArgs) =
-        ()
+        task {
+            match! tryPickSingleFile() with
+            | Some path ->
+                if appConfig.TrySet("UploadTemplate.ExportedData.Path", path) then
+                    self.LoadData() |> ignore
+                else do! showUploadTemplateFailedToChange ()
+            | _ -> ()
+        } |> ignore
 
     member private self.SaveButton_Click(sender: obj, event: RoutedEventArgs) =
         ()
