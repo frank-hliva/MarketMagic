@@ -1,0 +1,1 @@
+﻿- dat do konfigu "tcp://localhost:5555"

@@ -15,8 +15,7 @@ let buildAvaloniaApp () =
         .WithInterFont()
         .LogToTrace(areas = Array.empty)
 
-[<EntryPoint; STAThread>]
-let main argv =
+let main1 argv =
     Backend.start()
     match Backend.waitForReady 5000 with
     | true -> 
@@ -25,3 +24,8 @@ let main argv =
     | _ ->
         printfn "Backend did not start in time."
         1
+
+[<EntryPoint; STAThread>]
+let main argv =
+    buildAvaloniaApp()
+        .StartWithClassicDesktopLifetime(argv)

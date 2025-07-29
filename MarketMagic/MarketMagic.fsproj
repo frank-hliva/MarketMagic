@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Todo.txt" />
     <Compile Include="MarketMagicApp.fs" />
     <Compile Include="TomlTable.fs" />
     <Compile Include="AppConfigProvider.fs" />
@@ -20,7 +21,7 @@
     <Compile Include="BasicViewModel.fs" />
     <Compile Include="RowViewModel.fs" />
     <Compile Include="TableViewModel.fs" />
-    <Compile Include="Backend.fs" />
+    <Compile Include="Engine.fs" />
     <Compile Include="MainWindow.axaml.fs" />
     <Compile Include="ServiceContainer.fs" />
     <Compile Include="App.axaml.fs" />
@@ -62,4 +63,6 @@
       <AvaloniaResource Include="img\plus.svg" />
       <AvaloniaResource Include="img\download.svg" />
   </ItemGroup>
+
+  <ItemGroup />
 </Project>
