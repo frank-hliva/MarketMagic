@@ -8,14 +8,8 @@ open System
 open System.IO
 open MarketMagic
 
-
-type App() =
+type App(serviceProvider: IServiceProvider) =
     inherit Application()
-
-    let serviceProvider =
-        ServiceCollection()
-            .RegisterCommonServices()
-            .BuildServiceProvider()
 
     member self.ServiceProvider = serviceProvider
 

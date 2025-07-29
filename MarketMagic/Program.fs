@@ -2,30 +2,28 @@
 
 open System
 open System.Diagnostics
-open NetMQ
-open NetMQ.Sockets
 open System.Threading
 open Avalonia
+open Microsoft.Extensions.DependencyInjection
 
 [<CompiledName "BuildAvaloniaApp">] 
-let buildAvaloniaApp () = 
+let buildAvaloniaApp (serviceProvider: IServiceProvider) =
     AppBuilder
-        .Configure<App>()
-        .UsePlatformDetect() 
+        .Configure(fun () -> App(serviceProvider))
+        .UsePlatformDetect()
         .WithInterFont()
         .LogToTrace(areas = Array.empty)
 
-let main1 argv =
-    Backend.start()
-    match Backend.waitForReady 5000 with
-    | true -> 
-        printfn "Backend is ready. Starting frontend..."
-        buildAvaloniaApp().StartWithClassicDesktopLifetime(argv)
-    | _ ->
-        printfn "Backend did not start in time."
-        1
-
 [<EntryPoint; STAThread>]
 let main argv =
-    buildAvaloniaApp()
-        .StartWithClassicDesktopLifetime(argv)
+    let serviceProvider =
+        ServiceCollection()
+            .RegisterCommonServices()
+            .BuildServiceProvider()    
+    if serviceProvider.GetRequiredService<Engine>().Start().WaitForReady 5000 then
+        printfn "Backend is ready. Starting frontend..."
+        buildAvaloniaApp(serviceProvider)
+            .StartWithClassicDesktopLifetime(argv)
+    else
+        printfn "Backend did not start in time."
+        1

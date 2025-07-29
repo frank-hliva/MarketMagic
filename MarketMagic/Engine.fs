@@ -17,6 +17,7 @@ type Engine() =
         )
         |> Process.Start
         |> ignore
+        self
 
     member self.WaitForReady(timeoutMs : int) =
         let startTime = DateTime.Now
@@ -39,13 +40,3 @@ type Engine() =
                     Thread.Sleep(500)
                     loop ()
         loop ()
-
-    member self.Setup() =
-        self.Start()
-        match self.WaitForReady 5000 with
-        | true -> 
-            printfn "Backend is ready. Starting frontend..."
-            0
-        | _ ->
-            printfn "Backend did not start in time."
-            1
