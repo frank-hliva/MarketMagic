@@ -5,8 +5,9 @@ open System.Diagnostics
 open NetMQ
 open NetMQ.Sockets
 open System.Threading
+open Tomlyn.Model
 
-type Engine() =
+type Engine(appConfig : AppConfig) =
 
     member self.Start() =
         ProcessStartInfo(

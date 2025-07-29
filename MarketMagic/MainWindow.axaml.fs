@@ -17,11 +17,10 @@ open MsBox.Avalonia.Enums
 open Avalonia.Interactivity
 open System
 open Avalonia.Platform.Storage
+open Tomlyn.Model
 
-type MainWindow (viewModel : TableViewModel, appConfigProvider : IAppConfigProvider) as self = 
+type MainWindow (viewModel : TableViewModel, appConfig: AppConfig) as self = 
     inherit Window ()
-
-    let appConfig = appConfigProvider.Config
 
     let mutable dataGrid: DataGrid = null
 

@@ -1,5 +1,6 @@
 ﻿namespace MarketMagic
 
+open System
 open System.Runtime.CompilerServices
 open Microsoft.Extensions.DependencyInjection
 
@@ -7,8 +8,11 @@ open Microsoft.Extensions.DependencyInjection
 type ServiceCollectionExtensions() =
     [<Extension>]
     static member RegisterCommonServices(self : IServiceCollection) =
-        self.AddSingleton<IAppConfigProvider, AppConfigProvider>() |> ignore
-        self.AddSingleton<Engine>() |> ignore
-        self.AddSingleton<TableViewModel>() |> ignore
-        self.AddSingleton<MainWindow>() |> ignore
         self
+            .AddSingleton<IAppConfigProvider, AppConfigProvider>()
+            .AddSingleton<AppConfig>(fun serviceProvider ->
+                serviceProvider.GetRequiredService<IAppConfigProvider>().Config
+            )
+            .AddSingleton<Engine>()
+            .AddSingleton<TableViewModel>()
+            .AddSingleton<MainWindow>()

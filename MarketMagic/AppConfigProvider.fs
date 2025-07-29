@@ -1,4 +1,4 @@
-﻿namespace MarketMagic
+﻿namespace rec MarketMagic
 
 open System
 open System.IO
@@ -7,8 +7,10 @@ open Tomlyn.Model
 open System.Runtime.CompilerServices
 open System.Collections.Generic
 
+type AppConfig = TomlTable
+
 type IAppConfigProvider =
-    abstract member Config : TomlTable
+    abstract member Config : AppConfig
 
 type AppConfigProvider() =
     let config =
