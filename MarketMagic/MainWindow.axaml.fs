@@ -1,4 +1,4 @@
-namespace MarketMagic
+﻿namespace MarketMagic
 
 open System.Collections.Specialized
 open System.Collections.ObjectModel
@@ -16,6 +16,7 @@ open MsBox.Avalonia
 open MsBox.Avalonia.Enums
 open Avalonia.Interactivity
 open System
+open Avalonia.Platform.Storage
 
 type MainWindow (viewModel : TableViewModel, appConfigProvider : IAppConfigProvider) as self = 
     inherit Window ()
@@ -30,12 +31,37 @@ type MainWindow (viewModel : TableViewModel, appConfigProvider : IAppConfigProvi
     let showFailedToLoadExportedData () = 
         Dialogs.Unit.showError "Failed to load exported data." self
 
+    let showUploadTemplateFailedToChange () = 
+        Dialogs.Unit.showError "Upload template failed to change." self
+
+
     let displayDataInTable() =
         let response = UploadTemplate.fetch ()
         viewModel.SetData(
             response.Data.columns,
             response.Data.cells
         )
+
+    let tryPickSingleFile () = async {
+        let! files =
+            self.StorageProvider.OpenFilePickerAsync(
+                FilePickerOpenOptions(
+                    Title = "Select file",
+                    AllowMultiple = false,
+                    FileTypeFilter = [
+                        FilePickerFileType("Upload templates (*.csv)", Patterns = [| "*.csv" |])
+                        FilePickerFileTypes.All
+                    ]
+                )
+            ) |> Async.AwaitTask
+        match files with
+        | null -> return None
+        | files ->
+            match List.ofSeq files with
+            | [] -> return None
+            | file :: _ ->
+                return Some file.Path.LocalPath
+    }
 
     do
         self.InitializeComponent()
@@ -90,10 +116,17 @@ type MainWindow (viewModel : TableViewModel, appConfigProvider : IAppConfigProvi
         | _ -> do! showFailedToLoadUploadTemplate()
     }
 
-    member private self.OpenButton_Click(sender: obj, event: RoutedEventArgs) =
-        ()
+    member private self.OpenUploadTemplateButton_Click(sender: obj, event: RoutedEventArgs) =
+        task {
+            match! tryPickSingleFile() with
+            | Some path ->
+                if appConfig.TrySet("UploadTemplate.Source.Path", path) then
+                    self.LoadData() |> ignore
+                else do! showUploadTemplateFailedToChange ()
+            | _ -> ()
+        } |> ignore
 
-    member private self.InsertButton_Click(sender: obj, event: RoutedEventArgs) =
+    member private self.InsertDataButton_Click(sender: obj, event: RoutedEventArgs) =
         ()
 
     member private self.SaveButton_Click(sender: obj, event: RoutedEventArgs) =

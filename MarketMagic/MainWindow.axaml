@@ -35,10 +35,10 @@
             Orientation="Horizontal"
             Margin="2"
         >
-            <Button Click="OpenButton_Click">
+            <Button Click="OpenUploadTemplateButton_Click">
                 <svg:Svg Path="avares://MarketMagic/img/folder.svg" Width="36" Height="36" ToolTip.Tip="Open template" />
             </Button>
-            <Button Click="InsertButton_Click">
+            <Button Click="InsertDataButton_Click">
                 <svg:Svg Path="avares://MarketMagic/img/plus.svg" Width="36" Height="36" ToolTip.Tip="Insert existing items" />
             </Button>
             <Button Click="SaveButton_Click">

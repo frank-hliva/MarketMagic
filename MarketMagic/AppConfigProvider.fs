@@ -56,3 +56,25 @@ type TomlTableExtensions() =
         match self.TryGet<'t>(key) with
         | Some value -> value
         | None -> defaultValue
+
+    [<Extension>]
+    static member TrySet<'t>(self: TomlTable, path: string, value: 't) : bool =
+        let rec loop (tbl: TomlTable) (ps: string list) =
+            match ps with
+            | [] -> false
+            | [last] ->
+                tbl.[last] <- value
+                true
+            | hd :: tl ->
+                match tbl.TryGetItem<TomlTable>(hd) with
+                | Some subtbl -> loop subtbl tl
+                | None ->
+                    let newTbl = TomlTable()
+                    tbl.[hd] <- newTbl
+                    loop newTbl tl
+        path.Split '.' |> List.ofArray |> loop self
+
+    [<Extension>]
+    static member Set<'t>(self: TomlTable, path: string, value: 't) : unit =
+        if not <| self.TrySet(path, value) then
+            raise (KeyNotFoundException($"Could not set value for path '{path}' in TomlTable."))
