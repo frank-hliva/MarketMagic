@@ -1,10 +1,23 @@
 ﻿module MarketMagic.Ebay
 
 open System
+open Newtonsoft.Json
 open NetMQ
 open NetMQ.Sockets
 open FSharp.Data
 open Lime
+
+let inline sendRawCommand<'t> serverAddress (json : string) =
+    use client = new RequestSocket()
+    client.Connect(serverAddress)
+    client.SendFrame(json)
+    client.ReceiveFrameString()
+    |> JSON.parse<'t>
+
+let sendCommand<'t> serverAddress (requestObj : obj) =
+    requestObj
+    |> JSON.stringify
+    |> sendRawCommand<'t> serverAddress
 
 type UploadDataTable = 
     {
@@ -29,15 +42,30 @@ type CommandDataResponse<'t>(success : bool, data : 't) =
 type CommandSaveResponse(success : bool) = 
     inherit CommandResponse(success)
 
-let sendCommand<'t> serverAddress (json : string) =
-    use client = new RequestSocket()
-    client.Connect(serverAddress)
-    client.SendFrame(json)
-    let response = client.ReceiveFrameString()
-    printfn "Response: %s" response
-    JSON.parse<'t>(response)
+type UploadTemplate(uploadTemplateConfig : UploadTemplateConfig) =
 
-type UploadTemplateConfig(appConfig : AppConfig) =
+    let serverAddress = uploadTemplateConfig.FullAddress
+
+    member private self.SendCommand<'t> (requestObj : obj) =
+        sendCommand<'t> serverAddress requestObj
+
+    member self.Load (path : string) =
+        {| command = "loadUploadTemplate"; path = path |}
+        |> self.SendCommand<CommandMessageResponse>
+
+    member self.Fetch () =
+        {| command = "fetchUploadTemplate" |}
+        |> self.SendCommand<CommandDataResponse<UploadDataTable>>
+
+    member self.AddExportedData (path : string) =
+        {| command = "addExportedData"; path = path |}
+        |> self.SendCommand<CommandMessageResponse>
+
+    member self.Save (path : string) =
+        {| command = "saveUploadTemplate"; path = path |}
+        |> self.SendCommand<CommandSaveResponse>
+
+and UploadTemplateConfig(appConfig : AppConfig) =
 
     member self.AppConfig = appConfig
 
@@ -48,23 +76,3 @@ type UploadTemplateConfig(appConfig : AppConfig) =
         appConfig.GetOr("Engine.Server.Port", 7333)
 
     member self.FullAddress = self.Address |> Url.withPort self.Port
-
-type UploadTemplate(uploadTemplateConfig : UploadTemplateConfig) =
-
-    let serverAddress = uploadTemplateConfig.FullAddress
-
-    member self.Load (path : string) =
-        sprintf """{"command": "loadUploadTemplate", "path": "%s"}""" path
-        |> sendCommand<CommandMessageResponse> serverAddress
-
-    member self.Fetch () =
-        """{"command": "fetchUploadTemplate"}"""
-        |> sendCommand<CommandDataResponse<UploadDataTable>> serverAddress
-
-    member self.AddExportedData (path : string) =
-        sprintf """{"command": "addExportedData", "path":"%s"}""" path
-        |> sendCommand<CommandMessageResponse> serverAddress
-
-    member self.Save (path : string) =
-        sprintf """{"command": "saveUploadTemplate", "path": "%s"}""" path
-        |> sendCommand<CommandSaveResponse> serverAddress

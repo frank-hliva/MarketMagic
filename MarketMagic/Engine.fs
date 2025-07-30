@@ -7,33 +7,6 @@ open NetMQ.Sockets
 open System.Threading
 open Tomlyn.Model
 
-type EngineConfig(appConfig : AppConfig) =
-
-    member self.AppConfig = appConfig
-
-    member self.Interpreter =
-        appConfig.GetOr("Engine.Interpreter", "julia")
-
-    member self.Path =
-        appConfig.GetOr("Engine.Path", "../../../../Engine/src/MarketMagic.jl")
-
-    member self.Start =
-        appConfig.GetOr("Engine.Start", true)
-
-    member private self.Address =
-        appConfig.GetOr("Engine.Server.Address", "tcp://localhost")
-
-    member self.Port =
-        appConfig.GetOr("Engine.Server.Port", 7333)
-
-    member self.FullAddress = self.Address |> Url.withPort self.Port
-
-    member self.ConnectionTimeout =
-        appConfig.GetOr("Engine.Server.ConnectionTimeout", 5000.0)
-
-    member self.IterationTimeout =
-        appConfig.GetOr("Engine.Server.IterationTimeout", 500.0)
-
 type Engine(engineConfig : EngineConfig) as self =
 
     do
@@ -72,3 +45,30 @@ type Engine(engineConfig : EngineConfig) as self =
                     Thread.Sleep(int timeout)
                     loop ()
         loop ()
+
+and EngineConfig(appConfig : AppConfig) =
+
+    member self.AppConfig = appConfig
+
+    member self.Interpreter =
+        appConfig.GetOr("Engine.Interpreter", "julia")
+
+    member self.Path =
+        appConfig.GetOr("Engine.Path", "../../../../Engine/src/MarketMagic.jl")
+
+    member self.Start =
+        appConfig.GetOr("Engine.Start", true)
+
+    member private self.Address =
+        appConfig.GetOr("Engine.Server.Address", "tcp://localhost")
+
+    member self.Port =
+        appConfig.GetOr("Engine.Server.Port", 7333)
+
+    member self.FullAddress = self.Address |> Url.withPort self.Port
+
+    member self.ConnectionTimeout =
+        appConfig.GetOr("Engine.Server.ConnectionTimeout", 5000.0)
+
+    member self.IterationTimeout =
+        appConfig.GetOr("Engine.Server.IterationTimeout", 500.0)
