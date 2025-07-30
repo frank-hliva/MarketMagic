@@ -31,8 +31,14 @@ type MainWindow (
     let showFailedToLoadUploadTemplate () = 
         Dialogs.Unit.showError "Failed to load upload-template." self
 
+    let showFailedToLoadUploadTemplate_invalidPath (path : string) = 
+        Dialogs.Unit.showError $"Failed to load upload-template.\nThe file \"{path}\" was not found." self
+
     let showFailedToLoadExportedData () = 
         Dialogs.Unit.showError "Failed to load exported-data." self
+
+    let showFailedToLoadExportedData_invalidPath (path : string) = 
+        Dialogs.Unit.showError $"Failed to load exported-data.\nThe file \"{path}\" was not found." self
 
     let showUploadTemplateFailedToChange () = 
         Dialogs.Unit.showError "Upload-template failed to change." self
@@ -121,15 +127,21 @@ type MainWindow (
 
     member private self.LoadData() = task {
         match appConfig.TryGet<string>("UploadTemplate.Source.Path") with
-        | Some uploadTemplatePath ->
+        | Some uploadTemplatePath when IO.Path.Exists(uploadTemplatePath) ->
             if (uploadTemplate.Load uploadTemplatePath).Success then
                 match appConfig.TryGet<string>("UploadTemplate.ExportedData.Path") with
-                | Some exportedDataPath ->
+                | Some exportedDataPath when IO.Path.Exists(exportedDataPath) ->
                     if (uploadTemplate.AddExportedData exportedDataPath).Success then
                         displayDataInTable()
-                    else do! showFailedToLoadUploadTemplate()
+                    else
+                        do! showFailedToLoadExportedData()
+                        displayDataInTable()
+                | Some exportedDataPath when not <| String.IsNullOrWhiteSpace(exportedDataPath) ->
+                    do! showFailedToLoadExportedData_invalidPath(exportedDataPath)
+                    displayDataInTable()
                 | _ -> displayDataInTable()
             else do! showFailedToLoadUploadTemplate()
+        | Some uploadTemplatePath -> do! showFailedToLoadUploadTemplate_invalidPath(uploadTemplatePath)
         | _ -> do! showFailedToLoadUploadTemplate()
     }
 
@@ -138,6 +150,7 @@ type MainWindow (
             match! tryPickFileToOpen() with
             | Some path ->
                 if appConfig.TrySet("UploadTemplate.Source.Path", path) then
+                    appConfig.TrySet("UploadTemplate.ExportedData.Path", null) |> ignore
                     self.LoadData() |> ignore
                 else do! showUploadTemplateFailedToChange ()
             | _ -> ()

@@ -144,7 +144,15 @@ function handleCommand(commandData::Dict)
             end
             handleAddExportedData(path)
         end
-        
+
+        "ExportedData" => begin
+            path = get(commandData, "path", "")
+            if isempty(path)
+                return Dict("success" => false, "error" => "Path parameter required")
+            end
+            handleAddExportedData(path)
+        end
+
         "saveUploadTemplate" => begin
             path = get(commandData, "path", "")
             if isempty(path)

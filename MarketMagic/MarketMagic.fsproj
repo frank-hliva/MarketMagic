@@ -59,10 +59,9 @@
   </ItemGroup>
 
   <ItemGroup>
+      <AvaloniaResource Include="img\download.svg" />
       <AvaloniaResource Include="img\folder.svg" />
       <AvaloniaResource Include="img\plus.svg" />
-      <AvaloniaResource Include="img\download.svg" />
+      <AvaloniaResource Include="img\template.svg" />
   </ItemGroup>
-
-  <ItemGroup />
 </Project>

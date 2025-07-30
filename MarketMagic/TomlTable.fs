@@ -68,3 +68,7 @@ type TomlTableExtensions() =
     static member Set<'t>(self: TomlTable, path: string, value: 't) : unit =
         if not <| self.TrySet(path, value) then
             raise (KeyNotFoundException($"Could not set value for path '{path}' in TomlTable."))
+
+    [<Extension>]
+    static member Save(self: TomlTable, path: string) =
+        File.WriteAllText(path, self |> Toml.FromModel)
