@@ -1,18 +1,18 @@
-﻿    - save musi preniest riadky na BE
-    - nejde nacitat ulozeny template aj s datami 
-        - template a datove subory su dva rozne typy suborov
-            - ak nacitame datovy subor do slotu pre template - system by nas mal upozornit na chybu
-            - ak nacitame template do datoveho suboru - system by nas mal upozornit na chybu
-    - automaticky pridat novy riadok ak bola v predoslom vyplnena hodnota
-        // Predpokladám, že viewModel.Cells je ObservableCollection<RowType>
-        let addEmptyRowIfNeeded () =
-            let lastRow = viewModel.Cells.[viewModel.Cells.Count - 1]
-            if isRowFilled lastRow then
-                viewModel.Cells.Add(RowType()) // prázdny riadok
+﻿- save musi preniest riadky na BE
+- nejde nacitat ulozeny template aj s datami 
+    - template a datove subory su dva rozne typy suborov
+        - ak nacitame datovy subor do slotu pre template - system by nas mal upozornit na chybu
+        - ak nacitame template do datoveho suboru - system by nas mal upozornit na chybu
+- automaticky pridat novy riadok ak bola v predoslom vyplnena hodnota
+    // Predpokladám, že viewModel.Cells je ObservableCollection<RowType>
+    let addEmptyRowIfNeeded () =
+        let lastRow = viewModel.Cells.[viewModel.Cells.Count - 1]
+        if isRowFilled lastRow then
+            viewModel.Cells.Add(RowType()) // prázdny riadok
 
-        // Volaj túto funkciu pri zmene buniek v poslednom riadku
-        viewModel.Cells.CollectionChanged.Add(fun _ -> addEmptyRowIfNeeded())
-    - mazanie riadkov
+    // Volaj túto funkciu pri zmene buniek v poslednom riadku
+    viewModel.Cells.CollectionChanged.Add(fun _ -> addEmptyRowIfNeeded())
+- mazanie riadkov
 ----------------------------------------------------------------------------------------------
 - MarketMagic.jl ma tiez precitat port z config.toml
 - moznost zavriet UploadTemplate.ExportedData
