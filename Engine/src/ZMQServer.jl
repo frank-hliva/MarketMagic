@@ -180,7 +180,7 @@ function startServer(port::Int = 7333)
             requestBytes = recv(socket)
             requestString = String(requestBytes)
             
-            println("Received request: $requestString")
+            println("\e[38;5;75mReceived request\e[0m: $requestString")
             
             try
                 commandData = JSON3.read(requestString, Dict{String, Any})
@@ -190,7 +190,7 @@ function startServer(port::Int = 7333)
                 responseString = JSON3.write(response)
                 send(socket, responseString)
                 
-                println("Sent response: $responseString")
+                println("\e[38;5;43mSent response\e[0m: \e[93m$responseString\e[0m")
                 
             catch e
                 errorResponse = Dict(
@@ -200,7 +200,7 @@ function startServer(port::Int = 7333)
                 responseString = JSON3.write(errorResponse)
                 send(socket, responseString)
                 
-                println("Sent error response: $responseString")
+                println("\e[91mSent error response\e[0m: $responseString")
             end
         end
         

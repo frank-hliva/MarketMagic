@@ -17,6 +17,9 @@ type EngineConfig(appConfig : AppConfig) =
     member self.Path =
         appConfig.GetOr("Engine.Path", "../../../../Engine/src/MarketMagic.jl")
 
+    member self.Start =
+        appConfig.GetOr("Engine.Start", true)
+
     member private self.Address =
         appConfig.GetOr("Engine.Server.Address", "tcp://localhost")
 
@@ -31,7 +34,10 @@ type EngineConfig(appConfig : AppConfig) =
     member self.IterationTimeout =
         appConfig.GetOr("Engine.Server.IterationTimeout", 500.0)
 
-type Engine(engineConfig : EngineConfig) =
+type Engine(engineConfig : EngineConfig) as self =
+
+    do
+        if engineConfig.Start then self.Start() |> ignore
 
     member self.Start() =
         ProcessStartInfo(

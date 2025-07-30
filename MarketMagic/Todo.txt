@@ -1,4 +1,8 @@
-﻿x - dat do konfigu "tcp://localhost:7333"
+﻿- app.conf
+    x - run server
+
+
+x - dat do konfigu "tcp://localhost:7333"
 x - commit
 - MarketMagic.jl ma tiez precitat port z config.toml
 - po zmene
