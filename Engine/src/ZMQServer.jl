@@ -162,7 +162,7 @@ function handleCommand(commandData::Dict)
     end
 end
 
-function startServer(port::Int = 5555)
+function startServer(port::Int = 7333)
     context = Context()
     socket = Socket(context, REP)
     

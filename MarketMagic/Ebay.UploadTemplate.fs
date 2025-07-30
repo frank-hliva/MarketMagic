@@ -14,8 +14,6 @@ type UploadDataTable =
         cells : string[,]
     }
 
-let [<Literal>] serverAddress = "tcp://localhost:5555"
-
 type CommandResponse(success : bool) = 
     member self.Success = success
 
@@ -28,7 +26,10 @@ type CommandDataResponse<'t>(success : bool, data : 't) =
     inherit CommandResponse(success)
     member self.Data = data
 
-let private sendCommand<'t> (json : string) =
+type CommandSaveResponse(success : bool) = 
+    inherit CommandResponse(success)
+
+let sendCommand<'t> serverAddress (json : string) =
     use client = new RequestSocket()
     client.Connect(serverAddress)
     client.SendFrame(json)
@@ -36,20 +37,34 @@ let private sendCommand<'t> (json : string) =
     printfn "Response: %s" response
     JSON.parse<'t>(response)
 
-module UploadTemplate =
+type UploadTemplateConfig(appConfig : AppConfig) =
 
-    let load (path : string) =
+    member self.AppConfig = appConfig
+
+    member private self.Address =
+        appConfig.GetOr("Engine.Server.Address", "tcp://localhost")
+
+    member self.Port =
+        appConfig.GetOr("Engine.Server.Port", 7333)
+
+    member self.FullAddress = self.Address |> Url.withPort self.Port
+
+type UploadTemplate(uploadTemplateConfig : UploadTemplateConfig) =
+
+    let serverAddress = uploadTemplateConfig.FullAddress
+
+    member self.Load (path : string) =
         sprintf """{"command": "loadUploadTemplate", "path": "%s"}""" path
-        |> sendCommand<CommandMessageResponse>
+        |> sendCommand<CommandMessageResponse> serverAddress
 
-    let fetch () =
+    member self.Fetch () =
         """{"command": "fetchUploadTemplate"}"""
-        |> sendCommand<CommandDataResponse<UploadDataTable>>
+        |> sendCommand<CommandDataResponse<UploadDataTable>> serverAddress
 
-    let addExportedData (path : string) =
+    member self.AddExportedData (path : string) =
         sprintf """{"command": "addExportedData", "path":"%s"}""" path
-        |> sendCommand<CommandMessageResponse>
+        |> sendCommand<CommandMessageResponse> serverAddress
 
-    let save (path : string) =
+    member self.Save (path : string) =
         sprintf """{"command": "saveUploadTemplate", "path": "%s"}""" path
-        |> sendCommand
+        |> sendCommand<CommandSaveResponse> serverAddress

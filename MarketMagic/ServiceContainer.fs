@@ -15,5 +15,7 @@ type ServiceCollectionExtensions() =
             )
             .AddSingleton<EngineConfig>()
             .AddSingleton<Engine>()
+            .AddSingleton<Ebay.UploadTemplateConfig>()
+            .AddSingleton<Ebay.UploadTemplate>()
             .AddSingleton<TableViewModel>()
             .AddSingleton<MainWindow>()

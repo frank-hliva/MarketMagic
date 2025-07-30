@@ -6,6 +6,10 @@ open System.IO
 open System.IO.Compression
 open Lime
 
+module Url =
+    let withPort (port : int) (url : string) =            
+        $"""{if url.EndsWith("/") then url[..url.Length - 2] else url}:{port}"""
+
 module Directories =
     let homeDir = Environment.GetFolderPath Environment.SpecialFolder.UserProfile
 
@@ -30,7 +34,7 @@ module MarketMagicApp =
     let toConfigPath path = configDir /+ path
     let toSharedPath path = shareDir /+ path
 
-    let appConfig = toConfigPath "Application.config.toml"
+    let appConfig = toConfigPath "app.conf"
 
     let setupTarget = shareDir
 

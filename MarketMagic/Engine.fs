@@ -8,8 +8,6 @@ open System.Threading
 open Tomlyn.Model
 
 type EngineConfig(appConfig : AppConfig) =
-    let addressWithPort (addr : string) (port : int) =            
-        $"""{if addr.EndsWith("/") then addr[..addr.Length - 2] else addr}:{port}"""
 
     member self.AppConfig = appConfig
 
@@ -25,8 +23,7 @@ type EngineConfig(appConfig : AppConfig) =
     member self.Port =
         appConfig.GetOr("Engine.Server.Port", 7333)
 
-    member self.FullAddress =
-        addressWithPort self.Address self.Port
+    member self.FullAddress = self.Address |> Url.withPort self.Port
 
     member self.ConnectionTimeout =
         appConfig.GetOr("Engine.Server.ConnectionTimeout", 5000.0)

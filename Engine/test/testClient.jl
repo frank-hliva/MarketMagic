@@ -2,7 +2,7 @@
 using ZMQ
 using JSON3
 
-function testClient(port::Int = 5555)
+function testClient(port::Int = 7333)
     context = Context()
     socket = Socket(context, REQ)
     

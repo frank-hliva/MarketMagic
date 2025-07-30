@@ -1,3 +1,9 @@
-﻿x - dat do konfigu "tcp://localhost:5555"
-- commit
-- MarketMagic.jl ma tiez precitat port z Application.config.toml
+﻿x - dat do konfigu "tcp://localhost:7333"
+x - commit
+- MarketMagic.jl ma tiez precitat port z config.toml
+- po zmene
+    - zmena cesty UploadTemplate.Source
+    - zmena cesty UploadTemplate.ExportedData
+    - ulozenie zmien do config.toml
+- zrusit UploadTemplate.ExportedData
+- setup zo zipu config.toml
