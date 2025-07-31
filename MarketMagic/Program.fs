@@ -25,5 +25,5 @@ let main argv =
         buildAvaloniaApp(serviceProvider)
             .StartWithClassicDesktopLifetime(argv)
     else
-        printfn "Backend did not start in time."
+        Dialogs.Native.showError "MarketMagic backend did not start in time.\nPlease enable auto-start (in app.conf), or start it manually"
         1

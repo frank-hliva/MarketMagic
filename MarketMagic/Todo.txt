@@ -2,6 +2,7 @@
     x - uploadDataTable vo FE
 x - po save
     x - UploadTemplate.ExportedDataPath = savepath
+- button save pridat zatial mame len save as
 - nejde nacitat ulozeny template aj s datami 
     - template a datove subory su dva rozne typy suborov
         - ak nacitame datovy subor do slotu pre template - system by nas mal upozornit na chybu

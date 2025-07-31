@@ -84,23 +84,26 @@ and MainWindow (
 
     let mutable dataGrid: DataGrid = null
 
+    let showError (msg : string) = 
+        Dialogs.showErrorU msg self
+
     let showFailedToLoadUploadTemplate () = 
-        Dialogs.Unit.showError "Failed to load upload template." self
+        showError "Failed to load upload template."
 
     let showFailedToLoadUploadTemplate_invalidPath (path : string) = 
-        Dialogs.Unit.showError $"Failed to load upload template.\nThe file \"{path}\" was not found." self
+        showError $"Failed to load upload template.\nThe file \"{path}\" was not found."
 
     let showFailedToLoadExportedData () = 
-        Dialogs.Unit.showError "Failed to load exported data." self
+        showError "Failed to load exported data."
 
     let showFailedToLoadExportedData_invalidPath (path : string) = 
-        Dialogs.Unit.showError $"Failed to load exported data.\nThe file \"{path}\" was not found." self
+        showError $"Failed to load exported data.\nThe file \"{path}\" was not found."
 
     let showUploadTemplateFailedToChange () = 
-        Dialogs.Unit.showError "Upload template failed to change." self
+        showError "Upload template failed to change."
 
     let showUploadTemplateFailedToSave () = 
-        Dialogs.Unit.showError "Upload template failed to save." self
+        showError "Upload template failed to save."
 
     let displayDataInTable() =
         let response = uploadTemplateManager.Fetch()
@@ -180,24 +183,31 @@ and MainWindow (
 
     member private self.LoadData() = task {
         match windowConfig.UploadTemplate.SourcePath with
-        | "" -> do! showFailedToLoadUploadTemplate()
+        | "" -> ()
         | uploadTemplatePath when IO.Path.Exists(uploadTemplatePath) ->
             let uploadTemplate_loadInfo = uploadTemplateManager.Load uploadTemplatePath
             if uploadTemplate_loadInfo.Success then
                 match windowConfig.UploadTemplate.ExportedDataPath with
                 | "" -> displayDataInTable()
                 | exportedDataPath when IO.Path.Exists(exportedDataPath) ->
-                    if (uploadTemplateManager.AddExportedData exportedDataPath).Success then
+                    let exportedData_loadInfo = uploadTemplateManager.AddExportedData exportedDataPath
+                    if exportedData_loadInfo.Success then
                         displayDataInTable()
                     else
-                        do! showFailedToLoadExportedData()
+                        do! showError exportedData_loadInfo.Error
+                        windowConfig.UploadTemplate.ExportedDataPath <- ""
                         displayDataInTable()
                 | exportedDataPath when not <| String.IsNullOrWhiteSpace(exportedDataPath) ->
                     do! showFailedToLoadExportedData_invalidPath(exportedDataPath)
                     displayDataInTable()
                 | _ -> ()
-            else do! self |> Dialogs.Unit.showError uploadTemplate_loadInfo.Error
-        | uploadTemplatePath -> do! showFailedToLoadUploadTemplate_invalidPath(uploadTemplatePath)
+            else
+                do! showError uploadTemplate_loadInfo.Error
+                windowConfig.UploadTemplate.SourcePath <- ""
+                windowConfig.UploadTemplate.ExportedDataPath <- ""
+                displayDataInTable()
+        | uploadTemplatePath ->
+            do! showFailedToLoadUploadTemplate_invalidPath(uploadTemplatePath)
     }
 
     member private self.OpenUploadTemplateButton_Click(sender: obj, event: RoutedEventArgs) =
@@ -228,6 +238,6 @@ and MainWindow (
                     if uploadTemplateManager.Save(path, uploadDataTable).Success
                     then windowConfig.UploadTemplate.ExportedDataPath <- path
                     else do! showUploadTemplateFailedToSave ()
-                | Error errMsg -> do! Dialogs.Unit.showError errMsg self
+                | Error errMsg -> do! Dialogs.showErrorU errMsg self
             | _ -> ()
         } |> ignore

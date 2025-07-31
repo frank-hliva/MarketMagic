@@ -3,8 +3,6 @@ module ZMQServer
 using ZMQ
 using JSON3
 using MLStyle
-
-# include("Ebay/UploadTemplate.jl")
 using Main.Ebay
 
 mutable struct ServerState
@@ -30,58 +28,27 @@ function nestedArrayToMatrix(nestedArray::Vector{Vector{String}})
     return matrix
 end
 
-#= function tryGetUploadTemplateHeader(input::String)::Union{Nothing, Tuple{String, String}}
-    @match match(r"^Info;Version=([^;]+);Template=([^;]+)$", input) begin
-        nothing => nothing
-        m => (m.captures[1], m.captures[2])
-    end
-end
-
-function tryGetUploadTemplateHeader(stream::IOStream)::Union{Nothing, Tuple{String, String}}
-    local currentPosition = position(stream)
-    local result = tryGetUploadTemplateHeader(stream)
-    seek(stream, currentPosition)
-    return result
-end
-
 function handleLoadUploadTemplate(path::String)
     try
-        state.uploadDataTable = open(path) do templateStream
-            @match tryGetUploadTemplateHeader(templateStream) begin
-                nothing => nothing
-                _ => Ebay.UploadTemplate.load(templateStream)
+        open(path) do templateStream
+            @match Ebay.UploadTemplate.tryGetHeader(templateStream) begin
+                nothing => begin
+                    Dict(
+                        "success" => false,
+                        "error" => "Invalid format: csv file \"$path\" is not an upload template.\nPlease open the correct upload template"
+                    )
+                end
+                _ => begin
+                    state.uploadDataTable = Ebay.UploadTemplate.load(templateStream)
+                    Dict(
+                        "success" => true,
+                        "message" => "Upload template loaded successfully from: $path"
+                    )
+                end 
             end
         end
-        if state.uploadDataTable === nothing
-            return Dict(
-                "success" => false,
-                "error" => "Incorrect CSV file type, please load an upload template."
-            )
-        else
-            return Dict(
-                "success" => true,
-                "message" => "Upload template loaded successfully from: $path"
-            )
-        end
     catch e
-        return Dict(
-            "success" => false,
-            "error" => "Failed to load upload template: $(string(e))"
-        )
-    end
-end =#
-
-function handleLoadUploadTemplate(path::String)
-    try
-        state.uploadDataTable = open(path) do templateStream
-            Ebay.UploadTemplate.load(templateStream)
-        end
-        return Dict(
-            "success" => true,
-            "message" => "Upload template loaded successfully from: $path"
-        )
-    catch e
-        return Dict(
+        Dict(
             "success" => false,
             "error" => "Failed to load upload template: $(string(e))"
         )
@@ -91,24 +58,32 @@ end
 function handleAddExportedData(path::String)
     try
         if state.uploadDataTable === nothing
-            return Dict(
+            Dict(
                 "success" => false,
                 "error" => "No upload template loaded. Load upload template first."
             )
+        else
+            open(path) do exportedDataStream
+                @match Ebay.UploadTemplate.tryGetHeader(exportedDataStream) begin
+                    nothing => begin
+                        local exportedData = Ebay.ExportedData.load(exportedDataStream)
+                        state.uploadDataTable = Ebay.UploadTemplate.withCells(exportedData, state.uploadDataTable)
+                        Dict(
+                            "success" => true,
+                            "message" => "Exported data added successfully from: $path"
+                        )
+                    end
+                    _ => begin
+                        Dict(
+                            "success" => false,
+                            "error" => "Invalid format: csv file \"$path\" is an upload template.\nPlease open the correct csv data file"
+                        )
+                    end
+                end
+            end
         end
-
-        local exportedData = open(path) do exportedDataStream
-            Ebay.ExportedData.load(exportedDataStream)
-        end
-
-        state.uploadDataTable = Ebay.UploadTemplate.withCells(exportedData, state.uploadDataTable)
-        
-        return Dict(
-            "success" => true,
-            "message" => "Exported data added successfully from: $path"
-        )
     catch e
-        return Dict(
+        Dict(
             "success" => false,
             "error" => "Failed to add exported data: $(string(e))"
         )

@@ -89,6 +89,21 @@ module UploadTemplate
     using CSV
     using DataFrames
     using .File
+    using MLStyle
+
+    function tryGetHeader(input::String)::Union{Nothing, Tuple{String, String}}
+        @match match(r"Info;Version=([^;]+);Template=([^;]+)", input) begin
+            nothing => nothing
+            m => (m.captures[1], m.captures[2])
+        end
+    end
+
+    function tryGetHeader(stream::IOStream)::Union{Nothing, Tuple{String, String}}
+        local currentPosition = position(stream)
+        local result = stream |> readline |> tryGetHeader
+        seek(stream, currentPosition)
+        return result
+    end
 
     function load(templateStream::IOStream)::Main.Ebay.UploadDataTable
         seek(templateStream, 0)
