@@ -85,6 +85,9 @@ and MainWindow (
 
     let mutable dataGrid: DataGrid = null
 
+    let displayDataInTable() =
+        windowViewModel.Table.SetData <| uploadTemplateManager.Fetch().Data
+
     let showError (msg : string) = 
         Dialogs.showErrorU msg self
 
@@ -105,10 +108,6 @@ and MainWindow (
 
     let showUploadTemplateFailedToSave () = 
         showError "Upload template failed to save."
-
-    let displayDataInTable() =
-        let response = uploadTemplateManager.Fetch()
-        windowViewModel.Table.SetData(response.Data)
 
     let tryPickFileToOpen (title : string) (fileTypeTitle : string) = async {
         match! [
