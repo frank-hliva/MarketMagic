@@ -56,7 +56,7 @@ and WindowViewModel(
     | (null | "") as value -> value
     | input -> filter(input)
 
-    let renderTemplateSource = applyIfNotEmpty <| sprintf "(%s)"
+    let renderTemplateSource = applyIfNotEmpty <| sprintf "[Template: %s]"
     let extractFileName = applyIfNotEmpty <| IO.Path.GetFileName
 
     let mutable title = ""
