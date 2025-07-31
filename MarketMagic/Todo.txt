@@ -12,7 +12,7 @@
 - farby
 ----------------------------------------------------------------------------------------------
 - MarketMagic.jl ma tiez precitat port z config.toml
-- moznost zavriet UploadTemplate.ExportedData
+- moznost zavriet UploadTemplate.Document
 - po prvom nacitani appky (ak neexistuje config.toml) spravit setup zo zipu config.toml
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ x - cells ako 2D array
     x - button pre nacitanie loadUploadTemplate
         x - ikonka
         x - dialog
-    x - button pre nacitanie addExportedData
+    x - button pre nacitanie loadDocument
     x - button pre nacitanie saveUploadTemplate
     - vymenit ikonky
 

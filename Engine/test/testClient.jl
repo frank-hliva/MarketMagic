@@ -14,7 +14,7 @@ function testClient(port::Int = 7333)
         testCommands = [
             Dict("command" => "loadUploadTemplate", "path" => "./data/template.csv"),
             Dict("command" => "fetchUploadTemplate"),
-            Dict("command" => "addExportedData", "path" => "./data/active.csv"),
+            Dict("command" => "loadDocument", "path" => "./data/active.csv"),
             Dict("command" => "fetchUploadTemplate"),
             Dict("command" => "saveUploadTemplate", "path" => "./data/output_test.csv")
         ]

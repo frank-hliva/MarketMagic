@@ -20,6 +20,7 @@ open Tomlyn.Model
 open System.ComponentModel
 open System.Diagnostics
 open Lime
+open Dialogs
 
 type WindowConfig(appConfig : AppConfig, uploadTemplateConfig : UploadTemplateConfig) =
 
@@ -34,10 +35,10 @@ and UploadTemplateConfig(appConfig : AppConfig) =
 
     member self.AppConfig = appConfig
 
-    member self.ExportedDataPath
-        with get() = appConfig.GetOr("UploadTemplate.ExportedData.Path", "")
+    member self.DocumentPath
+        with get() = appConfig.GetOr("UploadTemplate.Document.Path", "")
         and set(value : string) =
-            if appConfig.TrySet("UploadTemplate.ExportedData.Path", value) then
+            if appConfig.TrySet("UploadTemplate.Document.Path", value) then
                 valueChanged.Trigger()
 
     member self.SourcePath
@@ -68,7 +69,7 @@ and WindowViewModel(
             self.OnPropertyChanged("Title")
 
     member self.UpdateTitle() =
-        let path = extractFileName uploadTemplateConfig.ExportedDataPath
+        let path = extractFileName uploadTemplateConfig.DocumentPath
         let templateSourcePath = extractFileName uploadTemplateConfig.SourcePath
         let subtitle = [path; renderTemplateSource templateSourcePath] |> String.concat " "
         self.Title <- $"MarketMagic: {subtitle}"
@@ -93,10 +94,10 @@ and MainWindow (
     let showFailedToLoadUploadTemplate_invalidPath (path : string) = 
         showError $"Failed to load upload template.\nThe file \"{path}\" was not found."
 
-    let showFailedToLoadExportedData () = 
+    let showFailedToLoadDocument () = 
         showError "Failed to load exported data."
 
-    let showFailedToLoadExportedData_invalidPath (path : string) = 
+    let showFailedToLoadDocument_invalidPath (path : string) = 
         showError $"Failed to load exported data.\nThe file \"{path}\" was not found."
 
     let showUploadTemplateFailedToChange () = 
@@ -109,38 +110,28 @@ and MainWindow (
         let response = uploadTemplateManager.Fetch()
         windowViewModel.Table.SetData(response.Data)
 
-    let tryPickFileToOpen () = async {            
-        match! self.StorageProvider.OpenFilePickerAsync(
-                FilePickerOpenOptions(
-                    Title = "Select file",
-                    AllowMultiple = false,
-                    FileTypeFilter = [
-                        FilePickerFileType("Upload templates (*.csv)", Patterns = [| "*.csv" |])
-                        FilePickerFileTypes.All
-                    ]
-                )
-            ) |> Async.AwaitTask with
-        | null -> return None
-        | files ->
-            match List.ofSeq files with
-            | [] -> return None
-            | file :: _ ->
-                return Some file.Path.LocalPath
+    let tryPickFileToOpen (title : string) (fileTypeTitle : string) = async {
+        match! [
+            FilePickerFileType(fileTypeTitle, Patterns = [| "*.csv" |])
+            FilePickerFileTypes.All
+        ] |> Pick.filesToOpen self {| title = title; allowMultiple = false |} with
+        | [] -> return None
+        | file :: _ ->
+            return Some file.Path.LocalPath
     }
 
-    let tryPickFileToSave () = async {
-        match! self.StorageProvider.SaveFilePickerAsync(
-                FilePickerSaveOptions(
-                    Title = "Save file",
-                    FileTypeChoices = [
-                        FilePickerFileType("Upload templates (*.csv)", Patterns = [| "*.csv" |])
-                        FilePickerFileTypes.All
-                    ]
-                )
-            ) |> Async.AwaitTask with
-        | null -> return None
-        | file -> return Some file.Path.LocalPath
+    let tryPickFileToSave (title : string) (fileTypeTitle : string) = async {
+        match! [
+            FilePickerFileType(fileTypeTitle, Patterns = [| "*.csv" |])
+            FilePickerFileTypes.All
+        ] |> Pick.filesToSave self {| title = title |} with
+        | [] -> return None
+        | file :: _ -> return Some file.Path.LocalPath
     }
+
+    let tryPickFileToLoadUploadTemplate () = tryPickFileToOpen "Open template" "Upload templates (*.csv)"
+    let tryPickFileToLoadDocument () = tryPickFileToOpen "Open document" "Documents (*.csv)"
+    let tryPickFileToSaveDocument () = tryPickFileToOpen "Save document" "Documents (*.csv)"
 
     do
         self.InitializeComponent()
@@ -173,7 +164,7 @@ and MainWindow (
             )
 
     member private self.HandleWindowOpened(event : EventArgs) =
-        self.LoadData()
+        self.TryLoadTemplateWithDocument()
         |> Async.AwaitTask
         |> Async.StartImmediate
 
@@ -181,62 +172,62 @@ and MainWindow (
         dataGrid.ItemsSource <- windowViewModel.Table.Cells
         ()
 
-    member private self.LoadData() = task {
+    member private self.TryLoadTemplateWithDocument() = task {
         match windowConfig.UploadTemplate.SourcePath with
         | "" -> ()
         | uploadTemplatePath when IO.Path.Exists(uploadTemplatePath) ->
             let uploadTemplate_loadInfo = uploadTemplateManager.Load uploadTemplatePath
             if uploadTemplate_loadInfo.Success then
-                match windowConfig.UploadTemplate.ExportedDataPath with
+                match windowConfig.UploadTemplate.DocumentPath with
                 | "" -> displayDataInTable()
-                | exportedDataPath when IO.Path.Exists(exportedDataPath) ->
-                    let exportedData_loadInfo = uploadTemplateManager.AddExportedData exportedDataPath
-                    if exportedData_loadInfo.Success then
+                | documentPath when IO.Path.Exists(documentPath) ->
+                    let document_loadInfo = uploadTemplateManager.LoadDocument documentPath
+                    if document_loadInfo.Success then
                         displayDataInTable()
                     else
-                        do! showError exportedData_loadInfo.Error
-                        windowConfig.UploadTemplate.ExportedDataPath <- ""
+                        do! showError document_loadInfo.Error
+                        windowConfig.UploadTemplate.DocumentPath <- ""
                         displayDataInTable()
-                | exportedDataPath when not <| String.IsNullOrWhiteSpace(exportedDataPath) ->
-                    do! showFailedToLoadExportedData_invalidPath(exportedDataPath)
+                | documentPath when not <| String.IsNullOrWhiteSpace(documentPath) ->
+                    do! showFailedToLoadDocument_invalidPath(documentPath)
                     displayDataInTable()
                 | _ -> ()
             else
                 do! showError uploadTemplate_loadInfo.Error
                 windowConfig.UploadTemplate.SourcePath <- ""
-                windowConfig.UploadTemplate.ExportedDataPath <- ""
+                windowConfig.UploadTemplate.DocumentPath <- ""
                 displayDataInTable()
         | uploadTemplatePath ->
             do! showFailedToLoadUploadTemplate_invalidPath(uploadTemplatePath)
     }
 
-    member private self.OpenUploadTemplateButton_Click(sender: obj, event: RoutedEventArgs) =
+    member private self.LoadUploadTemplateButton_Click(sender: obj, event: RoutedEventArgs) =
         task {
-            match! tryPickFileToOpen() with
+            match! tryPickFileToLoadUploadTemplate() with
             | Some path ->
                 windowConfig.UploadTemplate.SourcePath <- path
-                windowConfig.UploadTemplate.ExportedDataPath <- ""
-                self.LoadData() |> ignore
+                windowConfig.UploadTemplate.DocumentPath <- ""
+                self.TryLoadTemplateWithDocument() |> ignore
             | _ -> ()
         } |> ignore
 
-    member private self.InsertDataButton_Click(sender: obj, event: RoutedEventArgs) =
+    member private self.LoadDocumentButton_Click(sender: obj, event: RoutedEventArgs) =
         task {
-            match! tryPickFileToOpen() with
+            match! tryPickFileToLoadDocument() with
             | Some path ->
-                windowConfig.UploadTemplate.ExportedDataPath <- path
-                self.LoadData() |> ignore
+                windowConfig.UploadTemplate.DocumentPath <- path
+                self.TryLoadTemplateWithDocument() |> ignore
             | _ -> ()
         } |> ignore
 
-    member private self.SaveButton_Click(sender: obj, event: RoutedEventArgs) =
+    member private self.SaveDocumentButton_Click(sender: obj, event: RoutedEventArgs) =
         task {
-            match! tryPickFileToSave() with
+            match! tryPickFileToSaveDocument() with
             | Some path ->
                 match windowViewModel.Table.TryExportToUploadDataTable() with
                 | Ok uploadDataTable ->
                     if uploadTemplateManager.Save(path, uploadDataTable).Success
-                    then windowConfig.UploadTemplate.ExportedDataPath <- path
+                    then windowConfig.UploadTemplate.DocumentPath <- path
                     else do! showUploadTemplateFailedToSave ()
                 | Error errMsg -> do! Dialogs.showErrorU errMsg self
             | _ -> ()

@@ -164,7 +164,7 @@ module UploadTemplate
 end
 
 
-module ExportedData
+module Document
     using CSV
     using DataFrames
 
@@ -205,9 +205,9 @@ module ExportedData
         end
     end
 
-    function load(exportedDataStream::IOStream, columnNameMapping::Columns.ColumnMapping)::Main.Ebay.DataTable
+    function load(documentStream::IOStream, columnNameMapping::Columns.ColumnMapping)::Main.Ebay.DataTable
         local dataFrame = CSV.read(
-            exportedDataStream,
+            documentStream,
             DataFrame;
             delim = ";",
             header = true,
@@ -226,13 +226,13 @@ module ExportedData
         )
     end
 
-    function load(exportedDataStream::IOStream)::Main.Ebay.DataTable
-        load(exportedDataStream, Columns.commonMapping)
+    function load(documentStream::IOStream)::Main.Ebay.DataTable
+        load(documentStream, Columns.commonMapping)
     end
 
     export load
 end
 
-export UploadTemplate, ExportedData, DataTable
+export UploadTemplate, Document, DataTable
 
 end #module Ebay

@@ -56,3 +56,30 @@ let showError (msg : string) (owner : Window) =
     |> _.ShowWindowDialogAsync(owner)
 
 let showErrorU msg = showError msg >> Lime.Task.toUnitTask
+
+module Pick =
+
+    open Avalonia.Platform.Storage
+
+    let filesToOpen (owner : TopLevel) (opts: {| title : string; allowMultiple : bool |}) (fileTypeFilter : FilePickerFileType list) = async {            
+        match! owner.StorageProvider.OpenFilePickerAsync(
+                FilePickerOpenOptions(
+                    Title = opts.title,
+                    AllowMultiple = opts.allowMultiple,
+                    FileTypeFilter = fileTypeFilter
+                )
+            ) |> Async.AwaitTask with
+        | null -> return []
+        | files -> return List.ofSeq files
+    }
+
+    let filesToSave (owner : TopLevel) (opts: {| title : string |}) (fileTypeFilter : FilePickerFileType list) = async {            
+        match! owner.StorageProvider.SaveFilePickerAsync(
+                FilePickerSaveOptions(
+                    Title = opts.title,
+                    FileTypeChoices = fileTypeFilter
+                )
+            ) |> Async.AwaitTask with
+        | null -> return []
+        | file -> return [file]
+    }

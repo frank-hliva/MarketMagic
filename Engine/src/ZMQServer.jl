@@ -55,7 +55,7 @@ function handleLoadUploadTemplate(path::String)
     end
 end
 
-function handleAddExportedData(path::String)
+function handleLoadDocument(path::String)
     try
         if state.uploadDataTable === nothing
             Dict(
@@ -63,14 +63,14 @@ function handleAddExportedData(path::String)
                 "error" => "No upload template loaded. Load upload template first."
             )
         else
-            open(path) do exportedDataStream
-                @match Ebay.UploadTemplate.tryGetHeader(exportedDataStream) begin
+            open(path) do documentStream
+                @match Ebay.UploadTemplate.tryGetHeader(documentStream) begin
                     nothing => begin
-                        local exportedData = Ebay.ExportedData.load(exportedDataStream)
-                        state.uploadDataTable = Ebay.UploadTemplate.withCells(exportedData, state.uploadDataTable)
+                        local document = Ebay.Document.load(documentStream)
+                        state.uploadDataTable = Ebay.UploadTemplate.withCells(document, state.uploadDataTable)
                         Dict(
                             "success" => true,
-                            "message" => "Exported data added successfully from: $path"
+                            "message" => "Document added successfully from: $path"
                         )
                     end
                     _ => begin
@@ -155,12 +155,12 @@ function handleCommand(commandData::Dict)
             handleLoadUploadTemplate(path)
         end
         
-        "addExportedData" => begin
+        "loadDocument" => begin
             path = get(commandData, "path", "")
             if isempty(path)
                 return Dict("success" => false, "error" => "Path parameter required")
             end
-            handleAddExportedData(path)
+            handleLoadDocument(path)
         end
 
         "saveUploadTemplate" => begin
@@ -197,7 +197,7 @@ function startServer(port::Int = 7333)
         println("\n\e[38;5;183mMarketMagic\e[38;5;75m ZMQ Server\e[0m started on port \e[93m$port\e[0m ✅\n")
         println("Available commands:")
         println("  • \e[38;5;43mloadUploadTemplate\e[0m")
-        println("  • \e[38;5;43maddExportedData\e[0m")
+        println("  • \e[38;5;43mloadDocument\e[0m")
         println("  • \e[38;5;43msaveUploadTemplate\e[0m")
         println("  • \e[38;5;43mfetchUploadTemplate\e[0m")
         println("\nWaiting for requests...\n")

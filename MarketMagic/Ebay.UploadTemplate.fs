@@ -57,8 +57,8 @@ type UploadTemplateManager(uploadTemplateManagerConfig : UploadTemplateManagerCo
         {| command = "fetchUploadTemplate" |}
         |> self.SendCommand<CommandDataResponse<UploadDataTable>>
 
-    member self.AddExportedData (path : string) =
-        {| command = "addExportedData"; path = path |}
+    member self.LoadDocument (path : string) =
+        {| command = "loadDocument"; path = path |}
         |> self.SendCommand<CommandMessageResponse>
 
     member self.Save (path : string, uploadDataTable : UploadDataTable) =

@@ -6,9 +6,9 @@ const uploadDataTable = open("./data/template.csv") do templateStream
     Ebay.UploadTemplate.load(templateStream)
 end
 
-const modifiedUploadDataTable = open("./data/active.csv") do exportedDataStream
-    local exportedData = Ebay.ExportedData.load(exportedDataStream)
-    Ebay.UploadTemplate.withCells(exportedData, uploadDataTable)
+const modifiedUploadDataTable = open("./data/active.csv") do documentStream
+    local document = Ebay.Document.load(documentStream)
+    Ebay.UploadTemplate.withCells(document, uploadDataTable)
 end
 
 for cell in modifiedUploadDataTable.cells[1, :]

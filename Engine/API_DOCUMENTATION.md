@@ -37,13 +37,13 @@ Načíta upload template zo súboru.
 }
 ```
 
-### 2. addExportedData
+### 2. loadDocument
 Pridá exportované dáta k aktuálnemu upload template.
 
 **Request:**
 ```json
 {
-    "command": "addExportedData",
+    "command": "loadDocument",
     "path": "./data/active.csv"
 }
 ```
@@ -52,7 +52,7 @@ Pridá exportované dáta k aktuálnemu upload template.
 ```json
 {
     "success": true,
-    "message": "Exported data added successfully from: ./data/active.csv"
+    "message": "Document added successfully from: ./data/active.csv"
 }
 ```
 
