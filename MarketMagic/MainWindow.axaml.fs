@@ -18,11 +18,71 @@ open System.Timers
 open System.Threading
 open Avalonia.Platform.Storage
 open Tomlyn.Model
+open System.ComponentModel
+open System.Diagnostics
 
-type MainWindow (
-    viewModel : TableViewModel,
-    uploadTemplate : UploadTemplate,
-    appConfig: AppConfig
+type WindowConfig(appConfig : AppConfig, uploadTemplateConfig : UploadTemplateConfig) =
+
+    member self.AppConfig = appConfig
+
+    member self.UploadTemplate = uploadTemplateConfig
+
+and UploadTemplateConfig(appConfig : AppConfig) =
+    let valueChanged = Event<unit>()
+
+    member self.ValueChanged = valueChanged.Publish
+
+    member self.AppConfig = appConfig
+
+    member self.ExportedDataPath
+        with get() = appConfig.GetOr("UploadTemplate.ExportedData.Path", "")
+        and set(value : string) =
+            if appConfig.TrySet("UploadTemplate.ExportedData.Path", value) then
+                valueChanged.Trigger()
+
+    member self.SourcePath
+        with get() = appConfig.GetOr("UploadTemplate.Source.Path", "")
+        and set(value : string) =
+            if appConfig.TrySet("UploadTemplate.Source.Path", value) then
+                valueChanged.Trigger()
+
+and WindowViewModel(
+    uploadTemplateConfig: UploadTemplateConfig,
+    tableViewModel: TableViewModel
+) as self =
+    inherit BasicViewModel()
+
+    let applyIfNotEmpty (filter : string -> string) = function
+    | (null | "") as value -> value
+    | input -> filter(input)
+
+    let renderTemplateSource = applyIfNotEmpty <| sprintf "(%s)"
+    let extractFileName = applyIfNotEmpty <| IO.Path.GetFileName
+
+    let mutable title = ""
+
+    do
+        self.UpdateTitle()
+        uploadTemplateConfig.ValueChanged.Add(self.UpdateTitle)
+
+    member self.Title
+        with get() = title
+        and set(value) =
+            title <- value
+            self.OnPropertyChanged("Title")
+
+    member self.UpdateTitle() =
+        let path = extractFileName uploadTemplateConfig.ExportedDataPath
+        let templateSourcePath = extractFileName uploadTemplateConfig.SourcePath
+        let subtitle = [path; renderTemplateSource templateSourcePath] |> String.concat " "
+        self.Title <- $"MarketMagic: {subtitle}"
+
+    member self.Table = tableViewModel
+
+and MainWindow (
+    windowViewModel : WindowViewModel,
+    uploadTemplateManager : UploadTemplateManager,
+    windowConfig : WindowConfig
 ) as self = 
     inherit Window ()
 
@@ -47,8 +107,8 @@ type MainWindow (
         Dialogs.Unit.showError "Upload template failed to save." self
 
     let displayDataInTable() =
-        let response = uploadTemplate.Fetch()
-        viewModel.SetData(response.Data)
+        let response = uploadTemplateManager.Fetch()
+        windowViewModel.Table.SetData(response.Data)
 
     let tryPickFileToOpen () = async {            
         match! self.StorageProvider.OpenFilePickerAsync(
@@ -92,12 +152,12 @@ type MainWindow (
 #if DEBUG
         self.AttachDevTools()
 #endif
-        self.DataContext <- viewModel
+        self.DataContext <- windowViewModel
         AvaloniaXamlLoader.Load(self)
         dataGrid <- self.FindControl<DataGrid>("UploadTable")
 
     member private self.SetupDataGrid() =
-        viewModel.PropertyChanged.Add(fun args ->
+        windowViewModel.Table.PropertyChanged.Add(fun args ->
             match args.PropertyName with
             | "Columns" -> self.UpdateDataGridColumns()
             | _ -> ()
@@ -105,10 +165,10 @@ type MainWindow (
 
     member private self.UpdateDataGridColumns() =
         dataGrid.Columns.Clear()
-        for i in 0 .. viewModel.Columns.Count - 1 do
+        for i in 0 .. windowViewModel.Table.Columns.Count - 1 do
             dataGrid.Columns.Add(
                 DataGridTextColumn(
-                    Header = viewModel.Columns[i],
+                    Header = windowViewModel.Table.Columns[i],
                     Binding = Binding($"[{i}]")
                 )
             )
@@ -119,37 +179,37 @@ type MainWindow (
         |> Async.StartImmediate
 
     member private self.UpdateDataGridCells() =
-        dataGrid.ItemsSource <- viewModel.Cells
+        dataGrid.ItemsSource <- windowViewModel.Table.Cells
         ()
 
     member private self.LoadData() = task {
-        match appConfig.TryGet<string>("UploadTemplate.Source.Path") with
-        | Some uploadTemplatePath when IO.Path.Exists(uploadTemplatePath) ->
-            if (uploadTemplate.Load uploadTemplatePath).Success then
-                match appConfig.TryGet<string>("UploadTemplate.ExportedData.Path") with
-                | Some exportedDataPath when IO.Path.Exists(exportedDataPath) ->
-                    if (uploadTemplate.AddExportedData exportedDataPath).Success then
+        match windowConfig.UploadTemplate.SourcePath with
+        | "" -> do! showFailedToLoadUploadTemplate()
+        | uploadTemplatePath when IO.Path.Exists(uploadTemplatePath) ->
+            if (uploadTemplateManager.Load uploadTemplatePath).Success then
+                match windowConfig.UploadTemplate.ExportedDataPath with
+                | "" -> displayDataInTable()
+                | exportedDataPath when IO.Path.Exists(exportedDataPath) ->
+                    if (uploadTemplateManager.AddExportedData exportedDataPath).Success then
                         displayDataInTable()
                     else
                         do! showFailedToLoadExportedData()
                         displayDataInTable()
-                | Some exportedDataPath when not <| String.IsNullOrWhiteSpace(exportedDataPath) ->
+                | exportedDataPath when not <| String.IsNullOrWhiteSpace(exportedDataPath) ->
                     do! showFailedToLoadExportedData_invalidPath(exportedDataPath)
                     displayDataInTable()
-                | _ -> displayDataInTable()
+                | _ -> ()
             else do! showFailedToLoadUploadTemplate()
-        | Some uploadTemplatePath -> do! showFailedToLoadUploadTemplate_invalidPath(uploadTemplatePath)
-        | _ -> do! showFailedToLoadUploadTemplate()
+        | uploadTemplatePath -> do! showFailedToLoadUploadTemplate_invalidPath(uploadTemplatePath)
     }
 
     member private self.OpenUploadTemplateButton_Click(sender: obj, event: RoutedEventArgs) =
         task {
             match! tryPickFileToOpen() with
             | Some path ->
-                if appConfig.TrySet("UploadTemplate.Source.Path", path) then
-                    appConfig.TrySet("UploadTemplate.ExportedData.Path", null) |> ignore
-                    self.LoadData() |> ignore
-                else do! showUploadTemplateFailedToChange ()
+                windowConfig.UploadTemplate.SourcePath <- path
+                windowConfig.UploadTemplate.ExportedDataPath <- ""
+                self.LoadData() |> ignore
             | _ -> ()
         } |> ignore
 
@@ -157,9 +217,8 @@ type MainWindow (
         task {
             match! tryPickFileToOpen() with
             | Some path ->
-                if appConfig.TrySet("UploadTemplate.ExportedData.Path", path)
-                then self.LoadData() |> ignore
-                else do! showUploadTemplateFailedToChange ()
+                windowConfig.UploadTemplate.ExportedDataPath <- path
+                self.LoadData() |> ignore
             | _ -> ()
         } |> ignore
 
@@ -167,10 +226,10 @@ type MainWindow (
         task {
             match! tryPickFileToSave() with
             | Some path ->
-                match viewModel.TryExportToUploadDataTable() with
+                match windowViewModel.Table.TryExportToUploadDataTable() with
                 | Ok uploadDataTable ->
-                    if uploadTemplate.Save(path, uploadDataTable).Success
-                    then appConfig.TrySet("UploadTemplate.ExportedData.Path", path) |> ignore
+                    if uploadTemplateManager.Save(path, uploadDataTable).Success
+                    then windowConfig.UploadTemplate.ExportedDataPath <- path
                     else do! showUploadTemplateFailedToSave ()
                 | Error errMsg -> do! Dialogs.Unit.showError errMsg self
             | _ -> ()

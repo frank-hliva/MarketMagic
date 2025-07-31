@@ -42,9 +42,9 @@ type CommandDataResponse<'t>(success : bool, data : 't) =
 type CommandSaveResponse(success : bool) = 
     inherit CommandResponse(success)
 
-type UploadTemplate(uploadTemplateConfig : UploadTemplateConfig) =
+type UploadTemplateManager(uploadTemplateManagerConfig : UploadTemplateManagerConfig) =
 
-    let serverAddress = uploadTemplateConfig.FullAddress
+    let serverAddress = uploadTemplateManagerConfig.FullAddress
 
     member private self.SendCommand<'t> (requestObj : obj) =
         sendCommand<'t> serverAddress requestObj
@@ -65,7 +65,7 @@ type UploadTemplate(uploadTemplateConfig : UploadTemplateConfig) =
         {| command = "saveUploadTemplate"; path = path; uploadDataTable = uploadDataTable |}
         |> self.SendCommand<CommandSaveResponse>
 
-and UploadTemplateConfig(appConfig : AppConfig) =
+and UploadTemplateManagerConfig(appConfig : AppConfig) =
 
     member self.AppConfig = appConfig
 

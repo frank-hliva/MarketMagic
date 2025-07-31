@@ -8,8 +8,8 @@
     xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
     mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
     x:Class="MarketMagic.MainWindow"
-    x:DataType="local:TableViewModel"
-    Title="Market Magic"
+    x:DataType="local:WindowViewModel"
+    Title="{Binding Title}"
 >
     <Window.Styles>
         <Style Selector="DataGridCell">
@@ -48,7 +48,7 @@
         <DataGrid
             Grid.Row="1"
             Name="UploadTable"
-            ItemsSource="{Binding Cells}"
+            ItemsSource="{Binding Table.Cells}"
             GridLinesVisibility="All"
             BorderThickness="1"
             BorderBrush="Gray"

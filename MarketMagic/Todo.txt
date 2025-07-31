@@ -1,5 +1,7 @@
-﻿- save musi preniest riadky na BE
-    - uploadDataTable vo FE
+﻿x - save musi preniest riadky na BE
+    x - uploadDataTable vo FE
+- po save
+    UploadTemplate.ExportedDataPath = savepath
 - nejde nacitat ulozeny template aj s datami 
     - template a datove subory su dva rozne typy suborov
         - ak nacitame datovy subor do slotu pre template - system by nas mal upozornit na chybu
