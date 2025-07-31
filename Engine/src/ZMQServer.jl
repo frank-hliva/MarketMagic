@@ -74,8 +74,10 @@ function handleAddExportedData(path::String)
     end
 end
 
-function handleSaveUploadTemplate(path::String)
+function handleSaveUploadTemplate(path::String, uploadDataTable::Main.Ebay.UploadDataTable)
     try
+        state.uploadDataTable = uploadDataTable
+
         if state.uploadDataTable === nothing
             return Dict(
                 "success" => false,
@@ -145,20 +147,20 @@ function handleCommand(commandData::Dict)
             handleAddExportedData(path)
         end
 
-        "ExportedData" => begin
-            path = get(commandData, "path", "")
-            if isempty(path)
-                return Dict("success" => false, "error" => "Path parameter required")
-            end
-            handleAddExportedData(path)
-        end
-
         "saveUploadTemplate" => begin
             path = get(commandData, "path", "")
+            uploadDataTableDict = get(commandData, "uploadDataTable", "")
             if isempty(path)
                 return Dict("success" => false, "error" => "Path parameter required")
             end
-            handleSaveUploadTemplate(path)
+
+            local uploadDataTable = Main.Ebay.UploadDataTable(
+                id = uploadDataTableDict["id"],
+                columns = uploadDataTableDict["columns"],
+                enums = uploadDataTableDict["enums"],
+                cells = nestedArrayToMatrix(Vector{Vector{String}}(uploadDataTableDict["cells"]))
+            )
+            handleSaveUploadTemplate(path, uploadDataTable)
         end
         
         "fetchUploadTemplate" => handleFetchUploadTemplate()

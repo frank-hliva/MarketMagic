@@ -1,4 +1,5 @@
 ﻿- save musi preniest riadky na BE
+    - uploadDataTable vo FE
 - nejde nacitat ulozeny template aj s datami 
     - template a datove subory su dva rozne typy suborov
         - ak nacitame datovy subor do slotu pre template - system by nas mal upozornit na chybu

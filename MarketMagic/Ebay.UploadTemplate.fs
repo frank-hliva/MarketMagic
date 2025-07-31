@@ -61,8 +61,8 @@ type UploadTemplate(uploadTemplateConfig : UploadTemplateConfig) =
         {| command = "addExportedData"; path = path |}
         |> self.SendCommand<CommandMessageResponse>
 
-    member self.Save (path : string) =
-        {| command = "saveUploadTemplate"; path = path |}
+    member self.Save (path : string, uploadDataTable : UploadDataTable) =
+        {| command = "saveUploadTemplate"; path = path; uploadDataTable = uploadDataTable |}
         |> self.SendCommand<CommandSaveResponse>
 
 and UploadTemplateConfig(appConfig : AppConfig) =

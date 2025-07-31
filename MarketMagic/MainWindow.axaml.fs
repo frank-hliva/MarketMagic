@@ -29,29 +29,26 @@ type MainWindow (
     let mutable dataGrid: DataGrid = null
 
     let showFailedToLoadUploadTemplate () = 
-        Dialogs.Unit.showError "Failed to load upload-template." self
+        Dialogs.Unit.showError "Failed to load upload template." self
 
     let showFailedToLoadUploadTemplate_invalidPath (path : string) = 
-        Dialogs.Unit.showError $"Failed to load upload-template.\nThe file \"{path}\" was not found." self
+        Dialogs.Unit.showError $"Failed to load upload template.\nThe file \"{path}\" was not found." self
 
     let showFailedToLoadExportedData () = 
-        Dialogs.Unit.showError "Failed to load exported-data." self
+        Dialogs.Unit.showError "Failed to load exported data." self
 
     let showFailedToLoadExportedData_invalidPath (path : string) = 
-        Dialogs.Unit.showError $"Failed to load exported-data.\nThe file \"{path}\" was not found." self
+        Dialogs.Unit.showError $"Failed to load exported data.\nThe file \"{path}\" was not found." self
 
     let showUploadTemplateFailedToChange () = 
-        Dialogs.Unit.showError "Upload-template failed to change." self
+        Dialogs.Unit.showError "Upload template failed to change." self
 
     let showUploadTemplateFailedToSave () = 
-        Dialogs.Unit.showError "Upload-template failed to save." self
+        Dialogs.Unit.showError "Upload template failed to save." self
 
     let displayDataInTable() =
-        let response = uploadTemplate.Fetch ()
-        viewModel.SetData(
-            response.Data.columns,
-            response.Data.cells
-        )
+        let response = uploadTemplate.Fetch()
+        viewModel.SetData(response.Data)
 
     let tryPickFileToOpen () = async {            
         match! self.StorageProvider.OpenFilePickerAsync(
@@ -160,8 +157,8 @@ type MainWindow (
         task {
             match! tryPickFileToOpen() with
             | Some path ->
-                if appConfig.TrySet("UploadTemplate.ExportedData.Path", path) then
-                    self.LoadData() |> ignore
+                if appConfig.TrySet("UploadTemplate.ExportedData.Path", path)
+                then self.LoadData() |> ignore
                 else do! showUploadTemplateFailedToChange ()
             | _ -> ()
         } |> ignore
@@ -170,8 +167,11 @@ type MainWindow (
         task {
             match! tryPickFileToSave() with
             | Some path ->
-                if (uploadTemplate.Save path).Success then
-                    ()
-                else do! showUploadTemplateFailedToSave ()
+                match viewModel.TryExportToUploadDataTable() with
+                | Ok uploadDataTable ->
+                    if uploadTemplate.Save(path, uploadDataTable).Success
+                    then appConfig.TrySet("UploadTemplate.ExportedData.Path", path) |> ignore
+                    else do! showUploadTemplateFailedToSave ()
+                | Error errMsg -> do! Dialogs.Unit.showError errMsg self
             | _ -> ()
         } |> ignore

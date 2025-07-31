@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="app.conf" />
     <Content Include="Todo.txt" />
     <Compile Include="MarketMagicApp.fs" />
     <Compile Include="TomlTable.fs" />
@@ -64,4 +65,6 @@
       <AvaloniaResource Include="img\plus.svg" />
       <AvaloniaResource Include="img\template.svg" />
   </ItemGroup>
+
+  <ItemGroup />
 </Project>
