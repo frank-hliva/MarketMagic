@@ -5,7 +5,6 @@ open Avalonia.Controls
 open Avalonia.Data
 open Avalonia.Markup.Xaml
 open Avalonia.Threading
-open Lime.Timing
 open MarketMagic
 open MarketMagic.Ebay
 open MsBox.Avalonia
@@ -20,6 +19,7 @@ open Avalonia.Platform.Storage
 open Tomlyn.Model
 open System.ComponentModel
 open System.Diagnostics
+open Lime
 
 type WindowConfig(appConfig : AppConfig, uploadTemplateConfig : UploadTemplateConfig) =
 
@@ -52,11 +52,7 @@ and WindowViewModel(
 ) as self =
     inherit BasicViewModel()
 
-    let applyIfNotEmpty (filter : string -> string) = function
-    | (null | "") as value -> value
-    | input -> filter(input)
-
-    let renderTemplateSource = applyIfNotEmpty <| sprintf "[Template: %s]"
+    let renderTemplateSource = applyIfNotEmpty <| sprintf "<Template: %s>"
     let extractFileName = applyIfNotEmpty <| IO.Path.GetFileName
 
     let mutable title = ""
@@ -186,7 +182,8 @@ and MainWindow (
         match windowConfig.UploadTemplate.SourcePath with
         | "" -> do! showFailedToLoadUploadTemplate()
         | uploadTemplatePath when IO.Path.Exists(uploadTemplatePath) ->
-            if (uploadTemplateManager.Load uploadTemplatePath).Success then
+            let uploadTemplate_loadInfo = uploadTemplateManager.Load uploadTemplatePath
+            if uploadTemplate_loadInfo.Success then
                 match windowConfig.UploadTemplate.ExportedDataPath with
                 | "" -> displayDataInTable()
                 | exportedDataPath when IO.Path.Exists(exportedDataPath) ->
@@ -199,7 +196,7 @@ and MainWindow (
                     do! showFailedToLoadExportedData_invalidPath(exportedDataPath)
                     displayDataInTable()
                 | _ -> ()
-            else do! showFailedToLoadUploadTemplate()
+            else do! self |> Dialogs.Unit.showError uploadTemplate_loadInfo.Error
         | uploadTemplatePath -> do! showFailedToLoadUploadTemplate_invalidPath(uploadTemplatePath)
     }
 

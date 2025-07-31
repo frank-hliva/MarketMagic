@@ -30,6 +30,47 @@ function nestedArrayToMatrix(nestedArray::Vector{Vector{String}})
     return matrix
 end
 
+#= function tryGetUploadTemplateHeader(input::String)::Union{Nothing, Tuple{String, String}}
+    @match match(r"^Info;Version=([^;]+);Template=([^;]+)$", input) begin
+        nothing => nothing
+        m => (m.captures[1], m.captures[2])
+    end
+end
+
+function tryGetUploadTemplateHeader(stream::IOStream)::Union{Nothing, Tuple{String, String}}
+    local currentPosition = position(stream)
+    local result = tryGetUploadTemplateHeader(stream)
+    seek(stream, currentPosition)
+    return result
+end
+
+function handleLoadUploadTemplate(path::String)
+    try
+        state.uploadDataTable = open(path) do templateStream
+            @match tryGetUploadTemplateHeader(templateStream) begin
+                nothing => nothing
+                _ => Ebay.UploadTemplate.load(templateStream)
+            end
+        end
+        if state.uploadDataTable === nothing
+            return Dict(
+                "success" => false,
+                "error" => "Incorrect CSV file type, please load an upload template."
+            )
+        else
+            return Dict(
+                "success" => true,
+                "message" => "Upload template loaded successfully from: $path"
+            )
+        end
+    catch e
+        return Dict(
+            "success" => false,
+            "error" => "Failed to load upload template: $(string(e))"
+        )
+    end
+end =#
+
 function handleLoadUploadTemplate(path::String)
     try
         state.uploadDataTable = open(path) do templateStream
@@ -178,13 +219,13 @@ function startServer(port::Int = 7333)
     
     try
         bind(socket, "tcp://*:$port")
-        println("ZMQ Server started on port $port")
+        println("\n\e[38;5;183mMarketMagic\e[38;5;75m ZMQ Server\e[0m started on port \e[93m$port\e[0m ✅\n")
         println("Available commands:")
-        println("  - loadUploadTemplate")
-        println("  - addExportedData")
-        println("  - saveUploadTemplate")
-        println("  - fetchUploadTemplate")
-        println("Waiting for requests...")
+        println("  • \e[38;5;43mloadUploadTemplate\e[0m")
+        println("  • \e[38;5;43maddExportedData\e[0m")
+        println("  • \e[38;5;43msaveUploadTemplate\e[0m")
+        println("  • \e[38;5;43mfetchUploadTemplate\e[0m")
+        println("\nWaiting for requests...\n")
         
         while true
             requestBytes = recv(socket)
