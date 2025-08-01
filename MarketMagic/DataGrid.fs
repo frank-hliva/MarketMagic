@@ -31,7 +31,6 @@ type DataGridExtensions() =
             else "Press the [⏎] or [F2] or [Ins] to edit"
         else ""
 
-
     [<Extension>]
     static member Reselect (self : DataGrid) =
         self.Focus() |> ignore
