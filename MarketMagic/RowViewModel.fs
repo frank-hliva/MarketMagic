@@ -35,8 +35,8 @@ type RowViewModel(props : {| cells: string[]; isNew : bool |}) =
             isNew = true
         |})
 
-    static member New(columns : string[]) =
-        RowViewModel.New(columns.Length)
+    static member New(columns : string seq) =
+        RowViewModel.New(Seq.length columns)
 
     new(cells: string[]) =
         RowViewModel({|

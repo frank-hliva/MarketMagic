@@ -130,7 +130,7 @@ and MainWindow (
 
     let tryPickFileToLoadUploadTemplate () = tryPickFileToOpen "Open template" "Upload templates (*.csv)"
     let tryPickFileToLoadDocument () = tryPickFileToOpen "Open document" "Documents (*.csv)"
-    let tryPickFileToSaveDocument () = tryPickFileToOpen "Save document" "Documents (*.csv)"
+    let tryPickFileToSaveDocument () = tryPickFileToSave "Save document" "Documents (*.csv)"
 
     do
         self.InitializeComponent()

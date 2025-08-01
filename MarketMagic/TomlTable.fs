@@ -53,14 +53,14 @@ type TomlTableExtensions() =
             match ps with
             | [] -> false
             | [last] ->
-                tbl.[last] <- value
+                tbl[last] <- value
                 true
             | hd :: tl ->
                 match tbl.TryGetItem<TomlTable>(hd) with
                 | Some subtbl -> loop subtbl tl
                 | None ->
                     let newTbl = TomlTable()
-                    tbl.[hd] <- newTbl
+                    tbl[hd] <- newTbl
                     loop newTbl tl
         path.Split '.' |> List.ofArray |> loop self
 

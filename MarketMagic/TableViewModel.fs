@@ -16,6 +16,32 @@ type TableViewModel() =
     let mutable columns = ObservableCollection<string>()
     let mutable cells = ObservableCollection<RowViewModel>()
 
+    let rec withEmptyRow (observableRows : ObservableCollection<RowViewModel>) =
+        let lastEmptyRow = RowViewModel.New(columns)
+        registerRowChangedEvent lastEmptyRow
+        observableRows.Add lastEmptyRow
+        observableRows
+
+    and registerRowChangedEvent (row : RowViewModel) =
+        let handlerRef = ref None
+        let handler = PropertyChangedEventHandler(fun _ args ->
+            if args.PropertyName = "IsNew" && not row.IsNew then
+                if Object.ReferenceEquals(row, cells[cells.Count - 1]) then
+                    let newRow = RowViewModel.New(columns)
+                    registerRowChangedEvent newRow
+                    cells.Add(newRow)
+                handlerRef.Value
+                |> Option.iter row.PropertyChanged.RemoveHandler
+        )
+        handlerRef := Some handler
+        row.PropertyChanged.AddHandler(handler)
+
+    let removeLastEmptyRow (observableRows : ObservableCollection<RowViewModel>) =
+        let rowViewModel = observableRows[observableRows.Count - 1]
+        if rowViewModel.IsNew then
+            observableRows.Remove(rowViewModel) |> ignore
+        observableRows
+
     member self.Columns 
         with get() = columns
         and set(value) = 
@@ -37,27 +63,32 @@ type TableViewModel() =
     member self.SetData(uploadDataTable : Ebay.UploadDataTable) =
         self.UploadDataTable <- Some uploadDataTable
         self.Columns <- ObservableCollection<string>(uploadDataTable.columns)
-        self.Cells <- uploadDataTable.cells |> Cells.toObservable
+        self.Cells <-
+            uploadDataTable.cells
+            |> Cells.toObservable
+            |> withEmptyRow
 
     member self.TryExportToUploadDataTable() : Result<Ebay.UploadDataTable, string> =
         match self.UploadDataTable with
         | Some uploadDataTable ->
             { uploadDataTable with
                 columns = self.Columns |> List.ofSeq
-                cells = self.Cells |> Cells.ofObservable self.Columns
+                cells =
+                    self.Cells
+                    |> removeLastEmptyRow
+                    |> Cells.ofObservable self.Columns
             } |> Ok
         | _ -> Error "The upload template has not been loaded."
     
 module Cells =
-    let toObservable (cells : string array2d) =
+    let toObservable (cells : string array2d) : RowViewModel ObservableCollection =
         let rowCount = cells.GetLength(0)
         let columnCount = cells.GetLength(1)
         [for y in 0 .. rowCount - 1 ->
-            [| for x in 0 .. columnCount - 1 -> cells[y, x] |]
-            |> RowViewModel
+            [| for x in 0 .. columnCount - 1 -> cells[y, x] |] |> RowViewModel
         ] |> ObservableCollection
 
-    let ofObservable (columns : string ObservableCollection) (observableCells : RowViewModel ObservableCollection) = 
+    let ofObservable (columns : string ObservableCollection) (observableCells : RowViewModel ObservableCollection) : string array2d = 
         let rowList = Seq.toList observableCells
         let rowCount = List.length rowList
         Array2D.init rowCount columns.Count (fun y x -> rowList[y][x])
