@@ -75,6 +75,7 @@ type TableViewModel() =
                 columns = self.Columns |> List.ofSeq
                 cells =
                     self.Cells
+                    |> ObservableCollection<_>
                     |> removeLastEmptyRow
                     |> Cells.ofObservable self.Columns
             } |> Ok

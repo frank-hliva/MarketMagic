@@ -10,5 +10,114 @@
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
         <StyleInclude Source="avares://MsBox.Avalonia.Markdown/Controls/MarkdownView.axaml" />
     </Application.Styles>
+
+
+    <Application.Resources>
+        <SolidColorBrush x:Key="ForegroundColor" Color="#b0b7c3" />
+        <SolidColorBrush x:Key="PrimaryColor" Color="#394e75" />
+        <SolidColorBrush x:Key="RegionColor" Color="#21252b" />
+        <SolidColorBrush x:Key="ErrorColor" Color="Yellow" />
+        <SolidColorBrush x:Key="BoxBorderColor" Color="#181a1f" />
+        <SolidColorBrush x:Key="TextBoxBackgroundColor" Color="#23272f" />
+        <SolidColorBrush x:Key="ControlBackgroundColor" Color="#282c34" />
+        <SolidColorBrush x:Key="TypeForegroundColor" Color="#56b7c3" />
+        <SolidColorBrush x:Key="TagForegroundColor" Color="#6495ee" />
+        <SolidColorBrush x:Key="ConstForegroundColor" Color="#dcdcaa" />
+        <SolidColorBrush x:Key="ProcForegroundColor" Color="#98c379" />
+        <SolidColorBrush x:Key="ImportForegroundColor" Color="#808794" />
+        <SolidColorBrush x:Key="HighlightForegroundColor" Color="#ff6ab3" />
+    </Application.Resources>
+    <Application.Styles>
+        <FluentTheme>
+            <FluentTheme.Palettes>
+                <ColorPaletteResources x:Key="Light" Accent="Green" RegionColor="White" ErrorText="Red" />
+                <ColorPaletteResources x:Key="Dark" Accent="#394e75" RegionColor="#21252b" ErrorText="Yellow" />
+            </FluentTheme.Palettes>
+        </FluentTheme>
+        <Style Selector="Label">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TreeView">
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="{StaticResource ControlBackgroundColor}" />
+        </Style>
+        <Style Selector="TreeViewItem TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource ForegroundColor}"/>
+        </Style>
+
+        <Style Selector="TextBox">
+            <Setter Property="Foreground" Value="{StaticResource ForegroundColor}"/>
+            <Setter Property="Background" Value="{StaticResource TextBoxBackgroundColor}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BoxBorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style Selector="TextBox:pointerover, TextBox:focus">
+            <Setter Property="Foreground" Value="{StaticResource ForegroundColor}" />
+        </Style>
+        <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement, TextBox:focus /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="{StaticResource BoxBorderColor}"/>
+            <Setter Property="Background" Value="{StaticResource ControlBackgroundColor}" />
+        </Style>
+        <Style Selector="TextBox:pointerover /template/ TextBlock#PART_Watermark, TextBox:focus /template/ TextBlock#PART_FloatingWatermark">
+            <Setter Property="Foreground" Value="{StaticResource ForegroundColor}" />
+        </Style>
+
+        <Style Selector="Button">
+            <Setter Property="BorderBrush" Value="{StaticResource BoxBorderColor}"/>
+            <Setter Property="Background" Value="{StaticResource ControlBackgroundColor}" />
+            <Setter Property="Foreground" Value="{StaticResource ForegroundColor}" />
+        </Style>
+
+        <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button:pressed /template/ ContentPresenter#PART_ContentPresenter, Button:pressed /template/ ContentPresenter#PART_ContentPresenter, Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#4a70b7" />
+        </Style>
+
+        <Style Selector="GridSplitter">
+            <Setter Property="Background" Value="{StaticResource RegionColor}"/>
+            <Style Selector="^:pointerover">
+                <Setter Property="Background" Value="{StaticResource BoxBorderColor}"/>
+            </Style>
+        </Style>
+
+        <Style Selector="DataGrid">
+            <Setter Property="BorderBrush" Value="Silver"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="RowBackground" Value="White"/>
+            <!--<Setter Property="AlternatingRowBackground" Value="#f3f3f3"/>-->
+        </Style>
+        <Style Selector="DataGridRow">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="Silver"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        </Style>
+        <!--<Style Selector="DataGridRow:alternating">
+            <Setter Property="Background" Value="#f3f3f3"/>
+        </Style>-->
+        <Style Selector="DataGridCell">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Silver"/>
+            <Setter Property="BorderThickness" Value="0,0,1,0"/>
+            <Setter Property="Foreground" Value="#222"/>
+            <Setter Property="Padding" Value="4,2"/>
+        </Style>
+        <Style Selector="DataGridCell:selected">
+            <Setter Property="Background" Value="#cce6ff"/>
+            <Setter Property="Foreground" Value="#222"/>
+        </Style>
+        <Style Selector="DataGridCell:pointerover">
+            <Setter Property="Background" Value="#e6f2ff"/>
+        </Style>
+        <!--<Style Selector="DataGridColumnHeader">
+            <Setter Property="Background" Value="#eaeaea"/>
+            <Setter Property="Foreground" Value="#222"/>
+            <Setter Property="BorderBrush" Value="Silver"/>
+            <Setter Property="BorderThickness" Value="0,0,1,1"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="4,2"/>
+        </Style>-->
+    </Application.Styles>
+    
 </Application>
 

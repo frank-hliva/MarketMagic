@@ -12,13 +12,6 @@
     Title="{Binding Title}"
 >
     <Window.Styles>
-        <Style Selector="DataGridCell">
-            <Setter Property="Foreground" Value="Black"/>
-        </Style>
-        <Style Selector="DataGridCell TextBlock">
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
         <Style Selector="StackPanel Button">
             <Setter Property="Margin" Value="1"/>
             <Setter Property="Width" Value="48"/>
