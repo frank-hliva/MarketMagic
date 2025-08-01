@@ -17,6 +17,7 @@
     <Compile Include="MarketMagicApp.fs" />
     <Compile Include="TomlTable.fs" />
     <Compile Include="AppConfigProvider.fs" />
+    <Compile Include="DataGrid.fs" />
     <Compile Include="Ebay.UploadTemplate.fs" />
     <Compile Include="Dialogs.fs" />
     <Compile Include="BasicViewModel.fs" />
@@ -65,6 +66,4 @@
       <AvaloniaResource Include="img\plus.svg" />
       <AvaloniaResource Include="img\template.svg" />
   </ItemGroup>
-
-  <ItemGroup />
 </Project>

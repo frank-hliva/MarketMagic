@@ -134,22 +134,9 @@ and MainWindow (
     let tryPickFileToSaveDocument () = tryPickFileToSave "Save document" "Documents (*.csv)"
 
     let displayDataGridCellInfo(dataGrid : DataGrid) =
-        let rowIndex = dataGrid.SelectedIndex
-        let columnIndex = 
-            match dataGrid.CurrentColumn with
-            | null -> -1
-            | col -> col.DisplayIndex
-        match self.DataContext with
-        | :? WindowViewModel as viewModel ->
-            viewModel.Table.CellInfo <- $"Row: {rowIndex + 1}, Column: {columnIndex + 1}"
-            if dataGrid.IsFocused then
-                viewModel.Table.Help <- 
-                    if viewModel.Table.IsInEditMode
-                    then "Press the [⏎] or [Tab] or [Esc] key to exit edit mode"
-                    else "Press the [⏎] or [F2] or [Ins] to edit"
-            else
-                viewModel.Table.Help <- ""
-        | _ -> ()
+        let cellInfo, keyboardInfo = dataGrid.GetDataGridCellInfo(windowViewModel.Table.IsInEditMode)
+        windowViewModel.Table.CellInfo <- cellInfo
+        windowViewModel.Table.Help <- keyboardInfo
 
     do
         self.InitializeComponent()
@@ -285,7 +272,7 @@ and MainWindow (
             | Key.Enter | Key.Tab | Key.Escape when windowViewModel.Table.IsInEditMode ->
                 if dataGrid.SelectedItem <> null && dataGrid.CurrentColumn <> null then
                     dataGrid.CommitEdit() |> ignore
-                    dataGrid.Focus() |> ignore
+                    dataGrid.Reselect()
                     e.Handled <- true
             | Key.Delete when not dataGrid.IsReadOnly ->
                 this.ClearSelectedCell(dataGrid)
