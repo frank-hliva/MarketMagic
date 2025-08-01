@@ -9,11 +9,16 @@ open System.Collections.ObjectModel
 open System.ComponentModel
 open System.Runtime.CompilerServices
 
-type RowViewModel(props : {| cells: string[]; isNew : bool |}) =
+type RowViewModelProps = {
+    Cells: string[]
+    IsNew : bool
+}
+
+type RowViewModel(props : RowViewModelProps) =
     inherit BasicViewModel()
 
-    let mutable cellValues = props.cells
-    let mutable isNew = props.isNew
+    let mutable cellValues = props.Cells
+    let mutable isNew = props.IsNew
 
     member self.Item
         with get(i) = cellValues[i]
@@ -30,16 +35,16 @@ type RowViewModel(props : {| cells: string[]; isNew : bool |}) =
                 self.OnPropertyChanged(nameof self.IsNew)
 
     static member New(columnLength : int) =
-        RowViewModel({|
-            cells = Array.create columnLength ""
-            isNew = true
-        |})
+        RowViewModel({
+            Cells = Array.create columnLength ""
+            IsNew = true
+        })
 
     static member New(columns : string seq) =
         RowViewModel.New(Seq.length columns)
 
     new(cells: string[]) =
-        RowViewModel({|
-            cells = cells
-            isNew = false
-        |})
+        RowViewModel({
+            Cells = cells
+            IsNew = false
+        })

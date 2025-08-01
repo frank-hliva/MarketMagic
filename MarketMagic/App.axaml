@@ -11,7 +11,6 @@
         <StyleInclude Source="avares://MsBox.Avalonia.Markdown/Controls/MarkdownView.axaml" />
     </Application.Styles>
 
-
     <Application.Resources>
         <SolidColorBrush x:Key="ForegroundColor" Color="#b0b7c3" />
         <SolidColorBrush x:Key="PrimaryColor" Color="#394e75" />
@@ -80,43 +79,54 @@
             </Style>
         </Style>
 
+        <!-- DataGrid -->
         <Style Selector="DataGrid">
-            <Setter Property="BorderBrush" Value="Silver"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="RowBackground" Value="White"/>
-            <!--<Setter Property="AlternatingRowBackground" Value="#f3f3f3"/>-->
+            <Setter Property="Background" Value="{StaticResource RegionColor}"/>
+            <Setter Property="Foreground" Value="{StaticResource ForegroundColor}"/>
+            <Setter Property="GridLinesVisibility" Value="All"/>
         </Style>
-        <Style Selector="DataGridRow">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="Silver"/>
-            <Setter Property="BorderThickness" Value="0,0,0,1"/>
-        </Style>
-        <!--<Style Selector="DataGridRow:alternating">
-            <Setter Property="Background" Value="#f3f3f3"/>
-        </Style>-->
-        <Style Selector="DataGridCell">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="Silver"/>
-            <Setter Property="BorderThickness" Value="0,0,1,0"/>
-            <Setter Property="Foreground" Value="#222"/>
-            <Setter Property="Padding" Value="4,2"/>
-        </Style>
-        <Style Selector="DataGridCell:selected">
-            <Setter Property="Background" Value="#cce6ff"/>
-            <Setter Property="Foreground" Value="#222"/>
-        </Style>
-        <Style Selector="DataGridCell:pointerover">
-            <Setter Property="Background" Value="#e6f2ff"/>
-        </Style>
-        <!--<Style Selector="DataGridColumnHeader">
-            <Setter Property="Background" Value="#eaeaea"/>
-            <Setter Property="Foreground" Value="#222"/>
-            <Setter Property="BorderBrush" Value="Silver"/>
-            <Setter Property="BorderThickness" Value="0,0,1,1"/>
+        <Style Selector="DataGridColumnHeader">
+            <Setter Property="Background" Value="#282c34"/>
+            <Setter Property="Foreground" Value="#b0b7c3"/>    
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="4,2"/>
-        </Style>-->
+        </Style>    
+        <Style Selector="DataGridRow">
+            <Setter Property="Background" Value="#0e3a5c"/>
+            <Setter Property="Foreground" Value="{StaticResource ForegroundColor}"/>
+        </Style>
+        <Style Selector="DataGridRow:nth-child(even)">
+            <Setter Property="Background" Value="#002a46"/>
+        </Style>
+        <Style Selector="DataGridRow:selected">
+            <Setter Property="Background" Value="#000000"/>
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+        <Style Selector="DataGridCell">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="15"/>
+        </Style>
+        <Style Selector="DataGridCell TextBox">
+            <Setter Property="Background" Value="#23272f"/>
+            <Setter Property="BorderBrush" Value="#181a1f"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="0"/>
+        </Style>
+
+        <!-- StatusBar -->
+        <Style Selector="StackPanel.StatusBar">
+            <Setter Property="Background" Value="{StaticResource RegionColor}"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Orientation" Value="Horizontal"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="StackPanel.StatusBar TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="Silver"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="10,0"/>
+        </Style>
     </Application.Styles>
     
 </Application>

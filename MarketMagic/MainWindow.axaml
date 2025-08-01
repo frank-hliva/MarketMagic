@@ -23,6 +23,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="64"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="24"/>
         </Grid.RowDefinitions>
         <StackPanel
             Orientation="Horizontal"
@@ -43,9 +44,15 @@
             Name="UploadTable"
             ItemsSource="{Binding Table.Cells}"
             GridLinesVisibility="All"
-            BorderThickness="1"
+            BorderThickness="0,1,0,0"
             BorderBrush="Gray"
             IsReadOnly="False"
+            HeadersVisibility="All"
+            CurrentCellChanged="UploadTableDataGrid_CurrentCellChanged"
         />
+        <StackPanel Classes="StatusBar" Grid.Row="2">
+            <TextBlock Text="{Binding Table.CellInfo}" />
+            <TextBlock Text="{Binding Table.Help}" />
+        </StackPanel>
     </Grid>
 </Window>

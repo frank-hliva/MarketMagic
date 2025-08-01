@@ -21,6 +21,7 @@ open System.ComponentModel
 open System.Diagnostics
 open Lime
 open Dialogs
+open Avalonia.Input
 
 type WindowConfig(appConfig : AppConfig, uploadTemplateConfig : UploadTemplateConfig) =
 
@@ -132,10 +133,46 @@ and MainWindow (
     let tryPickFileToLoadDocument () = tryPickFileToOpen "Open document" "Documents (*.csv)"
     let tryPickFileToSaveDocument () = tryPickFileToSave "Save document" "Documents (*.csv)"
 
+    let displayDataGridCellInfo(dataGrid : DataGrid) =
+        let rowIndex = dataGrid.SelectedIndex
+        let columnIndex = 
+            match dataGrid.CurrentColumn with
+            | null -> -1
+            | col -> col.DisplayIndex
+        match self.DataContext with
+        | :? WindowViewModel as viewModel ->
+            viewModel.Table.CellInfo <- $"Row: {rowIndex + 1}, Column: {columnIndex + 1}"
+            if dataGrid.IsFocused then
+                viewModel.Table.Help <- 
+                    if viewModel.Table.IsInEditMode
+                    then "Press the [⏎] or [Tab] or [Esc] key to exit edit mode"
+                    else "Press the [⏎] or [F2] or [Ins] to edit"
+            else
+                viewModel.Table.Help <- ""
+        | _ -> ()
+
     do
         self.InitializeComponent()
         self.SetupDataGrid()
-        self.Opened.Add(self.HandleWindowOpened)
+        self.Opened.Add(self.WindowOpened)
+
+        dataGrid.BeginningEdit.Add(fun _ ->
+            windowViewModel.Table.IsInEditMode <- true
+            displayDataGridCellInfo <| dataGrid
+        )
+        dataGrid.CellEditEnded.Add(fun _ ->
+            windowViewModel.Table.IsInEditMode <- false
+            displayDataGridCellInfo <| dataGrid
+        )
+
+        dataGrid.AddHandler(
+            InputElement.KeyDownEvent,
+            EventHandler<KeyEventArgs>(
+                fun sender event ->
+                    self.UploadTableDataGrid_KeyDown(sender, event)
+            ),
+            RoutingStrategies.Tunnel
+        )
 
     member private self.InitializeComponent() =
 #if DEBUG
@@ -162,7 +199,7 @@ and MainWindow (
                 )
             )
 
-    member private self.HandleWindowOpened(event : EventArgs) =
+    member private self.WindowOpened(event : EventArgs) =
         self.TryLoadTemplateWithDocument()
         |> Async.AwaitTask
         |> Async.StartImmediate
@@ -200,7 +237,7 @@ and MainWindow (
             do! showFailedToLoadUploadTemplate_invalidPath(uploadTemplatePath)
     }
 
-    member private self.LoadUploadTemplateButton_Click(sender: obj, event: RoutedEventArgs) =
+    member private self.LoadUploadTemplateButton_Click(sender : obj, event : RoutedEventArgs) =
         task {
             match! tryPickFileToLoadUploadTemplate() with
             | Some path ->
@@ -210,7 +247,7 @@ and MainWindow (
             | _ -> ()
         } |> ignore
 
-    member private self.LoadDocumentButton_Click(sender: obj, event: RoutedEventArgs) =
+    member private self.LoadDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
         task {
             match! tryPickFileToLoadDocument() with
             | Some path ->
@@ -231,3 +268,33 @@ and MainWindow (
                 | Error errMsg -> do! Dialogs.showErrorU errMsg self
             | _ -> ()
         } |> ignore
+
+    member private self.UploadTableDataGrid_CurrentCellChanged(sender: obj, e: EventArgs) =
+        sender
+        :?> DataGrid
+        |> displayDataGridCellInfo
+
+    member this.UploadTableDataGrid_KeyDown(sender : obj, e : KeyEventArgs) =
+        let dataGrid = sender :?> DataGrid
+        if not dataGrid.IsReadOnly then
+            match e.Key with
+            | Key.Enter | Key.F2 | Key.Insert when not windowViewModel.Table.IsInEditMode ->
+                if dataGrid.SelectedItem <> null && dataGrid.CurrentColumn <> null then
+                    dataGrid.BeginEdit() |> ignore
+                    e.Handled <- true
+            | Key.Enter | Key.Tab | Key.Escape when windowViewModel.Table.IsInEditMode ->
+                if dataGrid.SelectedItem <> null && dataGrid.CurrentColumn <> null then
+                    dataGrid.CommitEdit() |> ignore
+                    dataGrid.Focus() |> ignore
+                    e.Handled <- true
+            | Key.Delete when not dataGrid.IsReadOnly ->
+                this.ClearSelectedCell(dataGrid)
+                e.Handled <- true
+            | _ -> ()
+
+    member this.ClearSelectedCell(dataGrid : DataGrid) =
+        match dataGrid.SelectedItem, dataGrid.CurrentColumn with
+        | (:? RowViewModel as row), col when col <> null ->
+            let columnIndex = col.DisplayIndex
+            row.[columnIndex] <- ""
+        | _ -> ()

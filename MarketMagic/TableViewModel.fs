@@ -15,6 +15,9 @@ type TableViewModel() =
     let mutable uploadDataTable : Ebay.UploadDataTable option = None
     let mutable columns = ObservableCollection<string>()
     let mutable cells = ObservableCollection<RowViewModel>()
+    let mutable cellInfo = ""
+    let mutable help = ""
+    let mutable isInEditingMode = false
 
     let rec withEmptyRow (observableRows : ObservableCollection<RowViewModel>) =
         let lastEmptyRow = RowViewModel.New(columns)
@@ -54,11 +57,30 @@ type TableViewModel() =
             cells <- value
             self.OnPropertyChanged("Cells")
 
+    member self.CellInfo 
+        with get() = cellInfo
+        and set(value) = 
+            cellInfo <- value
+            self.OnPropertyChanged("CellInfo")
+
+    member self.Help 
+        with get() = help
+        and set(value) = 
+            help <- value
+            self.OnPropertyChanged("Help")
+
     member self.UploadDataTable 
         with get() = uploadDataTable
         and set(value) = 
             uploadDataTable <- value
             self.OnPropertyChanged("UploadDataTable")
+
+    member self.IsInEditMode
+        with get() = isInEditingMode
+        and set(value) =
+            if isInEditingMode <> value then
+                isInEditingMode <- value
+                self.OnPropertyChanged("IsInEditMode")
 
     member self.SetData(uploadDataTable : Ebay.UploadDataTable) =
         self.UploadDataTable <- Some uploadDataTable
@@ -67,6 +89,8 @@ type TableViewModel() =
             uploadDataTable.cells
             |> Cells.toObservable
             |> withEmptyRow
+        self.CellInfo <- ""
+        self.Help <- ""
 
     member self.TryExportToUploadDataTable() : Result<Ebay.UploadDataTable, string> =
         match self.UploadDataTable with
