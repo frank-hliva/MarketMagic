@@ -29,6 +29,14 @@ type WindowConfig(appConfig : AppConfig, uploadTemplateConfig : UploadTemplateCo
 
     member self.UploadTemplate = uploadTemplateConfig
 
+    member self.State
+        with get() =
+            appConfig.GetOr("Window.State", (int)WindowState.Normal)
+            |> enum<WindowState>
+        and set(value : WindowState) =
+            if not <| appConfig.TrySet("Window.State", (int)value) then
+                failwith "Failed to change Window.State configuration"
+
 and UploadTemplateConfig(appConfig : AppConfig) =
     let valueChanged = Event<unit>()
 
@@ -88,6 +96,7 @@ and MainWindow (
 
     let displayDataInTable() =
         windowViewModel.Table.SetData <| uploadTemplateManager.Fetch().Data
+        dataGrid.Focus() |> ignore
 
     let showError (msg : string) = 
         Dialogs.showErrorU msg self
@@ -141,7 +150,8 @@ and MainWindow (
     do
         self.InitializeComponent()
         self.SetupDataGrid()
-        self.Opened.Add(self.WindowOpened)
+        self.Opened.Add(self.Window_Opened)
+        self.Closing.Add(self.Window_Closing)
 
         dataGrid.BeginningEdit.Add(fun _ ->
             windowViewModel.Table.IsInEditMode <- true
@@ -186,10 +196,14 @@ and MainWindow (
                 )
             )
 
-    member private self.WindowOpened(event : EventArgs) =
+    member private self.Window_Opened(event : EventArgs) =
+        self.WindowState <- windowConfig.State
         self.TryLoadTemplateWithDocument()
         |> Async.AwaitTask
         |> Async.StartImmediate
+
+    member private self.Window_Closing(event : EventArgs) =
+        windowConfig.State <- self.WindowState
 
     member private self.UpdateDataGridCells() =
         dataGrid.ItemsSource <- windowViewModel.Table.Cells
