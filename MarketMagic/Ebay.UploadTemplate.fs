@@ -1,10 +1,10 @@
 ﻿module MarketMagic.Ebay
 
 open System
+open FSharp.Data
 open Newtonsoft.Json
 open NetMQ
 open NetMQ.Sockets
-open FSharp.Data
 open Lime
 
 let inline sendRawCommand<'t> serverAddress (json : string) =

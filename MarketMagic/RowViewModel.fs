@@ -40,10 +40,10 @@ type RowViewModel(props : RowViewModelProps) =
                 self.OnPropertyChanged(nameof self.IsNew)
 
     member self.IsMarked
-        with get() = isNew
-        and private set(value) =
-            if isNew <> value then
-                isNew <- value
+        with get() = isMarked
+        and set(value) =
+            if isMarked <> value then
+                isMarked <- value
                 self.OnPropertyChanged(nameof self.IsMarked)
 
     member private self.ToArray() = cellValues

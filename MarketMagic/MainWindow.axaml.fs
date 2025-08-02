@@ -13,6 +13,8 @@ open Avalonia.Platform.Storage
 open Lime
 open MarketMagic
 open MarketMagic.Ebay
+open Avalonia.Markup.Xaml.Templates
+open Avalonia.Controls.Templates
 
 type WindowConfig(appConfig : AppConfig, uploadTemplateConfig : UploadTemplateConfig) =
 
@@ -179,6 +181,12 @@ and MainWindow (
 
     member private self.UpdateDataGridColumns() =
         dataGrid.Columns.Clear()
+        DataGridCheckBoxColumn(
+            Header = "#",
+            Binding = Binding("IsMarked"),
+            Width = DataGridLength(40.0, DataGridLengthUnitType.Pixel)
+        ) |> dataGrid.Columns.Add
+
         for i in 0 .. windowViewModel.Table.Columns.Count - 1 do
             dataGrid.Columns.Add(
                 DataGridTextColumn(

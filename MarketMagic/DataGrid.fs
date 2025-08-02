@@ -10,7 +10,6 @@ open Avalonia.Data
 open Avalonia.Markup.Xaml
 open Avalonia.Threading
 
-
 [<Extension>]
 type DataGridExtensions() =
 
