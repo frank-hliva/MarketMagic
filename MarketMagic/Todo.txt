@@ -1,15 +1,5 @@
-﻿- automaticky pridat novy riadok ak bola v predoslom vyplnena hodnota
-    // Predpokladám, že viewModel.Cells je ObservableCollection<RowType>
-    let addEmptyRowIfNeeded () =
-        let lastRow = viewModel.Cells[viewModel.Cells.Count - 1]
-        if isRowFilled lastRow then
-            viewModel.Cells.Add(RowType()) // prázdny riadok
-
-    // Volaj túto funkciu pri zmene buniek v poslednom riadku
-    viewModel.Cells.CollectionChanged.Add(fun _ -> addEmptyRowIfNeeded())
-- mazanie riadkov
+﻿- mazanie riadkov
 - button save pridat zatial mame len save as
-- farby
 ----------------------------------------------------------------------------------------------
 - MarketMagic.jl ma tiez precitat port z config.toml
 - moznost zavriet UploadTemplate.Document

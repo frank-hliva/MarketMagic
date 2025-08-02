@@ -20,6 +20,9 @@ type RowViewModel(props : RowViewModelProps) =
     let mutable cellValues = props.Cells
     let mutable isNew = props.IsNew
 
+    member self.Id
+        with get() = Guid.NewGuid()
+
     member self.Item
         with get(i) = cellValues[i]
         and set(i) value =
@@ -34,6 +37,10 @@ type RowViewModel(props : RowViewModelProps) =
                 isNew <- value
                 self.OnPropertyChanged(nameof self.IsNew)
 
+    member private self.ToArray() = cellValues
+
+    static member internal op_Explicit(row : RowViewModel) : string[] = row.ToArray()
+
     static member New(columnLength : int) =
         RowViewModel({
             Cells = Array.create columnLength ""
@@ -43,8 +50,14 @@ type RowViewModel(props : RowViewModelProps) =
     static member New(columns : string seq) =
         RowViewModel.New(Seq.length columns)
 
-    new(cells: string[]) =
+    new(cells : string[]) =
         RowViewModel({
             Cells = cells
+            IsNew = false
+        })
+
+    new(rowViewModel: RowViewModel) =
+        RowViewModel({
+            Cells = rowViewModel |> RowViewModel.op_Explicit
             IsNew = false
         })
