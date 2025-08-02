@@ -1,13 +1,13 @@
 ﻿namespace rec MarketMagic
 
-open Avalonia
-open Avalonia.Controls
-open Avalonia.Markup.Xaml
 open System
 open System.Collections.Generic
 open System.Collections.ObjectModel
 open System.ComponentModel
 open System.Runtime.CompilerServices
+open Avalonia
+open Avalonia.Controls
+open Avalonia.Markup.Xaml
 
 type TableViewModel() =
     inherit BasicViewModel()

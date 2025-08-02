@@ -2,11 +2,8 @@
 
 open System
 open System.IO
-open Tomlyn
-open Tomlyn.Model
 open System.Runtime.CompilerServices
 open System.Collections.Generic
-
 open Avalonia
 open Avalonia.Controls
 open Avalonia.Data

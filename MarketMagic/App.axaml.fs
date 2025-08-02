@@ -1,11 +1,11 @@
 namespace MarketMagic
 
+open System
+open System.IO
 open Avalonia
 open Avalonia.Controls.ApplicationLifetimes
 open Avalonia.Markup.Xaml
 open Microsoft.Extensions.DependencyInjection
-open System
-open System.IO
 open MarketMagic
 
 type App(serviceProvider: IServiceProvider) =

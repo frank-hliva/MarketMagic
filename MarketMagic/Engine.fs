@@ -5,7 +5,6 @@ open System.Diagnostics
 open NetMQ
 open NetMQ.Sockets
 open System.Threading
-open Tomlyn.Model
 
 type Engine(engineConfig : EngineConfig) as self =
 

@@ -1,11 +1,11 @@
 ﻿module MarketMagic.Dialogs
 
 open System
+open System.Runtime.InteropServices
 open Avalonia
 open Avalonia.Controls
 open MsBox.Avalonia
 open MsBox.Avalonia.Enums
-open System.Runtime.InteropServices
 
 module Native =
 
