@@ -1,27 +1,18 @@
 ﻿namespace MarketMagic
 
+open System
+open System.Threading
 open Avalonia
 open Avalonia.Controls
 open Avalonia.Data
 open Avalonia.Markup.Xaml
 open Avalonia.Threading
+open Avalonia.Input
+open Avalonia.Interactivity
+open Avalonia.Platform.Storage
+open Lime
 open MarketMagic
 open MarketMagic.Ebay
-open MsBox.Avalonia
-open MsBox.Avalonia.Enums
-open Avalonia.Interactivity
-open System
-open System.Collections.Specialized
-open System.Collections.ObjectModel
-open System.Timers
-open System.Threading
-open Avalonia.Platform.Storage
-open Tomlyn.Model
-open System.ComponentModel
-open System.Diagnostics
-open Lime
-open Dialogs
-open Avalonia.Input
 
 type WindowConfig(appConfig : AppConfig, uploadTemplateConfig : UploadTemplateConfig) =
 
@@ -123,7 +114,7 @@ and MainWindow (
         match! [
             FilePickerFileType(fileTypeTitle, Patterns = [| "*.csv" |])
             FilePickerFileTypes.All
-        ] |> Pick.filesToOpen self {| title = title; allowMultiple = false |} with
+        ] |> Dialogs.Pick.filesToOpen self {| title = title; allowMultiple = false |} with
         | [] -> return None
         | file :: _ ->
             return Some file.Path.LocalPath
@@ -133,7 +124,7 @@ and MainWindow (
         match! [
             FilePickerFileType(fileTypeTitle, Patterns = [| "*.csv" |])
             FilePickerFileTypes.All
-        ] |> Pick.filesToSave self {| title = title |} with
+        ] |> Dialogs.Pick.filesToSave self {| title = title |} with
         | [] -> return None
         | file :: _ -> return Some file.Path.LocalPath
     }
