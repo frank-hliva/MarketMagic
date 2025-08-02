@@ -5,7 +5,7 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <ApplicationIcon>icons8-magic-others-32.ico</ApplicationIcon>
+    <ApplicationIcon>MarketMagic.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaXaml Remove="Engine\**" />
@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <None Include="app.conf" />
-    <Content Include="icons8-magic-others-32.ico" />
+    <Content Include="MarketMagic.ico" />
     <Content Include="Todo.txt" />
     <Compile Include="MarketMagicApp.fs" />
     <Compile Include="TomlTable.fs" />
