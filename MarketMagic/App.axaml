@@ -176,6 +176,11 @@
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Margin" Value="10,0"/>
         </Style>
+
+        <!-- ScrollBar -->
+        <Style Selector="ScrollBar">
+            <Setter Property="AllowAutoHide" Value="False"/>
+        </Style>
     </Application.Styles>
     
 </Application>
