@@ -199,11 +199,11 @@ and MainWindow (
     member private self.SetupDataGrid() =
         windowViewModel.Table.PropertyChanged.Add(fun args ->
             match args.PropertyName with
-            | "Columns" -> self.UpdateDataGridColumns()
+            | "Columns" -> self.SetupDataGridColumns()
             | _ -> ()
         )
 
-    member private self.UpdateDataGridColumns() =
+    member private self.SetupDataGridColumns() =
         dataGrid.Columns.Clear()
         DataGridCheckBoxColumn(
             Header = "#",
@@ -262,10 +262,6 @@ and MainWindow (
 
     member private self.Window_Closing(event : EventArgs) =
         windowConfig.State <- self.WindowState
-
-    member private self.UpdateDataGridCells() =
-        dataGrid.ItemsSource <- windowViewModel.Table.Cells
-        ()
 
     member private self.TryLoadTemplateWithDocument() = task {
         match windowConfig.UploadTemplate.SourcePath with

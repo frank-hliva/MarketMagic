@@ -11,9 +11,6 @@
     x:DataType="local:WindowViewModel"
     Title="{Binding Title}"
 >
-    <Window.Styles>
-
-    </Window.Styles>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="36"/>

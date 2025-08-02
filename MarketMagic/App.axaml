@@ -133,6 +133,8 @@
         <Style Selector="DataGrid AutoCompleteBox">
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="0"/>
         </Style>
         <Style Selector="DataGrid TextBlock.EnumValue">
             <Setter Property="Padding" Value="10,0"/>
