@@ -211,12 +211,51 @@ and MainWindow (
             Width = DataGridLength(40.0, DataGridLengthUnitType.Pixel)
         ) |> dataGrid.Columns.Add
 
+        let enums =
+            windowViewModel.Table.UploadDataTable
+            |> Option.map _.enums
+            |> Option.defaultValue Map.empty
+
         for i in 0 .. windowViewModel.Table.Columns.Count - 1 do
+            let column = windowViewModel.Table.Columns[i]
             dataGrid.Columns.Add(
-                DataGridTextColumn(
-                    Header = windowViewModel.Table.Columns[i],
-                    Binding = Binding($"[{i}]")
-                )
+                match enums.TryFind column with
+                | Some enum when not enum.IsEmpty ->
+                    DataGridTemplateColumn(
+                        Header = column,
+                        CellTemplate = FuncDataTemplate(
+                            typeof<RowViewModel>,
+                            Func<obj, INameScope, Control>(fun item _ ->
+                                let row = item :?> RowViewModel
+                                TextBlock(
+                                    Text = row[i],
+                                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left,
+                                    VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                                    Padding = Thickness(10.0, 0.0)
+                                ) :> Control
+                            ),
+                            false
+                        ),
+                        CellEditingTemplate = FuncDataTemplate(
+                            typeof<RowViewModel>,
+                            Func<obj, INameScope, Control>(fun item _ ->
+                                let row = item :?> RowViewModel
+                                let autoCompleteBox = AutoCompleteBox(
+                                    ItemsSource = enum,
+                                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+                                    VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch
+                                )
+                                autoCompleteBox.Bind(AutoCompleteBox.TextProperty, Binding($"[{i}]")) |> ignore
+                                autoCompleteBox :> Control
+                            ),
+                            false
+                        )
+                    ) :> DataGridColumn
+                | _ ->
+                    DataGridTextColumn(
+                        Header = column,
+                        Binding = Binding($"[{i}]")
+                    ) :> DataGridColumn
             )
 
     member private self.Window_Opened(event : EventArgs) =
