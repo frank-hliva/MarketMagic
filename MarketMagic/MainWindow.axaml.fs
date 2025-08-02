@@ -283,6 +283,8 @@ and MainWindow (
                 if dataGrid.SelectedItem <> null && dataGrid.CurrentColumn <> null then
                     dataGrid.BeginEdit() |> ignore
                     e.Handled <- true
+            | Key.Enter when e.KeyModifiers.HasFlag KeyModifiers.Shift ->
+                e.Handled <- true
             | Key.Enter | Key.Tab | Key.Escape when windowViewModel.Table.IsInEditMode ->
                 if dataGrid.SelectedItem <> null && dataGrid.CurrentColumn <> null then
                     dataGrid.CommitEdit() |> ignore
