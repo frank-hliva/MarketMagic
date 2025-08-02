@@ -12,6 +12,7 @@ open System.Runtime.CompilerServices
 type RowViewModelProps = {
     Cells: string[]
     IsNew : bool
+    IsMarked : bool
 }
 
 type RowViewModel(props : RowViewModelProps) =
@@ -19,6 +20,7 @@ type RowViewModel(props : RowViewModelProps) =
 
     let mutable cellValues = props.Cells
     let mutable isNew = props.IsNew
+    let mutable isMarked = props.IsMarked
 
     member self.Id
         with get() = Guid.NewGuid()
@@ -37,6 +39,13 @@ type RowViewModel(props : RowViewModelProps) =
                 isNew <- value
                 self.OnPropertyChanged(nameof self.IsNew)
 
+    member self.IsMarked
+        with get() = isNew
+        and private set(value) =
+            if isNew <> value then
+                isNew <- value
+                self.OnPropertyChanged(nameof self.IsNew)
+
     member private self.ToArray() = cellValues
 
     static member internal op_Explicit(row : RowViewModel) : string[] = row.ToArray()
@@ -45,6 +54,7 @@ type RowViewModel(props : RowViewModelProps) =
         RowViewModel({
             Cells = Array.create columnLength ""
             IsNew = true
+            IsMarked = false
         })
 
     static member New(columns : string seq) =
@@ -54,10 +64,12 @@ type RowViewModel(props : RowViewModelProps) =
         RowViewModel({
             Cells = cells
             IsNew = false
+            IsMarked = false
         })
 
     new(rowViewModel: RowViewModel) =
         RowViewModel({
             Cells = rowViewModel |> RowViewModel.op_Explicit
-            IsNew = false
+            IsNew = rowViewModel.IsNew
+            IsMarked = rowViewModel.IsMarked
         })
