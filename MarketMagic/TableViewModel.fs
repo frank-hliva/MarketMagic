@@ -46,35 +46,35 @@ type TableViewModel() =
             observableRows.Remove(rowViewModel) |> ignore
         observableRows
 
+    member self.UploadDataTable 
+        with get() = uploadDataTable
+        and set(value) = 
+            uploadDataTable <- value
+            self.OnPropertyChanged(nameof self.UploadDataTable)
+
     member self.Columns 
         with get() = columns
         and set(value) = 
             columns <- value
-            self.OnPropertyChanged("Columns")
+            self.OnPropertyChanged(nameof self.Columns)
     
     member self.Cells 
         with get() = cells
         and set(value) = 
             cells <- value
-            self.OnPropertyChanged("Cells")
+            self.OnPropertyChanged(nameof self.Cells)
 
-    member self.CellInfo 
+    member self.CursorYXHelp 
         with get() = cellInfo
         and set(value) = 
             cellInfo <- value
-            self.OnPropertyChanged("CellInfo")
+            self.OnPropertyChanged(nameof self.CursorYXHelp)
 
-    member self.Help 
+    member self.KeyboardHelp 
         with get() = help
         and set(value) = 
             help <- value
-            self.OnPropertyChanged("Help")
-
-    member self.UploadDataTable 
-        with get() = uploadDataTable
-        and set(value) = 
-            uploadDataTable <- value
-            self.OnPropertyChanged("UploadDataTable")
+            self.OnPropertyChanged(nameof self.KeyboardHelp)
 
     member self.IsInEditMode
         with get() = isInEditingMode
@@ -99,8 +99,8 @@ type TableViewModel() =
             uploadDataTable.cells
             |> Cells.toObservable
             |> withEmptyRow
-        self.CellInfo <- ""
-        self.Help <- ""
+        self.CursorYXHelp <- ""
+        self.KeyboardHelp <- ""
         self.CanSave <- false
 
     member self.DeleteSelected() =

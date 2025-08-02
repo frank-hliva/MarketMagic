@@ -52,3 +52,4 @@ Project.toml
 
 ## Avalonia
 AvaloniaResources/
+.fake

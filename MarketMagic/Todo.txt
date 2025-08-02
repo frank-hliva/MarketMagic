@@ -1,41 +1,11 @@
-﻿- mazanie riadkov
-- button save pridat zatial mame len save as
-----------------------------------------------------------------------------------------------
+﻿
+- opened file history
 - MarketMagic.jl ma tiez precitat port z config.toml
 - moznost zavriet UploadTemplate.Document
 - po prvom nacitani appky (ak neexistuje config.toml) spravit setup zo zipu config.toml
-----------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------
-x - 1. urobit jeden typ so vsetkym
-    x - jeden typ
-    x - jedna funkcia co vsetko precita
-    x - vsetky fieldy
-x - 2. zabranit viditelnosti veci co nechcem exportovat
-x - 3. skombinovať s testovacími dátami
-    x - prejdeme cyklom riadky DataTable.cells
-        x - prejdeme vsetky columny DataTable
-            x - zistime ci key v DataTable.columns je aj v UploadDataTable.columns
-                x - ziskame hodnoty
-                    x - DataTable.cells[DataTable.columns[key]]
-x - cells ako 2D array
-
-- DataGrid
-    - na koniec pridat prazdny riadok
-    - mazanie riadkov
-
 - ukladanie konfigu po kazdej zmene
-
 - zatvaranie suboru
-
-- toolbar
-    x - button pre nacitanie loadUploadTemplate
-        x - ikonka
-        x - dialog
-    x - button pre nacitanie loadDocument
-    x - button pre nacitanie saveUploadTemplate
-    - vymenit ikonky
-
-
+     
 ------------------------------------------------------------------------------------------------------
 
 - json nahradit MessagePackom

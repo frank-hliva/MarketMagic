@@ -61,8 +61,8 @@
             CurrentCellChanged="UploadTableDataGrid_CurrentCellChanged"
         />
         <StackPanel Classes="StatusBar" Grid.Row="2">
-            <TextBlock Text="{Binding Table.CellInfo}" />
-            <TextBlock Text="{Binding Table.Help}" />
+            <TextBlock Text="{Binding Table.CursorYXHelp}" />
+            <TextBlock Text="{Binding Table.KeyboardHelp}" />
         </StackPanel>
     </Grid>
 </Window>

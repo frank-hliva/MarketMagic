@@ -140,8 +140,8 @@ and MainWindow (
 
     let displayDataGridCellInfo(dataGrid : DataGrid) =
         let cellInfo, keyboardInfo = dataGrid.GetDataGridCellInfo(windowViewModel.Table.IsInEditMode)
-        windowViewModel.Table.CellInfo <- cellInfo
-        windowViewModel.Table.Help <- keyboardInfo
+        windowViewModel.Table.CursorYXHelp <- cellInfo
+        windowViewModel.Table.KeyboardHelp <- keyboardInfo
 
     let rec saveDocumentToFile (path : string) = task {
         match windowViewModel.Table.TryExportToUploadDataTable() with
