@@ -130,6 +130,9 @@
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="CornerRadius" Value="0"/>
         </Style>
+        <Style Selector="DataGrid TextBlock.EnumValue">
+            <Setter Property="Padding" Value="10,0"/>
+        </Style>
 
         <!-- Toolbars, Toolbar -->
         <Style Selector="StackPanel.Toolbars">

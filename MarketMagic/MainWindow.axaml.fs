@@ -227,12 +227,13 @@ and MainWindow (
                             typeof<RowViewModel>,
                             Func<obj, INameScope, Control>(fun item _ ->
                                 let row = item :?> RowViewModel
-                                TextBlock(
+                                let textBlock = TextBlock(
                                     Text = row[i],
                                     HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left,
-                                    VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                                    Padding = Thickness(10.0, 0.0)
-                                ) :> Control
+                                    VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
+                                ) 
+                                textBlock.Classes.Add("EnumValue")
+                                textBlock :> Control
                             ),
                             false
                         ),
