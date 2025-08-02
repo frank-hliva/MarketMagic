@@ -61,9 +61,11 @@
   </ItemGroup>
 
   <ItemGroup>
-      <AvaloniaResource Include="img\download.svg" />
-      <AvaloniaResource Include="img\folder.svg" />
-      <AvaloniaResource Include="img\plus.svg" />
-      <AvaloniaResource Include="img\template.svg" />
+      <AvaloniaResource Include="icons\AddDocument.svg" />
+      <AvaloniaResource Include="icons\OpenFolder.svg" />
+      <AvaloniaResource Include="icons\Save.svg" />
+      <AvaloniaResource Include="icons\SaveAs.svg" />
+      
+      <AvaloniaResource Include="icons\TableError.svg" />
   </ItemGroup>
 </Project>

@@ -18,6 +18,7 @@ type TableViewModel() =
     let mutable cellInfo = ""
     let mutable help = ""
     let mutable isInEditingMode = false
+    let mutable canSave = false
 
     let rec withEmptyRow (observableRows : ObservableCollection<RowViewModel>) =
         let lastEmptyRow = RowViewModel.New(columns)
@@ -80,7 +81,16 @@ type TableViewModel() =
         and set(value) =
             if isInEditingMode <> value then
                 isInEditingMode <- value
+                canSave <- true
                 self.OnPropertyChanged("IsInEditMode")
+                self.OnPropertyChanged("CanSave")
+
+    member self.CanSave
+        with get() = canSave
+        and set(value) =
+            if canSave <> value then
+                canSave <- value
+                self.OnPropertyChanged("CanSave")
 
     member self.SetData(uploadDataTable : Ebay.UploadDataTable) =
         self.UploadDataTable <- Some uploadDataTable
@@ -91,10 +101,19 @@ type TableViewModel() =
             |> withEmptyRow
         self.CellInfo <- ""
         self.Help <- ""
+        self.CanSave <- false
+
+    member self.DeleteSelected() =
+        self.Cells <-
+            self.Cells
+            |> Seq.filter(fun cell -> not cell.IsMarked || cell.IsNew)
+            |> ObservableCollection
+        self.CanSave <- true
 
     member self.TryExportToUploadDataTable() : Result<Ebay.UploadDataTable, string> =
         match self.UploadDataTable with
         | Some uploadDataTable ->
+            self.CanSave <- false
             { uploadDataTable with
                 columns = self.Columns |> List.ofSeq
                 cells =

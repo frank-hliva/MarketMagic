@@ -12,32 +12,42 @@
     Title="{Binding Title}"
 >
     <Window.Styles>
-        <Style Selector="StackPanel Button">
-            <Setter Property="Margin" Value="1"/>
-            <Setter Property="Width" Value="48"/>
-            <Setter Property="Height" Value="48"/>
-            <Setter Property="Background" Value="Transparent"/>
-        </Style>
+
     </Window.Styles>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="64"/>
+            <RowDefinition Height="36"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="24"/>
         </Grid.RowDefinitions>
-        <StackPanel
-            Orientation="Horizontal"
-            Margin="2"
+        <StackPanel Classes="Toolbars" Orientation="Horizontal">
+            <Border>
+                <StackPanel
+                    Classes="Toolbar"
+                    Orientation="Horizontal"
+                >
+                    <Button Click="LoadUploadTemplateButton_Click">
+                        <svg:Svg Path="avares://MarketMagic/icons/AddDocument.svg" ToolTip.Tip="New from template" />
+                    </Button>
+                    <Button Click="LoadDocumentButton_Click">
+                        <svg:Svg Path="avares://MarketMagic/icons/OpenFolder.svg" ToolTip.Tip="Open" />
+                    </Button>
+                    <Button Click="SaveDocumentButton_Click" IsEnabled="{Binding Table.CanSave}">
+                        <svg:Svg Path="avares://MarketMagic/icons/Save.svg" ToolTip.Tip="Save" />
+                    </Button>
+                    <Button Click="SaveAsDocumentButton_Click">
+                        <svg:Svg Path="avares://MarketMagic/icons/SaveAs.svg" ToolTip.Tip="Save As" />
+                    </Button>
+                </StackPanel>
+            </Border>
+            <StackPanel
+                Classes="Toolbar"
+                Orientation="Horizontal"
         >
-            <Button Click="LoadUploadTemplateButton_Click">
-                <svg:Svg Path="avares://MarketMagic/img/template.svg" Width="36" Height="36" ToolTip.Tip="Open template" />
-            </Button>
-            <Button Click="LoadDocumentButton_Click">
-                <svg:Svg Path="avares://MarketMagic/img/folder.svg" Width="36" Height="36" ToolTip.Tip="Insert existing items" />
-            </Button>
-            <Button Click="SaveDocumentButton_Click">
-                <svg:Svg Path="avares://MarketMagic/img/download.svg" Width="36" Height="36" ToolTip.Tip="Save template" />
-            </Button>
+                <Button Click="DeleteRowsButton_Click" Margin="5,0,0,0">
+                    <svg:Svg Path="avares://MarketMagic/icons/TableError.svg" ToolTip.Tip="Delete row(s)" />
+                </Button>
+            </StackPanel>
         </StackPanel>
         <DataGrid
             Grid.Row="1"

@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Class="MarketMagic.App"
     RequestedThemeVariant="Dark"
+    xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
 >
     <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
     <Application.Styles>
@@ -85,8 +86,6 @@
             <Setter Property="Foreground" Value="{StaticResource ForegroundColor}"/>
             <Setter Property="GridLinesVisibility" Value="All"/>
         </Style>
-
-        <!-- Prvý DataGridColumnHeader -->
         <Style Selector="DataGridColumnHeader:nth-child(1)">
             <Setter Property="Width" Value="40"/>
             <Setter Property="Background" Value="#282c34"/>
@@ -95,7 +94,6 @@
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
-        <!-- Bunky v prvom stĺpci -->
         <Style Selector="DataGridCell:nth-child(1)">
             <Setter Property="Width" Value="40"/>
             <Setter Property="Background" Value="#282c34"/>
@@ -104,7 +102,6 @@
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
-
         <Style Selector="DataGridColumnHeader">
             <Setter Property="Background" Value="#282c34"/>
             <Setter Property="Foreground" Value="#b0b7c3"/>    
@@ -132,6 +129,33 @@
             <Setter Property="BorderBrush" Value="#181a1f"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="CornerRadius" Value="0"/>
+        </Style>
+
+        <!-- Toolbars, Toolbar -->
+        <Style Selector="StackPanel.Toolbars">
+            <Setter Property="Background" Value="#282c34"/>
+            <Setter Property="Height" Value="36"/>
+        </Style>
+        <Style Selector="StackPanel.Toolbars > Border">
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="BorderBrush" Value="#8e99b1"/>
+            <Setter Property="BorderThickness" Value="0,0,3,0"/>
+        </Style>
+        <Style Selector="StackPanel.Toolbar">
+            <Setter Property="Background" Value="#282c34"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Margin" Value="4,0"/>
+        </Style>
+        <Style Selector="StackPanel.Toolbar > Button">
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="StackPanel.Toolbar > Button svg|Svg">
+            <Setter Property="Width" Value="18"/>
+            <Setter Property="Height" Value="18"/>
         </Style>
 
         <!-- StatusBar -->

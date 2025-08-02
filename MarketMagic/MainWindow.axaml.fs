@@ -94,6 +94,9 @@ and MainWindow (
     let showError (msg : string) = 
         Dialogs.showErrorU msg self
 
+    let showFileNotFound (path : string) = 
+        showError $"The file \"{path}\" was not found."
+
     let showFailedToLoadUploadTemplate () = 
         showError "Failed to load upload template."
 
@@ -139,6 +142,27 @@ and MainWindow (
         let cellInfo, keyboardInfo = dataGrid.GetDataGridCellInfo(windowViewModel.Table.IsInEditMode)
         windowViewModel.Table.CellInfo <- cellInfo
         windowViewModel.Table.Help <- keyboardInfo
+
+    let rec saveDocumentToFile (path : string) = task {
+        match windowViewModel.Table.TryExportToUploadDataTable() with
+        | Ok uploadDataTable ->
+            if uploadTemplateManager.Save(path, uploadDataTable).Success
+            then windowConfig.UploadTemplate.DocumentPath <- path
+            else do! showUploadTemplateFailedToSave ()
+        | Error errMsg -> do! Dialogs.showErrorU errMsg self
+    }
+
+    and saveDocument () = task {
+        let path = windowConfig.UploadTemplate.DocumentPath
+        if IO.File.Exists path then do! saveDocumentToFile path
+        else do! saveAsDocument ()
+    }
+
+    and saveAsDocument () = task {
+        match! tryPickFileToSaveDocument() with
+        | Some path -> do! saveDocumentToFile path
+        | _ -> ()
+    }
 
     do
         self.InitializeComponent()
@@ -257,17 +281,10 @@ and MainWindow (
         } |> ignore
 
     member private self.SaveDocumentButton_Click(sender: obj, event: RoutedEventArgs) =
-        task {
-            match! tryPickFileToSaveDocument() with
-            | Some path ->
-                match windowViewModel.Table.TryExportToUploadDataTable() with
-                | Ok uploadDataTable ->
-                    if uploadTemplateManager.Save(path, uploadDataTable).Success
-                    then windowConfig.UploadTemplate.DocumentPath <- path
-                    else do! showUploadTemplateFailedToSave ()
-                | Error errMsg -> do! Dialogs.showErrorU errMsg self
-            | _ -> ()
-        } |> ignore
+        saveDocument () |> ignore
+
+    member private self.SaveAsDocumentButton_Click(sender: obj, event: RoutedEventArgs) =
+        saveAsDocument () |> ignore
 
     member private self.UploadTableDataGrid_CurrentCellChanged(sender: obj, e: EventArgs) =
         sender
@@ -290,13 +307,8 @@ and MainWindow (
                     dataGrid.Reselect()
                     e.Handled <- true
             | Key.Delete when not dataGrid.IsReadOnly ->
-                this.ClearSelectedCell(dataGrid)
                 e.Handled <- true
             | _ -> ()
 
-    member this.ClearSelectedCell(dataGrid : DataGrid) =
-        match dataGrid.SelectedItem, dataGrid.CurrentColumn with
-        | (:? RowViewModel as row), col when col <> null ->
-            let columnIndex = col.DisplayIndex
-            row.[columnIndex] <- ""
-        | _ -> ()
+    member private self.DeleteRowsButton_Click(sender : obj, event : RoutedEventArgs) =
+        windowViewModel.Table.DeleteSelected()
