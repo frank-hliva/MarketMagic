@@ -132,6 +132,8 @@
         </Style>
         <Style Selector="DataGrid TextBlock.EnumValue">
             <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
         <!-- Toolbars, Toolbar -->
