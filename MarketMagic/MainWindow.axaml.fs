@@ -237,12 +237,11 @@ and MainWindow (
                             typeof<RowViewModel>,
                             Func<obj, INameScope, Control>(fun item _ ->
                                 let row = item :?> RowViewModel
-                                let autoCompleteBox = AutoCompleteBox(
-                                    ItemsSource = enum,
-                                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
-                                    VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch
-                                )
-                                autoCompleteBox.Bind(AutoCompleteBox.TextProperty, Binding($"[{i}]")) |> ignore
+                                let autoCompleteBox = AutoCompleteBox(ItemsSource = enum)
+                                autoCompleteBox.Bind(
+                                    AutoCompleteBox.TextProperty,
+                                    Binding($"[{i}]")
+                                ) |> ignore
                                 autoCompleteBox :> Control
                             ),
                             false
