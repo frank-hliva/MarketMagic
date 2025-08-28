@@ -1,10 +1,5 @@
 module Ebay
 
-@kwdef struct DataTable
-    columns::Vector{String}
-    cells::Matrix{String}
-end
-
 @kwdef struct UploadDataTable
     id::Int64
     columns::Vector{String}
@@ -123,7 +118,7 @@ module UploadTemplate
         )
     end
 
-    function withCells(dataTable::Main.Ebay.DataTable, uploadDataTable::Main.Ebay.UploadDataTable)::Main.Ebay.UploadDataTable
+    function withCells(dataTable::Main.Model.DataTable, uploadDataTable::Main.Ebay.UploadDataTable)::Main.Ebay.UploadDataTable
         local lastRowIndex = size(uploadDataTable.cells, 1)
         local numberOfNewRows = size(dataTable.cells, 1)
         local columnCount = length(uploadDataTable.columns)
@@ -205,7 +200,7 @@ module Document
         end
     end
 
-    function load(documentStream::IOStream, columnNameMapping::Columns.ColumnMapping)::Main.Ebay.DataTable
+    function load(documentStream::IOStream, columnNameMapping::Columns.ColumnMapping)::Main.Model.DataTable
         local dataFrame = CSV.read(
             documentStream,
             DataFrame;
@@ -220,13 +215,13 @@ module Document
             Columns.rename(columnNameMapping, dataFrame)
         end
         
-        Main.Ebay.DataTable(
+        Main.Model.DataTable(
             columns = string.(names(dataFrame)),
             cells = Cells.removeNothing(Matrix(dataFrame))
         )
     end
 
-    function load(documentStream::IOStream)::Main.Ebay.DataTable
+    function load(documentStream::IOStream)::Main.Model.DataTable
         load(documentStream, Columns.commonMapping)
     end
 

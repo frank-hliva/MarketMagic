@@ -12,7 +12,7 @@ open Avalonia.Markup.Xaml
 type TableViewModel() =
     inherit BasicViewModel()
     
-    let mutable uploadDataTable : Ebay.UploadDataTable option = None
+    let mutable uploadDataTable : DataTable option = None
     let mutable columns = ObservableCollection<string>()
     let mutable cells = ObservableCollection<RowViewModel>()
     let mutable cellInfo = ""
@@ -92,7 +92,7 @@ type TableViewModel() =
                 canSave <- value
                 self.OnPropertyChanged("CanSave")
 
-    member self.SetData(uploadDataTable : Ebay.UploadDataTable) =
+    member self.SetData(uploadDataTable : DataTable) =
         self.UploadDataTable <- Some uploadDataTable
         self.Columns <- ObservableCollection<string>(uploadDataTable.columns)
         self.Cells <-
@@ -110,7 +110,7 @@ type TableViewModel() =
             |> ObservableCollection
         self.CanSave <- true
 
-    member self.TryExportToUploadDataTable() : Result<Ebay.UploadDataTable, string> =
+    member self.TryExportToUploadDataTable() : Result<DataTable, string> =
         match self.UploadDataTable with
         | Some uploadDataTable ->
             self.CanSave <- false

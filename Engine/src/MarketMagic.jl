@@ -1,3 +1,4 @@
+include("Model/DataTable.jl")
 include("Ebay/UploadTemplate.jl")
 include("ZMQServer.jl")
 

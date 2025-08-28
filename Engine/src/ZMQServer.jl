@@ -7,9 +7,10 @@ using Main.Ebay
 
 mutable struct ServerState
     uploadDataTable::Union{Nothing, Ebay.UploadDataTable}
+    moneyDataTable::Union{Nothing, Main.Model.DataTable}
 end
 
-const state = ServerState(nothing)
+const state = ServerState(nothing, nothing)
 
 function matrixToNestedArray(matrix::Matrix{String})
     return [collect(row) for row in eachrow(matrix)]
@@ -143,27 +144,80 @@ function handleFetchUploadTemplate()
     end
 end
 
+function handleMoneyNew(path::String)
+    try
+        open(path, "w+") do stream
+            state.moneyDataTable = Money.File.new(stream)
+        end
+        return Dict(
+            "success" => true,
+            "message" => "Money table created at: $path"
+        )
+    catch e
+        return Dict(
+            "success" => false,
+            "error" => "Failed to create money table: $(string(e))"
+        )
+    end
+end
+
+function handleMoneyLoad(path::String)
+    try
+        open(path) do stream
+            state.moneyDataTable = Money.File.load(stream)
+        end
+        return Dict(
+            "success" => true,
+            "data" => Dict(
+                "columns" => state.moneyDataTable.columns,
+                "cells" => state.moneyDataTable.cells
+            )
+        )
+    catch e
+        return Dict(
+            "success" => false,
+            "error" => "Failed to load money table: $(string(e))"
+        )
+    end
+end
+
+function handleMoneySave(path::String, dataTableDict)
+    try
+        local dataTable = Main.Model.DataTable(
+            columns = dataTableDict["columns"],
+            cells = dataTableDict["cells"]
+        )
+        open(path, "w") do stream
+            Money.File.save(stream, dataTable)
+        end
+        state.moneyDataTable = dataTable
+        return Dict(
+            "success" => true,
+            "message" => "Money table saved to: $path"
+        )
+    catch e
+        return Dict(
+            "success" => false,
+            "error" => "Failed to save money table: $(string(e))"
+        )
+    end
+end
+
 function handleCommand(commandData::Dict)
     command = get(commandData, "command", "")
     
     @match command begin
-        "loadUploadTemplate" => begin
+        "eBay.UploadTemplate.load" => begin
             path = get(commandData, "path", "")
             if isempty(path)
                 return Dict("success" => false, "error" => "Path parameter required")
             end
             handleLoadUploadTemplate(path)
         end
-        
-        "loadDocument" => begin
-            path = get(commandData, "path", "")
-            if isempty(path)
-                return Dict("success" => false, "error" => "Path parameter required")
-            end
-            handleLoadDocument(path)
-        end
 
-        "saveUploadTemplate" => begin
+        "eBay.UploadTemplate.fetch" => handleFetchUploadTemplate()
+
+        "eBay.UploadTemplate.save" => begin
             path = get(commandData, "path", "")
             uploadDataTableDict = get(commandData, "uploadDataTable", "")
             if isempty(path)
@@ -178,8 +232,39 @@ function handleCommand(commandData::Dict)
             )
             handleSaveUploadTemplate(path, uploadDataTable)
         end
+
+        "eBay.Document.load" => begin
+            path = get(commandData, "path", "")
+            if isempty(path)
+                return Dict("success" => false, "error" => "Path parameter required")
+            end
+            handleLoadDocument(path)
+        end
+
+        "Money.Document.new" => begin
+            path = get(commandData, "path", "")
+            if isempty(path)
+                return Dict("success" => false, "error" => "Path parameter required")
+            end
+            handleMoneyNew(path)
+        end
+
+        "Money.Document.load" => begin
+            path = get(commandData, "path", "")
+            if isempty(path)
+                return Dict("success" => false, "error" => "Path parameter required")
+            end
+            handleMoneyLoad(path)
+        end
         
-        "fetchUploadTemplate" => handleFetchUploadTemplate()
+        "Money.Document.save" => begin
+            path = get(commandData, "path", "")
+            dataTableDict = get(commandData, "dataTable", nothing)
+            if isempty(path) || dataTableDict === nothing
+                return Dict("success" => false, "error" => "Path and dataTable required")
+            end
+            handleMoneySave(path, dataTableDict)
+        end
         
         _ => Dict(
             "success" => false,
