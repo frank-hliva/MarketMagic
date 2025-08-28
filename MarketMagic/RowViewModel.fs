@@ -67,7 +67,7 @@ type RowViewModel(props : RowViewModelProps) =
             IsMarked = false
         })
 
-    new(rowViewModel: RowViewModel) =
+    new(rowViewModel : RowViewModel) =
         RowViewModel({
             Cells = rowViewModel |> RowViewModel.op_Explicit
             IsNew = rowViewModel.IsNew
