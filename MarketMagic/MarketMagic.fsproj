@@ -26,7 +26,9 @@
     <Compile Include="Dialogs.fs" />
     <Compile Include="BasicViewModel.fs" />
     <Compile Include="RowViewModel.fs" />
+    <Compile Include="Cells.fs" />
     <Compile Include="TableViewModel.fs" />
+    <Compile Include="MoneyTableViewModel.fs" />
     <Compile Include="Engine.fs" />
     <Compile Include="MainWindow.axaml.fs" />
     <Compile Include="ServiceContainer.fs" />

@@ -13,51 +13,108 @@
 >
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="36"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="24"/>
         </Grid.RowDefinitions>
-        <StackPanel Classes="Toolbars" Orientation="Horizontal">
-            <Border>
-                <StackPanel
-                    Classes="Toolbar"
-                    Orientation="Horizontal"
-                >
-                    <Button Click="LoadUploadTemplateButton_Click">
-                        <svg:Svg Path="avares://MarketMagic/icons/AddDocument.svg" ToolTip.Tip="New from template" />
-                    </Button>
-                    <Button Click="LoadDocumentButton_Click">
-                        <svg:Svg Path="avares://MarketMagic/icons/OpenFolder.svg" ToolTip.Tip="Open" />
-                    </Button>
-                    <Button Click="SaveDocumentButton_Click" IsEnabled="{Binding Table.CanSave}">
-                        <svg:Svg Path="avares://MarketMagic/icons/Save.svg" ToolTip.Tip="Save" />
-                    </Button>
-                    <Button Click="SaveAsDocumentButton_Click">
-                        <svg:Svg Path="avares://MarketMagic/icons/SaveAs.svg" ToolTip.Tip="Save As" />
-                    </Button>
-                </StackPanel>
-            </Border>
-            <StackPanel
-                Classes="Toolbar"
-                Orientation="Horizontal"
-        >
-                <Button Click="DeleteRowsButton_Click" Margin="5,0,0,0">
-                    <svg:Svg Path="avares://MarketMagic/icons/TableError.svg" ToolTip.Tip="Delete row(s)" />
-                </Button>
-            </StackPanel>
-        </StackPanel>
-        <DataGrid
-            Grid.Row="1"
-            Name="UploadTable"
-            ItemsSource="{Binding Table.Cells}"
-            GridLinesVisibility="All"
-            BorderThickness="0,1,0,0"
-            BorderBrush="Gray"
-            IsReadOnly="False"
-            HeadersVisibility="All"
-            CurrentCellChanged="UploadTableDataGrid_CurrentCellChanged"
-        />
-        <StackPanel Classes="StatusBar" Grid.Row="2">
+        <TabControl>
+            <TabItem Header="eBay Listings">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="36"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Classes="Toolbars" Orientation="Horizontal">
+                        <Border>
+                            <StackPanel
+                                Classes="Toolbar"
+                                Orientation="Horizontal"
+                            >
+                                <Button Click="LoadUploadTemplateButton_Click">
+                                    <svg:Svg Path="avares://MarketMagic/icons/AddDocument.svg" ToolTip.Tip="New from template" />
+                                </Button>
+                                <Button Click="LoadDocumentButton_Click">
+                                    <svg:Svg Path="avares://MarketMagic/icons/OpenFolder.svg" ToolTip.Tip="Open" />
+                                </Button>
+                                <Button Click="SaveDocumentButton_Click" IsEnabled="{Binding Table.CanSave}">
+                                    <svg:Svg Path="avares://MarketMagic/icons/Save.svg" ToolTip.Tip="Save" />
+                                </Button>
+                                <Button Click="SaveAsDocumentButton_Click">
+                                    <svg:Svg Path="avares://MarketMagic/icons/SaveAs.svg" ToolTip.Tip="Save As" />
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                        <StackPanel
+                            Classes="Toolbar"
+                            Orientation="Horizontal"
+                        >
+                            <Button Click="DeleteRowsButton_Click" Margin="5,0,0,0">
+                                <svg:Svg Path="avares://MarketMagic/icons/TableError.svg" ToolTip.Tip="Delete row(s)" />
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                    <DataGrid
+                        Grid.Row="1"
+                        Name="UploadTable"
+                        ItemsSource="{Binding Table.Cells}"
+                        GridLinesVisibility="All"
+                        BorderThickness="0,1,0,0"
+                        BorderBrush="Gray"
+                        IsReadOnly="False"
+                        HeadersVisibility="All"
+                        CurrentCellChanged="UploadTableDataGrid_CurrentCellChanged"
+                    />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Money">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="36"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Classes="Toolbars" Orientation="Horizontal">
+                        <Border>
+                            <StackPanel
+                                Classes="Toolbar"
+                                Orientation="Horizontal"
+                            >
+                                <Button Click="LoadUploadTemplateButton_Click">
+                                    <svg:Svg Path="avares://MarketMagic/icons/AddDocument.svg" ToolTip.Tip="New from template" />
+                                </Button>
+                                <Button Click="LoadDocumentButton_Click">
+                                    <svg:Svg Path="avares://MarketMagic/icons/OpenFolder.svg" ToolTip.Tip="Open" />
+                                </Button>
+                                <Button Click="SaveDocumentButton_Click" IsEnabled="{Binding Table.CanSave}">
+                                    <svg:Svg Path="avares://MarketMagic/icons/Save.svg" ToolTip.Tip="Save" />
+                                </Button>
+                                <Button Click="SaveAsDocumentButton_Click">
+                                    <svg:Svg Path="avares://MarketMagic/icons/SaveAs.svg" ToolTip.Tip="Save As" />
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                        <StackPanel
+                            Classes="Toolbar"
+                            Orientation="Horizontal"
+                        >
+                            <Button Click="DeleteRowsButton_Click" Margin="5,0,0,0">
+                                <svg:Svg Path="avares://MarketMagic/icons/TableError.svg" ToolTip.Tip="Delete row(s)" />
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                    <DataGrid
+                        Grid.Row="1"
+                        Name="MoneyTable"
+                        ItemsSource="{Binding MoneyTable.Cells}"
+                        GridLinesVisibility="All"
+                        BorderThickness="0,1,0,0"
+                        BorderBrush="Gray"
+                        IsReadOnly="False"
+                        HeadersVisibility="All"
+                        CurrentCellChanged="MoneyTableDataGrid_CurrentCellChanged"
+                    />
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <StackPanel Classes="StatusBar" Grid.Row="1">
             <TextBlock Text="{Binding Table.CursorYXHelp}" />
             <TextBlock Text="{Binding Table.KeyboardHelp}" />
         </StackPanel>

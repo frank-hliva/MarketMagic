@@ -50,8 +50,9 @@ and UploadTemplateConfig(appConfig : AppConfig) =
                 valueChanged.Trigger()
 
 and WindowViewModel(
-    uploadTemplateConfig: UploadTemplateConfig,
-    tableViewModel: TableViewModel
+    uploadTemplateConfig : UploadTemplateConfig,
+    tableViewModel : TableViewModel,
+    moneyTableViewModel : MoneyTableViewModel
 ) as self =
     inherit BasicViewModel()
 
@@ -77,6 +78,8 @@ and WindowViewModel(
         self.Title <- $"MarketMagic: {subtitle}"
 
     member self.Table = tableViewModel
+
+    member self.MoneyTable = moneyTableViewModel
 
 and MainWindow (
     windowViewModel : WindowViewModel,
@@ -311,16 +314,19 @@ and MainWindow (
             | _ -> ()
         } |> ignore
 
-    member private self.SaveDocumentButton_Click(sender: obj, event: RoutedEventArgs) =
+    member private self.SaveDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
         saveDocument () |> ignore
 
-    member private self.SaveAsDocumentButton_Click(sender: obj, event: RoutedEventArgs) =
+    member private self.SaveAsDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
         saveAsDocument () |> ignore
 
-    member private self.UploadTableDataGrid_CurrentCellChanged(sender: obj, e: EventArgs) =
+    member private self.UploadTableDataGrid_CurrentCellChanged(sender : obj, e : EventArgs) =
         sender
         :?> DataGrid
         |> displayDataGridCellInfo
+
+    member private self.MoneyTableDataGrid_CurrentCellChanged(sender : obj, e : EventArgs) =
+        ()
 
     member this.UploadTableDataGrid_KeyDown(sender : obj, e : KeyEventArgs) =
         let dataGrid = sender :?> DataGrid
