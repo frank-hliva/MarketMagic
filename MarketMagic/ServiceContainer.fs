@@ -19,6 +19,7 @@ type ServiceCollectionExtensions() =
             .AddSingleton<Ebay.UploadTemplateManager>()
             .AddSingleton<Money.MoneyDocumentManager>()
             .AddSingleton<UploadTemplateConfig>()
+            .AddSingleton<MoneyDocumentConfig>()
             .AddSingleton<WindowConfig>()
             .AddSingleton<TableViewModel>()
             .AddSingleton<MoneyTableViewModel>()

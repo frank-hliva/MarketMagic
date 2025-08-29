@@ -67,11 +67,11 @@
   </ItemGroup>
 
   <ItemGroup>
+      <AvaloniaResource Include="icons\NewDocument.svg" />
       <AvaloniaResource Include="icons\AddDocument.svg" />
       <AvaloniaResource Include="icons\OpenFolder.svg" />
       <AvaloniaResource Include="icons\Save.svg" />
       <AvaloniaResource Include="icons\SaveAs.svg" />
-      
       <AvaloniaResource Include="icons\TableError.svg" />
   </ItemGroup>
 </Project>

@@ -15,18 +15,29 @@ open MarketMagic
 open Avalonia.Markup.Xaml.Templates
 open Avalonia.Controls.Templates
 
-type WindowConfig(appConfig : AppConfig, uploadTemplateConfig : UploadTemplateConfig) =
-
+type WindowConfig(
+    appConfig : AppConfig,
+    uploadTemplateConfig : UploadTemplateConfig,
+    moneyDocumentConfig : MoneyDocumentConfig
+) =
     member self.AppConfig = appConfig
+
+    member self.TabIndex
+        with get () = appConfig.GetOr<int>("Window.TabIndex", 0)
+        and set (value : int) =
+            if not <| appConfig.TrySet("Window.TabIndex", value) then
+                failwith "Failed to change Tab.Index configuration"
 
     member self.UploadTemplate = uploadTemplateConfig
 
+    member self.MoneyDocument = moneyDocumentConfig
+
     member self.State
-        with get() =
-            appConfig.GetOr("Window.State", (int)WindowState.Normal)
+        with get () =
+            appConfig.GetOr("Window.State", int WindowState.Normal)
             |> enum<WindowState>
-        and set(value : WindowState) =
-            if not <| appConfig.TrySet("Window.State", (int)value) then
+        and set (value : WindowState) =
+            if not <| appConfig.TrySet("Window.State", int value) then
                 failwith "Failed to change Window.State configuration"
 
 and UploadTemplateConfig(appConfig : AppConfig) =
@@ -48,8 +59,23 @@ and UploadTemplateConfig(appConfig : AppConfig) =
             if appConfig.TrySet("UploadTemplate.Source.Path", value) then
                 valueChanged.Trigger()
 
+and MoneyDocumentConfig(appConfig : AppConfig) =
+    let valueChanged = Event<unit>()
+
+    member self.ValueChanged = valueChanged.Publish
+
+    member self.AppConfig = appConfig
+
+    member self.DocumentPath
+        with get() = appConfig.GetOr("MoneyDocument.Document.Path", "")
+        and set(value : string) =
+            if appConfig.TrySet("MoneyDocument.Document.Path", value) then
+                valueChanged.Trigger()
+
 and WindowViewModel(
+    windowConfig : WindowConfig,
     uploadTemplateConfig : UploadTemplateConfig,
+    moneyDocumentConfig : MoneyDocumentConfig,
     tableViewModel : TableViewModel,
     moneyTableViewModel : MoneyTableViewModel
 ) as self =
@@ -80,6 +106,10 @@ and WindowViewModel(
 
     member self.MoneyTable = moneyTableViewModel
 
+    member self.TabIndex
+        with get() = windowConfig.TabIndex
+        and set(value : int) = windowConfig.TabIndex <- value
+
 and MainWindow (
     windowViewModel : WindowViewModel,
     uploadTemplateManager : Ebay.UploadTemplateManager,
@@ -89,6 +119,7 @@ and MainWindow (
     inherit Window ()
 
     let mutable dataGrid : DataGrid = null
+    let mutable moneyDocumentDataGrid : DataGrid = null
 
     let displayDataInTable() =
         windowViewModel.Table.SetData <| uploadTemplateManager.Fetch().Data
@@ -96,7 +127,7 @@ and MainWindow (
 
     let displayMoneyDataInTable() =
         windowViewModel.MoneyTable.SetData <| moneyDocumentManager.Fetch().Data
-        dataGrid.Focus() |> ignore
+        moneyDocumentDataGrid.Focus() |> ignore
 
     let showError (msg : string) = 
         Dialogs.showErrorU msg self
@@ -121,6 +152,9 @@ and MainWindow (
 
     let showUploadTemplateFailedToSave () = 
         showError "Upload template failed to save."
+
+    let showFailedToLoadMoneyDocument_invalidPath (path : string) = 
+        showError $"Failed to load money document.\nThe file \"{path}\" was not found."
 
     let tryPickFileToOpen (title : string) (fileTypeTitle : string) = async {
         match! [
@@ -202,6 +236,7 @@ and MainWindow (
         self.DataContext <- windowViewModel
         AvaloniaXamlLoader.Load(self)
         dataGrid <- self.FindControl<DataGrid>("UploadTable")
+        moneyDocumentDataGrid <- self.FindControl<DataGrid>("MoneyTable")
 
     member private self.SetupDataGrid() =
         windowViewModel.Table.PropertyChanged.Add(fun args ->
@@ -263,7 +298,12 @@ and MainWindow (
 
     member private self.Window_Opened(event : EventArgs) =
         self.WindowState <- windowConfig.State
+
         self.TryLoadTemplateWithDocument()
+        |> Async.AwaitTask
+        |> Async.StartImmediate
+
+        self.TryLoadMoneyDocument()
         |> Async.AwaitTask
         |> Async.StartImmediate
 
@@ -287,7 +327,7 @@ and MainWindow (
                         windowConfig.UploadTemplate.DocumentPath <- ""
                         displayDataInTable()
                 | documentPath when not <| String.IsNullOrWhiteSpace(documentPath) ->
-                    do! showFailedToLoadDocument_invalidPath(documentPath)
+                    do! showFailedToLoadDocument_invalidPath documentPath
                     displayDataInTable()
                 | _ -> ()
             else
@@ -296,7 +336,22 @@ and MainWindow (
                 windowConfig.UploadTemplate.DocumentPath <- ""
                 displayDataInTable()
         | uploadTemplatePath ->
-            do! showFailedToLoadUploadTemplate_invalidPath(uploadTemplatePath)
+            do! showFailedToLoadUploadTemplate_invalidPath uploadTemplatePath
+    }
+
+    member private self.TryLoadMoneyDocument() = task {
+        match windowConfig.MoneyDocument.DocumentPath with
+        | "" | null -> ()
+        | moneyDocumentPath when IO.Path.Exists(moneyDocumentPath) ->
+            let moneyDocument_loadInfo = moneyDocumentManager.Load moneyDocumentPath
+            if moneyDocument_loadInfo.Success then
+                displayMoneyDataInTable()
+            else
+                do! showError moneyDocument_loadInfo.Error
+                windowConfig.MoneyDocument.DocumentPath <- ""
+                displayMoneyDataInTable()
+        | moneyDocumentPath ->
+            do! showFailedToLoadMoneyDocument_invalidPath moneyDocumentPath
     }
 
     member private self.LoadUploadTemplateButton_Click(sender : obj, event : RoutedEventArgs) =

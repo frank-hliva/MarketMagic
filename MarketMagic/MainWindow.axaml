@@ -12,7 +12,7 @@
     Title="{Binding Title}"
 >
 
-    <TabControl>
+    <TabControl Name="Tabs" SelectedIndex="{Binding TabIndex}">
         <TabItem Header="eBay Listings">
             <Grid>
                 <Grid.RowDefinitions>

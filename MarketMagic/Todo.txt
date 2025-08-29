@@ -1,4 +1,8 @@
 ﻿
+- selectnut spravny tab
+    - select
+    - ulozit po zmene tabu
+
 - opened file history
 - MarketMagic.jl ma tiez precitat port z config.toml
 - moznost zavriet UploadTemplate.Document

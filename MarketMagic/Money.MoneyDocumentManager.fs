@@ -9,12 +9,12 @@ type MoneyDocumentManager(zmqServerConfig : ZMQServerConfig) =
 
     member self.New () =
         {| command = "Money.Document.new" |}
-        |> self.SendCommand<CommandDataResponse<DataTable>>
-
-    member self.Load (path : string, dataTable : DataTable) =
-        {| command = "Money.Document.load"; path = path; dataTable = dataTable |}
-        |> self.SendCommand<CommandSaveResponse>
-
-    member self.Save (path : string) =
-        {| command = "Money.Document.save"; path = path |}
         |> self.SendCommand<CommandMessageResponse>
+
+    member self.Load (path : string) =
+        {| command = "Money.Document.load"; path = path |}
+        |> self.SendCommand<CommandMessageResponse>
+
+    member self.Save (path : string, uploadDataTable : DataTable) =
+        {| command = "Money.Document.save"; path = path; uploadDataTable = uploadDataTable |}
+        |> self.SendCommand<CommandSaveResponse>
