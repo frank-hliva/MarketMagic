@@ -144,24 +144,51 @@ function handleFetchUploadTemplate()
     end
 end
 
-function handleMoneyNew(path::String)
+function handleMoneyDocumentFetch()
+    try
+        if state.moneyDataTable === nothing
+            return Dict(
+                "success" => false,
+                "error" => "No money document loaded."
+            )
+        end
+
+        return Dict(
+            "success" => true,
+            "data" => Dict(
+                "id" => -1,
+                "columns" => state.moneyDataTable.columns,
+                "enums" => Dict([]),
+                "cells" => matrixToNestedArray(state.moneyDataTable.cells)
+            )
+        )
+
+    catch e
+        return Dict(
+            "success" => false,
+            "error" => "Failed to fetch money document: $(string(e))"
+        )
+    end
+end
+
+function handleMoneyDocumentNew(path::String)
     try
         open(path, "w+") do stream
             state.moneyDataTable = Money.File.new(stream)
         end
         return Dict(
             "success" => true,
-            "message" => "Money table created at: $path"
+            "message" => "Money document created at: $path"
         )
     catch e
         return Dict(
             "success" => false,
-            "error" => "Failed to create money table: $(string(e))"
+            "error" => "Failed to create money document: $(string(e))"
         )
     end
 end
 
-function handleMoneyLoad(path::String)
+function handleMoneyDocumentLoad(path::String)
     try
         open(path) do stream
             state.moneyDataTable = Money.File.load(stream)
@@ -176,12 +203,12 @@ function handleMoneyLoad(path::String)
     catch e
         return Dict(
             "success" => false,
-            "error" => "Failed to load money table: $(string(e))"
+            "error" => "Failed to load money document: $(string(e))"
         )
     end
 end
 
-function handleMoneySave(path::String, dataTableDict)
+function handleMoneyDocumentSave(path::String, dataTableDict)
     try
         local dataTable = Main.Model.DataTable(
             columns = dataTableDict["columns"],
@@ -193,12 +220,12 @@ function handleMoneySave(path::String, dataTableDict)
         state.moneyDataTable = dataTable
         return Dict(
             "success" => true,
-            "message" => "Money table saved to: $path"
+            "message" => "Money document saved to: $path"
         )
     catch e
         return Dict(
             "success" => false,
-            "error" => "Failed to save money table: $(string(e))"
+            "error" => "Failed to save money document: $(string(e))"
         )
     end
 end
@@ -207,6 +234,10 @@ function handleCommand(commandData::Dict)
     command = get(commandData, "command", "")
     
     @match command begin
+        # UPLOAD TEMPLATE
+
+        "eBay.UploadTemplate.fetch" => handleFetchUploadTemplate()
+
         "eBay.UploadTemplate.load" => begin
             path = get(commandData, "path", "")
             if isempty(path)
@@ -214,8 +245,6 @@ function handleCommand(commandData::Dict)
             end
             handleLoadUploadTemplate(path)
         end
-
-        "eBay.UploadTemplate.fetch" => handleFetchUploadTemplate()
 
         "eBay.UploadTemplate.save" => begin
             path = get(commandData, "path", "")
@@ -241,12 +270,16 @@ function handleCommand(commandData::Dict)
             handleLoadDocument(path)
         end
 
+        # MONEY DOCUMENT
+
+        "Money.Document.fetch" => handleMoneyDocumentFetch()
+
         "Money.Document.new" => begin
             path = get(commandData, "path", "")
             if isempty(path)
                 return Dict("success" => false, "error" => "Path parameter required")
             end
-            handleMoneyNew(path)
+            handleMoneyDocumentNew(path)
         end
 
         "Money.Document.load" => begin
@@ -254,7 +287,7 @@ function handleCommand(commandData::Dict)
             if isempty(path)
                 return Dict("success" => false, "error" => "Path parameter required")
             end
-            handleMoneyLoad(path)
+            handleMoneyDocumentLoad(path)
         end
         
         "Money.Document.save" => begin
@@ -263,7 +296,7 @@ function handleCommand(commandData::Dict)
             if isempty(path) || dataTableDict === nothing
                 return Dict("success" => false, "error" => "Path and dataTable required")
             end
-            handleMoneySave(path, dataTableDict)
+            handleMoneyDocumentSave(path, dataTableDict)
         end
         
         _ => Dict(

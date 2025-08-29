@@ -12,7 +12,6 @@ open Avalonia.Interactivity
 open Avalonia.Platform.Storage
 open Lime
 open MarketMagic
-open MarketMagic.Ebay
 open Avalonia.Markup.Xaml.Templates
 open Avalonia.Controls.Templates
 
@@ -83,15 +82,20 @@ and WindowViewModel(
 
 and MainWindow (
     windowViewModel : WindowViewModel,
-    uploadTemplateManager : UploadTemplateManager,
+    uploadTemplateManager : Ebay.UploadTemplateManager,
+    moneyDocumentManager : Money.MoneyDocumentManager,
     windowConfig : WindowConfig
 ) as self = 
     inherit Window ()
 
-    let mutable dataGrid: DataGrid = null
+    let mutable dataGrid : DataGrid = null
 
     let displayDataInTable() =
         windowViewModel.Table.SetData <| uploadTemplateManager.Fetch().Data
+        dataGrid.Focus() |> ignore
+
+    let displayMoneyDataInTable() =
+        windowViewModel.MoneyTable.SetData <| moneyDocumentManager.Fetch().Data
         dataGrid.Focus() |> ignore
 
     let showError (msg : string) = 

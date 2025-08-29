@@ -3,6 +3,10 @@
 type MoneyDocumentManager(zmqServerConfig : ZMQServerConfig) =
     inherit ZMQCommandManager(zmqServerConfig)
 
+    member self.Fetch () =
+        {| command = "Money.Document.fetch" |}
+        |> self.SendCommand<CommandDataResponse<DataTable>>
+
     member self.New () =
         {| command = "Money.Document.new" |}
         |> self.SendCommand<CommandDataResponse<DataTable>>

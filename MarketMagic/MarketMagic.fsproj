@@ -21,8 +21,8 @@
     <Compile Include="AppConfigProvider.fs" />
     <Compile Include="DataGrid.fs" />
     <Compile Include="ZMQCommand.fs" />
-    <Compile Include="Ebay.UploadTemplate.fs" />
-    <Compile Include="Money.MoneyDocument.fs" />
+    <Compile Include="Ebay.UploadTemplateManager.fs" />
+    <Compile Include="Money.MoneyDocumentManager.fs" />
     <Compile Include="Dialogs.fs" />
     <Compile Include="BasicViewModel.fs" />
     <Compile Include="RowViewModel.fs" />
