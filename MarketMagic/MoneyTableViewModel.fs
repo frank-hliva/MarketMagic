@@ -12,7 +12,7 @@ open Avalonia.Markup.Xaml
 type MoneyTableViewModel() =
     inherit BasicViewModel()
     
-    let mutable uploadDataTable : DataTable option = None
+    let mutable dataTable : DataTable option = None
     let mutable columns = ObservableCollection<string>()
     let mutable cells = ObservableCollection<RowViewModel>()
     let mutable cellInfo = ""
@@ -46,11 +46,11 @@ type MoneyTableViewModel() =
             observableRows.Remove(rowViewModel) |> ignore
         observableRows
 
-    member self.UploadDataTable 
-        with get() = uploadDataTable
+    member self.DataTable 
+        with get() = dataTable
         and set(value) = 
-            uploadDataTable <- value
-            self.OnPropertyChanged(nameof self.UploadDataTable)
+            dataTable <- value
+            self.OnPropertyChanged(nameof self.DataTable)
 
     member self.Columns 
         with get() = columns
@@ -92,11 +92,11 @@ type MoneyTableViewModel() =
                 canSave <- value
                 self.OnPropertyChanged("CanSave")
 
-    member self.SetData(uploadDataTable : DataTable) =
-        self.UploadDataTable <- Some uploadDataTable
-        self.Columns <- ObservableCollection<string>(uploadDataTable.columns)
+    member self.SetData(dataTable : DataTable) =
+        self.DataTable <- Some dataTable
+        self.Columns <- ObservableCollection<string>(dataTable.columns)
         self.Cells <-
-            uploadDataTable.cells
+            dataTable.cells
             |> Cells.toObservable
             |> withEmptyRow
         self.CursorYXHelp <- ""
@@ -110,11 +110,11 @@ type MoneyTableViewModel() =
             |> ObservableCollection
         self.CanSave <- true
 
-    member self.TryExportToUploadDataTable() : Result<DataTable, string> =
-        match self.UploadDataTable with
-        | Some uploadDataTable ->
+    member self.TryExportToDataTable() : Result<DataTable, string> =
+        match self.DataTable with
+        | Some dataTable ->
             self.CanSave <- false
-            { uploadDataTable with
+            { dataTable with
                 columns = self.Columns |> List.ofSeq
                 cells =
                     self.Cells

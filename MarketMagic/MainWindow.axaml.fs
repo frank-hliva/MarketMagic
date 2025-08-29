@@ -349,3 +349,21 @@ and MainWindow (
 
     member private self.DeleteRowsButton_Click(sender : obj, event : RoutedEventArgs) =
         windowViewModel.Table.DeleteSelected()
+
+
+    (* Money Document *)
+
+    member private self.NewMoneyDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
+        ()
+
+    member private self.LoadMoneyDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
+        ()
+
+    member private self.SaveMoneyDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
+        ()
+
+    member private self.SaveAsMoneyDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
+        ()
+
+    member private self.DeleteMoneyDocumentRowsButton_Click(sender : obj, event : RoutedEventArgs) =
+        ()
