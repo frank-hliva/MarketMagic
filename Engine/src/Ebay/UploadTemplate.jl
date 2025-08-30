@@ -98,9 +98,9 @@ module UploadTemplate
     end
 
     function load(templateStream::IOStream)::Main.Ebay.UploadDataTable
-        seek(templateStream, 0)
+        seekstart(templateStream)
         local columns = templateStream |> File.readColumns
-        seek(templateStream, 0)
+        seekstart(templateStream)
         local enumRows = templateStream |> File.readEnumRows
         local enumMap = Dict(enumRows |> File.parseAllEnums)
 
