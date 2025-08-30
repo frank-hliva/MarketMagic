@@ -12,8 +12,6 @@ module UploadTemplate
 
         using CSV
 
-        const HEADER_ID_META = "Info;Version=1.0.0;Template=fx_category_template_EBAY_DE";
-
         function readColumns(stream::IO)
             CSV.File(
                 stream;
@@ -92,11 +90,15 @@ module UploadTemplate
         end
     end
 
+    function tryReadHeader(stream::IO)::Union{Nothing, Tuple{String, String}}
+        stream |> readline |> tryGetHeader
+    end
+
     function tryGetHeader(stream::IO)::Union{Nothing, Tuple{String, String}}
         local currentPosition = position(stream)
-        local result = stream |> readline |> tryGetHeader
+        local result = tryReadHeader(stream)
         seek(stream, currentPosition)
-        return result
+        result
     end
 
     function load(templateStream::IO)::Main.Ebay.UploadDataTable
@@ -138,13 +140,15 @@ module UploadTemplate
         newUploadDataTable
     end
 
+    const UPLOAD_TEMPLATE_HEADER = "Info;Version=1.0.0;Template=fx_category_template_EBAY_DE";
+
     function save(outputStream::IO, uploadDataTable::Main.Ebay.UploadDataTable)
-        println(outputStream, HEADER_ID_META)
         local buffer = IOBuffer()
         local dataFrame = DataFrame(
             uploadDataTable.cells, 
             uploadDataTable.columns
         )
+        println(outputStream, UPLOAD_TEMPLATE_HEADER)
         CSV.write(
             buffer,
             dataFrame;

@@ -63,22 +63,16 @@ function handleLoadDocument(path::String)
             )
         else
             open(path) do documentStream
-                @match Ebay.UploadTemplate.tryGetHeader(documentStream) begin
-                    nothing => begin
-                        local document = Ebay.Document.load(documentStream)
-                        state.uploadDataTable = Ebay.UploadTemplate.withCells(document, state.uploadDataTable)
-                        Dict(
-                            "success" => true,
-                            "message" => "Document added successfully from: $path"
-                        )
-                    end
-                    _ => begin
-                        Dict(
-                            "success" => false,
-                            "error" => "Invalid format: csv file \"$path\" is an upload template.\nPlease open the correct csv data file"
-                        )
-                    end
+                local currentPosition = position(documentStream)
+                if Ebay.UploadTemplate.tryReadHeader(documentStream) === nothing 
+                    seek(documentStream, currentPosition)
                 end
+                local document = Ebay.Document.load(documentStream)
+                state.uploadDataTable = Ebay.UploadTemplate.withCells(document, state.uploadDataTable)
+                Dict(
+                    "success" => true,
+                    "message" => "Document added successfully from: $path"
+                )
             end
         end
     catch e
