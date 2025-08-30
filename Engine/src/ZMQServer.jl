@@ -1,6 +1,6 @@
 module ZMQServer
 
-using ZMQ, JSON3, MLStyle, Main.Ebay
+using ZMQ, JSON3, MLStyle, Main.Ebay, Main.Money
 
 mutable struct ServerState
     uploadDataTable::Union{Nothing, Ebay.UploadDataTable}
@@ -178,7 +178,7 @@ function handleMoneyDocumentNew()
         state.moneyDataTable = Money.File.new()
         return Dict(
             "success" => true,
-            "message" => "Money document created at: $path"
+            "message" => "Money document created"
         )
     catch e
         return Dict(
