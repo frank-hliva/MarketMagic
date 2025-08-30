@@ -1,3 +1,4 @@
+include("Core/Cells.jl")
 include("Model/DataTable.jl")
 include("Ebay/UploadTemplate.jl")
 include("Money/Money.jl")

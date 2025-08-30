@@ -157,7 +157,7 @@ end
 
 
 module Document
-    using CSV, DataFrames
+    using CSV, DataFrames, Main.Cells
 
     module Columns
         using DataFrames
@@ -187,12 +187,6 @@ module Document
                     rename!(dataFrame, oldName => newName)
                 end
             end
-        end
-    end
-
-    module Cells
-        function removeNothing(cells)::Matrix{String}
-            string.(replace(cells, missing => ""))
         end
     end
 

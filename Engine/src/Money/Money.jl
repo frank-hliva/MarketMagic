@@ -1,7 +1,26 @@
 module Money
     module File
 
-        using CSV, DataFrames
+        using CSV, DataFrames, Main.Cells
+
+        function load(inputStream::IO)::Main.Model.DataTable
+            local dataFrame = CSV.read(
+                inputStream,
+                DataFrame;
+                delim = ";",
+                header = true,
+                comment = "#",
+                quotechar = '"',
+                escapechar = '"',
+                ignoreemptyrows = true,
+                silencewarnings = true
+            )
+            
+            Main.Model.DataTable(
+                columns = string.(names(dataFrame)),
+                cells = Cells.removeNothing(Matrix(dataFrame))
+            )
+        end
 
         function new()::Main.Model.DataTable
             dataFrame = DataFrame(
@@ -23,26 +42,7 @@ module Money
             return load(inputStream)
         end
 
-        function load(inputStream::IOStream)::Main.Model.DataTable
-            local dataFrame = CSV.read(
-                inputStream,
-                DataFrame;
-                delim = ";",
-                header = true,
-                comment = "#",
-                quotechar = '"',
-                escapechar = '"',
-                ignoreemptyrows = true,
-                silencewarnings = true
-            )
-            
-            Main.Model.DataTable(
-                columns = string.(names(dataFrame)),
-                cells = Cells.removeNothing(Matrix(dataFrame))
-            )
-        end
-
-        function save(outputStream::IOStream, dataTable::Main.Model.DataTable)
+        function save(outputStream::IO, dataTable::Main.Model.DataTable)
             local dataFrame = DataFrame(
                 dataTable.cells, 
                 dataTable.columns
