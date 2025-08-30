@@ -12,7 +12,9 @@ module UploadTemplate
 
         using CSV
 
-        function readColumns(stream::IOStream)
+        const HEADER_ID_META = "Info;Version=1.0.0;Template=fx_category_template_EBAY_DE";
+
+        function readColumns(stream::IO)
             CSV.File(
                 stream;
                 header = 2,
@@ -26,7 +28,7 @@ module UploadTemplate
             columns -> string.(columns)
         end
         
-        function readEnumRows(stream::IOStream)
+        function readEnumRows(stream::IO)
             CSV.File(
                 stream;
                 skipto = 3,
@@ -90,14 +92,14 @@ module UploadTemplate
         end
     end
 
-    function tryGetHeader(stream::IOStream)::Union{Nothing, Tuple{String, String}}
+    function tryGetHeader(stream::IO)::Union{Nothing, Tuple{String, String}}
         local currentPosition = position(stream)
         local result = stream |> readline |> tryGetHeader
         seek(stream, currentPosition)
         return result
     end
 
-    function load(templateStream::IOStream)::Main.Ebay.UploadDataTable
+    function load(templateStream::IO)::Main.Ebay.UploadDataTable
         seekstart(templateStream)
         local columns = templateStream |> File.readColumns
         seekstart(templateStream)
@@ -136,20 +138,23 @@ module UploadTemplate
         newUploadDataTable
     end
 
-    function save(outputStream::IOStream, uploadDataTable::Main.Ebay.UploadDataTable)
+    function save(outputStream::IO, uploadDataTable::Main.Ebay.UploadDataTable)
+        println(outputStream, HEADER_ID_META)
+        local buffer = IOBuffer()
         local dataFrame = DataFrame(
             uploadDataTable.cells, 
             uploadDataTable.columns
         )
-        
         CSV.write(
-            outputStream,
+            buffer,
             dataFrame;
             delim = ";",
             writeheader = true,
             quotechar = '"',
             escapechar = '"'
         )
+        seekstart(buffer)
+        write(outputStream, read(buffer))
     end
 
     export load, withCells, save
@@ -190,7 +195,7 @@ module Document
         end
     end
 
-    function load(documentStream::IOStream, columnNameMapping::Columns.ColumnMapping)::Main.Model.DataTable
+    function load(documentStream::IO, columnNameMapping::Columns.ColumnMapping)::Main.Model.DataTable
         local dataFrame = CSV.read(
             documentStream,
             DataFrame;
@@ -211,7 +216,7 @@ module Document
         )
     end
 
-    function load(documentStream::IOStream)::Main.Model.DataTable
+    function load(documentStream::IO)::Main.Model.DataTable
         load(documentStream, Columns.commonMapping)
     end
 
