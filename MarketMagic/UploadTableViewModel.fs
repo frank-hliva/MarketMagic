@@ -9,7 +9,7 @@ open Avalonia
 open Avalonia.Controls
 open Avalonia.Markup.Xaml
 
-type TableViewModel() =
+type UploadTableViewModel() =
     inherit BasicViewModel()
     
     let mutable uploadDataTable : DataTable option = None

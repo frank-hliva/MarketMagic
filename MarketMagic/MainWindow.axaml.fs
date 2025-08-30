@@ -76,7 +76,7 @@ and WindowViewModel(
     windowConfig : WindowConfig,
     uploadTemplateConfig : UploadTemplateConfig,
     moneyDocumentConfig : MoneyDocumentConfig,
-    tableViewModel : TableViewModel,
+    uploadTableViewModel : UploadTableViewModel,
     moneyTableViewModel : MoneyTableViewModel
 ) as self =
     inherit BasicViewModel()
@@ -102,7 +102,7 @@ and WindowViewModel(
         let subtitle = [path; renderTemplateSource templateSourcePath] |> String.concat " "
         self.Title <- $"MarketMagic: {subtitle}"
 
-    member self.Table = tableViewModel
+    member self.UploadTable = uploadTableViewModel
 
     member self.MoneyTable = moneyTableViewModel
 
@@ -118,12 +118,12 @@ and MainWindow (
 ) as self = 
     inherit Window ()
 
-    let mutable dataGrid : DataGrid = null
+    let mutable uploadTableDataGrid : DataGrid = null
     let mutable moneyDocumentDataGrid : DataGrid = null
 
     let displayDataInTable() =
-        windowViewModel.Table.SetData <| uploadTemplateManager.Fetch().Data
-        dataGrid.Focus() |> ignore
+        windowViewModel.UploadTable.SetData <| uploadTemplateManager.Fetch().Data
+        uploadTableDataGrid.Focus() |> ignore
 
     let displayMoneyDataInTable() =
         windowViewModel.MoneyTable.SetData <| moneyDocumentManager.Fetch().Data
@@ -156,6 +156,12 @@ and MainWindow (
     let showFailedToLoadMoneyDocument_invalidPath (path : string) = 
         showError $"Failed to load money document.\nThe file \"{path}\" was not found."
 
+    let processError (moneyDocument_loadInfo : CommandMessageResponse) = task {
+        do! showError $"{moneyDocument_loadInfo.Error}\n{moneyDocument_loadInfo.InternalError}"
+        windowConfig.MoneyDocument.DocumentPath <- ""
+        displayMoneyDataInTable()
+    }
+
     let tryPickFileToOpen (title : string) (fileTypeTitle : string) = async {
         match! [
             FilePickerFileType(fileTypeTitle, Patterns = [| "*.csv" |])
@@ -180,12 +186,12 @@ and MainWindow (
     let tryPickFileToSaveDocument () = tryPickFileToSave "Save document" "Documents (*.csv)"
 
     let displayDataGridCellInfo(dataGrid : DataGrid) =
-        let cellInfo, keyboardInfo = dataGrid.GetDataGridCellInfo(windowViewModel.Table.IsInEditMode)
-        windowViewModel.Table.CursorYXHelp <- cellInfo
-        windowViewModel.Table.KeyboardHelp <- keyboardInfo
+        let cellInfo, keyboardInfo = dataGrid.GetDataGridCellInfo(windowViewModel.UploadTable.IsInEditMode)
+        windowViewModel.UploadTable.CursorYXHelp <- cellInfo
+        windowViewModel.UploadTable.KeyboardHelp <- keyboardInfo
 
     let rec saveDocumentToFile (path : string) = task {
-        match windowViewModel.Table.TryExportToUploadDataTable() with
+        match windowViewModel.UploadTable.TryExportToUploadDataTable() with
         | Ok uploadDataTable ->
             if uploadTemplateManager.Save(path, uploadDataTable).Success
             then windowConfig.UploadTemplate.DocumentPath <- path
@@ -211,16 +217,16 @@ and MainWindow (
         self.Opened.Add(self.Window_Opened)
         self.Closing.Add(self.Window_Closing)
 
-        dataGrid.BeginningEdit.Add(fun _ ->
-            windowViewModel.Table.IsInEditMode <- true
-            displayDataGridCellInfo <| dataGrid
+        uploadTableDataGrid.BeginningEdit.Add(fun _ ->
+            windowViewModel.UploadTable.IsInEditMode <- true
+            displayDataGridCellInfo <| uploadTableDataGrid
         )
-        dataGrid.CellEditEnded.Add(fun _ ->
-            windowViewModel.Table.IsInEditMode <- false
-            displayDataGridCellInfo <| dataGrid
+        uploadTableDataGrid.CellEditEnded.Add(fun _ ->
+            windowViewModel.UploadTable.IsInEditMode <- false
+            displayDataGridCellInfo <| uploadTableDataGrid
         )
 
-        dataGrid.AddHandler(
+        uploadTableDataGrid.AddHandler(
             InputElement.KeyDownEvent,
             EventHandler<KeyEventArgs>(
                 fun sender event ->
@@ -235,32 +241,32 @@ and MainWindow (
 #endif
         self.DataContext <- windowViewModel
         AvaloniaXamlLoader.Load(self)
-        dataGrid <- self.FindControl<DataGrid>("UploadTable")
+        uploadTableDataGrid <- self.FindControl<DataGrid>("UploadTable")
         moneyDocumentDataGrid <- self.FindControl<DataGrid>("MoneyTable")
 
     member private self.SetupDataGrid() =
-        windowViewModel.Table.PropertyChanged.Add(fun args ->
+        windowViewModel.UploadTable.PropertyChanged.Add(fun args ->
             match args.PropertyName with
             | "Columns" -> self.SetupDataGridColumns()
             | _ -> ()
         )
 
     member private self.SetupDataGridColumns() =
-        dataGrid.Columns.Clear()
+        uploadTableDataGrid.Columns.Clear()
         DataGridCheckBoxColumn(
             Header = "#",
             Binding = Binding("IsMarked"),
             Width = DataGridLength(40.0, DataGridLengthUnitType.Pixel)
-        ) |> dataGrid.Columns.Add
+        ) |> uploadTableDataGrid.Columns.Add
 
         let enums =
-            windowViewModel.Table.UploadDataTable
+            windowViewModel.UploadTable.UploadDataTable
             |> Option.map _.enums
             |> Option.defaultValue Map.empty
 
-        for i in 0 .. windowViewModel.Table.Columns.Count - 1 do
-            let column = windowViewModel.Table.Columns[i]
-            dataGrid.Columns.Add(
+        for i in 0 .. windowViewModel.UploadTable.Columns.Count - 1 do
+            let column = windowViewModel.UploadTable.Columns[i]
+            uploadTableDataGrid.Columns.Add(
                 match enums.TryFind column with
                 | Some enum when not enum.IsEmpty ->
                     DataGridTemplateColumn(
@@ -341,15 +347,16 @@ and MainWindow (
 
     member private self.TryLoadMoneyDocument() = task {
         match windowConfig.MoneyDocument.DocumentPath with
-        | "" | null -> ()
+        | "" | null ->
+            let moneyDocument_loadInfo = moneyDocumentManager.New()
+            if moneyDocument_loadInfo.Success
+            then displayMoneyDataInTable()
+            else do! processError moneyDocument_loadInfo
         | moneyDocumentPath when IO.Path.Exists(moneyDocumentPath) ->
             let moneyDocument_loadInfo = moneyDocumentManager.Load moneyDocumentPath
-            if moneyDocument_loadInfo.Success then
-                displayMoneyDataInTable()
-            else
-                do! showError moneyDocument_loadInfo.Error
-                windowConfig.MoneyDocument.DocumentPath <- ""
-                displayMoneyDataInTable()
+            if moneyDocument_loadInfo.Success
+            then displayMoneyDataInTable()
+            else do! processError moneyDocument_loadInfo
         | moneyDocumentPath ->
             do! showFailedToLoadMoneyDocument_invalidPath moneyDocumentPath
     }
@@ -391,13 +398,13 @@ and MainWindow (
         let dataGrid = sender :?> DataGrid
         if not dataGrid.IsReadOnly then
             match e.Key with
-            | Key.Enter | Key.F2 | Key.Insert when not windowViewModel.Table.IsInEditMode ->
+            | Key.Enter | Key.F2 | Key.Insert when not windowViewModel.UploadTable.IsInEditMode ->
                 if dataGrid.SelectedItem <> null && dataGrid.CurrentColumn <> null then
                     dataGrid.BeginEdit() |> ignore
                     e.Handled <- true
             | Key.Enter when e.KeyModifiers.HasFlag KeyModifiers.Shift ->
                 e.Handled <- true
-            | Key.Enter | Key.Tab | Key.Escape when windowViewModel.Table.IsInEditMode ->
+            | Key.Enter | Key.Tab | Key.Escape when windowViewModel.UploadTable.IsInEditMode ->
                 if dataGrid.SelectedItem <> null && dataGrid.CurrentColumn <> null then
                     dataGrid.CommitEdit() |> ignore
                     dataGrid.Reselect()
@@ -407,12 +414,13 @@ and MainWindow (
             | _ -> ()
 
     member private self.DeleteRowsButton_Click(sender : obj, event : RoutedEventArgs) =
-        windowViewModel.Table.DeleteSelected()
+        windowViewModel.UploadTable.DeleteSelected()
 
 
     (* Money Document *)
-
     member private self.NewMoneyDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
+        windowConfig.MoneyDocument.DocumentPath <- ""
+        self.TryLoadMoneyDocument() |> ignore
         ()
 
     member private self.LoadMoneyDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
@@ -425,4 +433,4 @@ and MainWindow (
         ()
 
     member private self.DeleteMoneyDocumentRowsButton_Click(sender : obj, event : RoutedEventArgs) =
-        ()
+        windowViewModel.MoneyTable.DeleteSelected()

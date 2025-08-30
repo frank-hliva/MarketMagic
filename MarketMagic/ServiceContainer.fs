@@ -21,7 +21,7 @@ type ServiceCollectionExtensions() =
             .AddSingleton<UploadTemplateConfig>()
             .AddSingleton<MoneyDocumentConfig>()
             .AddSingleton<WindowConfig>()
-            .AddSingleton<TableViewModel>()
+            .AddSingleton<UploadTableViewModel>()
             .AddSingleton<MoneyTableViewModel>()
             .AddSingleton<WindowViewModel>()
             .AddSingleton<MainWindow>()

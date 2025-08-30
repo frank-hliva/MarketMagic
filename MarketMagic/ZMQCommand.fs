@@ -33,10 +33,16 @@ module ZMQCommand =
 type CommandResponse(success : bool) = 
     member self.Success = success
 
-type CommandMessageResponse(success : bool, message : string, error : string) = 
+type CommandMessageResponse(
+    success : bool,
+    message : string,
+    error : string,
+    internalError : string
+) = 
     inherit CommandResponse(success)
     member self.Message = message
     member self.Error = error
+    member self.InternalError = internalError
 
 type CommandDataResponse<'t>(success : bool, data : 't) = 
     inherit CommandResponse(success)

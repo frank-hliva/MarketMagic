@@ -32,7 +32,7 @@
                             <Button Click="LoadDocumentButton_Click">
                                 <svg:Svg Path="avares://MarketMagic/icons/OpenFolder.svg" ToolTip.Tip="Open" />
                             </Button>
-                            <Button Click="SaveDocumentButton_Click" IsEnabled="{Binding Table.CanSave}">
+                            <Button Click="SaveDocumentButton_Click" IsEnabled="{Binding UploadTable.CanSave}">
                                 <svg:Svg Path="avares://MarketMagic/icons/Save.svg" ToolTip.Tip="Save" />
                             </Button>
                             <Button Click="SaveAsDocumentButton_Click">
@@ -52,7 +52,7 @@
                 <DataGrid
                     Grid.Row="1"
                     Name="UploadTable"
-                    ItemsSource="{Binding Table.Cells}"
+                    ItemsSource="{Binding UploadTable.Cells}"
                     GridLinesVisibility="All"
                     BorderThickness="0,1,0,0"
                     BorderBrush="Gray"
@@ -61,8 +61,8 @@
                     CurrentCellChanged="UploadTableDataGrid_CurrentCellChanged"
                 />
                 <StackPanel Classes="StatusBar" Grid.Row="2">
-                    <TextBlock Text="{Binding Table.CursorYXHelp}" />
-                    <TextBlock Text="{Binding Table.KeyboardHelp}" />
+                    <TextBlock Text="{Binding UploadTable.CursorYXHelp}" />
+                    <TextBlock Text="{Binding UploadTable.KeyboardHelp}" />
                 </StackPanel>
             </Grid>
         </TabItem>
@@ -114,8 +114,8 @@
                     CurrentCellChanged="MoneyTableDataGrid_CurrentCellChanged"
                 />
                 <StackPanel Classes="StatusBar" Grid.Row="2">
-                    <TextBlock Text="{Binding Table.CursorYXHelp}" />
-                    <TextBlock Text="{Binding Table.KeyboardHelp}" />
+                    <TextBlock Text="{Binding MoneyTable.CursorYXHelp}" />
+                    <TextBlock Text="{Binding MoneyTable.KeyboardHelp}" />
                 </StackPanel>
             </Grid>
         </TabItem>

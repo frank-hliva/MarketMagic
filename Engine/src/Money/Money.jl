@@ -1,13 +1,14 @@
 module Money
     module File
 
-    function new(inputStream::IOStream)::Main.Model.DataTable
+    function new()::Main.Model.DataTable
         using CSV, DataFrames
         dataFrame = DataFrame(
             Subject = String[],
             Note = String[],
             Price = Float64[]
         )
+        local inputStream = IOBuffer()
         CSV.write(
             inputStream,
             dataFrame;
@@ -17,7 +18,7 @@ module Money
             quotechar = '"',
             escapechar = '"'
         )
-        seek(inputStream, 0)
+        seekstart(inputStream)
         return load(inputStream)
     end
 

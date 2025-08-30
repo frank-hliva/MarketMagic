@@ -51,7 +51,8 @@ function handleLoadUploadTemplate(path::String)
     catch e
         Dict(
             "success" => false,
-            "error" => "Failed to load upload template: $(string(e))"
+            "error" => "Failed to load upload template",
+            "internalError" => string(e)
         )
     end
 end
@@ -86,7 +87,8 @@ function handleLoadDocument(path::String)
     catch e
         Dict(
             "success" => false,
-            "error" => "Failed to add exported data: $(string(e))"
+            "error" => "Failed to add exported data",
+            "internalError" => string(e)
         )
     end
 end
@@ -113,7 +115,8 @@ function handleSaveUploadTemplate(path::String, uploadDataTable::Main.Ebay.Uploa
     catch e
         return Dict(
             "success" => false,
-            "error" => "Failed to save upload template: $(string(e))"
+            "error" => "Failed to save upload template",
+            "internalError" => string(e)
         )
     end
 end
@@ -139,7 +142,8 @@ function handleFetchUploadTemplate()
     catch e
         return Dict(
             "success" => false,
-            "error" => "Failed to fetch upload template: $(string(e))"
+            "error" => "Failed to fetch upload template",
+            "internalError" => string(e)
         )
     end
 end
@@ -166,16 +170,15 @@ function handleMoneyDocumentFetch()
     catch e
         return Dict(
             "success" => false,
-            "error" => "Failed to fetch money document: $(string(e))"
+            "error" => "Failed to fetch money document",
+            "internalError" => string(e)
         )
     end
 end
 
-function handleMoneyDocumentNew(path::String)
+function handleMoneyDocumentNew()
     try
-        open(path, "w+") do stream
-            state.moneyDataTable = Money.File.new(stream)
-        end
+        state.moneyDataTable = Money.File.new()
         return Dict(
             "success" => true,
             "message" => "Money document created at: $path"
@@ -183,7 +186,8 @@ function handleMoneyDocumentNew(path::String)
     catch e
         return Dict(
             "success" => false,
-            "error" => "Failed to create money document: $(string(e))"
+            "error" => "Failed to create money document",
+            "internalError" => string(e)
         )
     end
 end
@@ -195,15 +199,13 @@ function handleMoneyDocumentLoad(path::String)
         end
         return Dict(
             "success" => true,
-            "data" => Dict(
-                "columns" => state.moneyDataTable.columns,
-                "cells" => state.moneyDataTable.cells
-            )
+            "message" => "Money document loaded at: $path"
         )
     catch e
         return Dict(
             "success" => false,
-            "error" => "Failed to load money document: $(string(e))"
+            "error" => "Failed to load money document",
+            "internalError" => string(e)
         )
     end
 end
@@ -225,7 +227,8 @@ function handleMoneyDocumentSave(path::String, dataTableDict)
     catch e
         return Dict(
             "success" => false,
-            "error" => "Failed to save money document: $(string(e))"
+            "error" => "Failed to save money document",
+            "internalError" => string(e)
         )
     end
 end
@@ -275,11 +278,7 @@ function handleCommand(commandData::Dict)
         "Money.Document.fetch" => handleMoneyDocumentFetch()
 
         "Money.Document.new" => begin
-            path = get(commandData, "path", "")
-            if isempty(path)
-                return Dict("success" => false, "error" => "Path parameter required")
-            end
-            handleMoneyDocumentNew(path)
+            handleMoneyDocumentNew()
         end
 
         "Money.Document.load" => begin
@@ -339,7 +338,8 @@ function startServer(port::Int = 7333)
             catch e
                 errorResponse = Dict(
                     "success" => false,
-                    "error" => "Invalid request format: $(string(e))"
+                    "error" => "Invalid request format",
+                    "internalError" => string(e)
                 )
                 responseString = JSON3.write(errorResponse)
                 send(socket, responseString)
