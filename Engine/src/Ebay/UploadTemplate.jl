@@ -81,10 +81,7 @@ module UploadTemplate
         end
     end
 
-    using CSV
-    using DataFrames
-    using .File
-    using MLStyle
+    using CSV, DataFrames, .File, MLStyle
 
     function tryGetHeader(input::String)::Union{Nothing, Tuple{String, String}}
         @match match(r"Info;Version=([^;]+);Template=([^;]+)", input) begin
@@ -160,8 +157,7 @@ end
 
 
 module Document
-    using CSV
-    using DataFrames
+    using CSV, DataFrames
 
     module Columns
         using DataFrames

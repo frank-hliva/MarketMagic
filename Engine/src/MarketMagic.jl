@@ -1,9 +1,9 @@
 include("Model/DataTable.jl")
 include("Ebay/UploadTemplate.jl")
+include("Money/Money.jl")
 include("ZMQServer.jl")
 
-using .ZMQServer
-using .Ebay
+using .ZMQServer, .Ebay, .Money
 
 function main()
     port = 7333

@@ -1,9 +1,6 @@
 module ZMQServer
 
-using ZMQ
-using JSON3
-using MLStyle
-using Main.Ebay
+using ZMQ, JSON3, MLStyle, Main.Ebay
 
 mutable struct ServerState
     uploadDataTable::Union{Nothing, Ebay.UploadDataTable}

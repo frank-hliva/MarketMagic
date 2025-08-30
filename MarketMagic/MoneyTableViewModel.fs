@@ -93,12 +93,18 @@ type MoneyTableViewModel() =
                 self.OnPropertyChanged("CanSave")
 
     member self.SetData(dataTable : DataTable) =
-        self.DataTable <- Some dataTable
-        self.Columns <- ObservableCollection<string>(dataTable.columns)
-        self.Cells <-
-            dataTable.cells
-            |> Cells.toObservable
-            |> withEmptyRow
+        match box dataTable with
+        | :? DataTable as dataTable ->
+            self.DataTable <- Some dataTable
+            self.Columns <- ObservableCollection<string>(dataTable.columns)
+            self.Cells <-
+                dataTable.cells
+                |> Cells.toObservable
+                |> withEmptyRow
+        | _ ->
+            self.DataTable <- None
+            self.Columns <- ObservableCollection<string>()
+            self.Cells <- ObservableCollection<RowViewModel>() 
         self.CursorYXHelp <- ""
         self.KeyboardHelp <- ""
         self.CanSave <- false
