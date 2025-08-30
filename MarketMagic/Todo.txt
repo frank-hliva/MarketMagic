@@ -1,8 +1,9 @@
-﻿
-- selectnut spravny tab
-    - select
-    - ulozit po zmene tabu
+﻿x - nefunguje select podla enum
+    x - funguje ako autocomplete
+- Command: Add, Revise, Relist, End
+- ListingType: FixedPriceItem, Chinese, StoresFixedPrice
 
+------------------------------------------------------------------------------------------------------
 - opened file history
 - MarketMagic.jl ma tiez precitat port z config.toml
 - moznost zavriet UploadTemplate.Document
