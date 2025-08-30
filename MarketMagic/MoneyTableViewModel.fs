@@ -104,7 +104,9 @@ type MoneyTableViewModel() =
         | _ ->
             self.DataTable <- None
             self.Columns <- ObservableCollection<string>()
-            self.Cells <- ObservableCollection<RowViewModel>() 
+            self.Cells <-
+                ObservableCollection<RowViewModel>()
+                |> withEmptyRow
         self.CursorYXHelp <- ""
         self.KeyboardHelp <- ""
         self.CanSave <- false
@@ -128,4 +130,4 @@ type MoneyTableViewModel() =
                     |> removeLastEmptyRow
                     |> Cells.ofObservable self.Columns
             } |> Ok
-        | _ -> Error "The upload template has not been loaded."
+        | _ -> Error "The money table has not been loaded."

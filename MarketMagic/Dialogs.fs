@@ -6,6 +6,7 @@ open Avalonia
 open Avalonia.Controls
 open MsBox.Avalonia
 open MsBox.Avalonia.Enums
+open System.Threading
 
 module Native =
 

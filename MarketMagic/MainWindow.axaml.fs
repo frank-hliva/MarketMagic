@@ -126,7 +126,8 @@ and MainWindow (
         uploadTableDataGrid.Focus() |> ignore
 
     let displayMoneyDataInTable() =
-        windowViewModel.MoneyTable.SetData <| moneyDocumentManager.Fetch().Data
+        let data = moneyDocumentManager.Fetch().Data
+        windowViewModel.MoneyTable.SetData data
         moneyDocumentDataGrid.Focus() |> ignore
 
     let showError (msg : string) = 

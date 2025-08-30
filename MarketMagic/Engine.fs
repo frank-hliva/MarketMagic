@@ -67,7 +67,7 @@ and EngineConfig(appConfig : AppConfig) =
     member self.FullAddress = self.Address |> Url.withPort self.Port
 
     member self.ConnectionTimeout =
-        appConfig.GetOr("Engine.Server.ConnectionTimeout", 5000.0)
+        appConfig.GetOr("Engine.Server.ConnectionTimeout", 20000.0)
 
     member self.IterationTimeout =
         appConfig.GetOr("Engine.Server.IterationTimeout", 500.0)
