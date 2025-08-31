@@ -1,6 +1,4 @@
-﻿x - nefunguje select podla enum
-    x - funguje ako autocomplete
-- Command: Add, Revise, Relist, End
+﻿- Command: Add, Revise, Relist, End
 - ListingType: FixedPriceItem, Chinese, StoresFixedPrice
 
 ------------------------------------------------------------------------------------------------------

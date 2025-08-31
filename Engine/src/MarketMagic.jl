@@ -24,3 +24,9 @@ end
 if abspath(PROGRAM_FILE) == @__FILE__
     main()
 end
+
+# open("b:/VikingTekDIY/2025-08-30/eBay-category-listing-template-Aug-31-2025-1-17-35.csv") do stream
+#     template = Main.Ebay.UploadTemplate.load(stream)
+#     output = template.enums
+#     output
+# end

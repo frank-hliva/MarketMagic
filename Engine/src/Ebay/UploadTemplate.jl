@@ -1,9 +1,14 @@
 module Ebay
 
+@kwdef struct Enumeration
+    values::Vector{String}
+    isFixed::Bool
+end
+
 @kwdef struct UploadDataTable
     id::Int64
     columns::Vector{String}
-    enums::Dict{String, Vector{String}}
+    enums::Dict{String, Enumeration}
     cells::Matrix{String}
 end
 
@@ -11,6 +16,7 @@ module UploadTemplate
     module File
 
         using CSV
+        const Enumeration = Main.Ebay.Enumeration
 
         function readColumns(stream::IO)
             CSV.File(
@@ -65,19 +71,20 @@ module UploadTemplate
             columns -> strip.(string.(columns))
         end
 
-        function parseKeyEnumPair(text::AbstractString)
+        function parseColumnEnumPair(text::AbstractString)
             local colonIndex = findfirst(':', text)
             if isnothing(colonIndex)
                 return nothing
             end
-            "C:$(strip(text[1 : colonIndex - 1]))",
-            strip(text[colonIndex + 2 : end]) |> parseEnums
+            local column = "C:$(strip(text[1 : colonIndex - 1]))"
+            local values = strip(text[colonIndex + 2 : end]) |> parseEnums
+            column, values
         end
 
         function parseAllEnums(enumRows)
             enumRows |> 
             data -> filter(row -> row.key == "Info" && startswith(row.value, enumValueToken), data) |>
-            data -> map(((_, value),) -> value[length(enumValueToken) + 1 : end] |> string |> strip |> parseKeyEnumPair, data)
+            data -> map(((_, value),) -> value[length(enumValueToken) + 1 : end] |> string |> strip |> parseColumnEnumPair, data)
         end
     end
 
@@ -101,20 +108,64 @@ module UploadTemplate
         result
     end
 
+    function tryGetHeader(stream::IO)::Union{Nothing, Tuple{String, String}}
+        local currentPosition = position(stream)
+        local result = tryReadHeader(stream)
+        seek(stream, currentPosition)
+        result
+    end
+
+    const Enumeration = Main.Ebay.Enumeration
+
+    const defaultEnums = Dict(
+        "*Action(SiteID=Germany|Country=DE|Currency=EUR|Version=1193|CC=UTF-8)" => 
+            Enumeration(
+                values = [
+                    "Add",
+                    "Revise",
+                    "Relist",
+                    "End"
+                ],
+                isFixed = true
+            ),
+        "*Format" => 
+            Enumeration(
+                values = [
+                    "AdType",
+                    "Auction",
+                    "Chinese",
+                    "CustomCode",
+                    "FixedPriceItem",
+                    "LeadGeneration",
+                    "PersonalOffer",
+                    "Unknown"
+                ],
+                isFixed = true
+            ),
+    )
+    
+    function withDefaults(enums::Dict{String, Enumeration})::Dict{String, Enumeration}
+        merge(enums, defaultEnums)
+    end
+
     function load(templateStream::IO)::Main.Ebay.UploadDataTable
         seekstart(templateStream)
         local columns = templateStream |> File.readColumns
         seekstart(templateStream)
         local enumRows = templateStream |> File.readEnumRows
         local enumMap = Dict(enumRows |> File.parseAllEnums)
+        local enums = map(column -> begin
+            column,
+            Enumeration(
+                values = haskey(enumMap, column) ? enumMap[column] : Vector{String}(),
+                isFixed = false
+            )
+        end, columns) |> Dict
 
         Main.Ebay.UploadDataTable(
             id = File.parseCategoryId(enumRows),
             columns = columns,
-            enums = map(column -> begin
-                column,
-                haskey(enumMap, column) ? enumMap[column] : Vector{String}()
-            end, columns) |> Dict,
+            enums = enums |> withDefaults,
             cells = fill("", 0, length(columns))
         )
     end
