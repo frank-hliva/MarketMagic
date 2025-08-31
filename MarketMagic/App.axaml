@@ -130,7 +130,7 @@
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="CornerRadius" Value="0"/>
         </Style>
-        <Style Selector="DataGrid AutoCompleteBox">
+        <Style Selector="DataGrid AutoCompleteBox, DataGrid ComboBox">
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="VerticalAlignment" Value="Stretch"/>
             <Setter Property="BorderThickness" Value="0"/>

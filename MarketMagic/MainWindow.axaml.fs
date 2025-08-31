@@ -269,7 +269,7 @@ and MainWindow (
             let column = windowViewModel.UploadTable.Columns[i]
             uploadTableDataGrid.Columns.Add(
                 match enums.TryFind column with
-                | Some enum when not enum.IsEmpty ->
+                | Some enumInfo when not enumInfo.values.IsEmpty ->
                     DataGridTemplateColumn(
                         Header = column,
                         CellTemplate = FuncDataTemplate(
@@ -286,12 +286,20 @@ and MainWindow (
                             typeof<RowViewModel>,
                             Func<obj, INameScope, Control>(fun item _ ->
                                 let row = item :?> RowViewModel
-                                let autoCompleteBox = AutoCompleteBox(ItemsSource = enum)
-                                autoCompleteBox.Bind(
-                                    AutoCompleteBox.TextProperty,
-                                    Binding($"[{i}]")
-                                ) |> ignore
-                                autoCompleteBox :> Control
+                                if enumInfo.isFixed then
+                                    let comboBox = ComboBox(ItemsSource = enumInfo.values)
+                                    comboBox.Bind(
+                                        ComboBox.SelectedItemProperty,
+                                        Binding($"[{i}]")
+                                    ) |> ignore
+                                    comboBox :> Control
+                                else
+                                    let autoCompleteBox = AutoCompleteBox(ItemsSource = enumInfo.values)
+                                    autoCompleteBox.Bind(
+                                        AutoCompleteBox.TextProperty,
+                                        Binding($"[{i}]")
+                                    ) |> ignore
+                                    autoCompleteBox :> Control
                             ),
                             false
                         )

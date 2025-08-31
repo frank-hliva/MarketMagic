@@ -12,8 +12,14 @@ type DataTable =
     {
         id : int64
         columns : string list
-        enums : Map<string, string list>
+        enums : Map<string, Enumeration>
         cells : string[,]
+    }
+
+and Enumeration =
+    {
+        values : string list
+        isFixed : bool
     }
 
 module ZMQCommand =
