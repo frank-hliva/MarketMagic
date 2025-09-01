@@ -3,6 +3,7 @@ module Ebay
 @kwdef struct Enumeration
     values::Vector{String}
     isFixed::Bool
+    defaultValue::Union{Nothing, String} = nothing
 end
 
 @kwdef struct UploadDataTable
@@ -16,7 +17,7 @@ module UploadTemplate
     module File
 
         using CSV
-        const Enumeration = Main.Ebay.Enumeration
+        using Main.Ebay: Enumeration
 
         function readColumns(stream::IO)
             CSV.File(
@@ -89,6 +90,11 @@ module UploadTemplate
     end
 
     using CSV, DataFrames, .File, MLStyle
+    using Main.Ebay: Enumeration
+    using Main.Ebay: UploadDataTable
+    using Main.Model: DataTable
+    
+    const UPLOAD_TEMPLATE_HEADER = "Info;Version=1.0.0;Template=fx_category_template_EBAY_DE"
 
     function tryGetHeader(input::String)::Union{Nothing, Tuple{String, String}}
         @match match(r"Info;Version=([^;]+);Template=([^;]+)", input) begin
@@ -115,8 +121,6 @@ module UploadTemplate
         result
     end
 
-    const Enumeration = Main.Ebay.Enumeration
-
     const defaultEnums = Dict(
         "*Action(SiteID=Germany|Country=DE|Currency=EUR|Version=1193|CC=UTF-8)" => 
             Enumeration(
@@ -126,7 +130,8 @@ module UploadTemplate
                     "Relist",
                     "End"
                 ],
-                isFixed = true
+                isFixed = true,
+                defaultValue = "Add"
             ),
         "*Format" => 
             Enumeration(
@@ -140,15 +145,16 @@ module UploadTemplate
                     "PersonalOffer",
                     "Unknown"
                 ],
-                isFixed = true
+                isFixed = true,
+                defaultValue = "FixedPriceItem"
             ),
     )
-    
-    function withDefaults(enums::Dict{String, Enumeration})::Dict{String, Enumeration}
+
+    function withDefaultEnums(enums::Dict{String, Enumeration})::Dict{String, Enumeration}
         merge(enums, defaultEnums)
     end
 
-    function load(templateStream::IO)::Main.Ebay.UploadDataTable
+    function load(templateStream::IO)::UploadDataTable
         seekstart(templateStream)
         local columns = templateStream |> File.readColumns
         seekstart(templateStream)
@@ -162,20 +168,20 @@ module UploadTemplate
             )
         end, columns) |> Dict
 
-        Main.Ebay.UploadDataTable(
+        UploadDataTable(
             id = File.parseCategoryId(enumRows),
             columns = columns,
-            enums = enums |> withDefaults,
+            enums = enums |> withDefaultEnums,
             cells = fill("", 0, length(columns))
         )
     end
 
-    function withCells(dataTable::Main.Model.DataTable, uploadDataTable::Main.Ebay.UploadDataTable)::Main.Ebay.UploadDataTable
+    function withCells(dataTable::DataTable, uploadDataTable::UploadDataTable)::UploadDataTable
         local lastRowIndex = size(uploadDataTable.cells, 1)
         local numberOfNewRows = size(dataTable.cells, 1)
         local columnCount = length(uploadDataTable.columns)
 
-        local newUploadDataTable = Main.Ebay.UploadDataTable(
+        local newUploadDataTable = UploadDataTable(
             id = uploadDataTable.id,
             columns = deepcopy(uploadDataTable.columns),
             enums = deepcopy(uploadDataTable.enums),
@@ -191,9 +197,29 @@ module UploadTemplate
         newUploadDataTable
     end
 
-    const UPLOAD_TEMPLATE_HEADER = "Info;Version=1.0.0;Template=fx_category_template_EBAY_DE";
+    function withDefaults(uploadDataTable::UploadDataTable)::UploadDataTable
+        local newUploadDataTable = UploadDataTable(
+            id = uploadDataTable.id,
+            columns = deepcopy(uploadDataTable.columns),
+            enums = deepcopy(uploadDataTable.enums),
+            cells = deepcopy(uploadDataTable.cells)
+        )
 
-    function save(outputStream::IO, uploadDataTable::Main.Ebay.UploadDataTable)
+        for (columnName, enumInfo) in defaultEnums
+            local columnIndex = findfirst(==(columnName), newUploadDataTable.columns)
+            if columnIndex !== nothing
+                for rowIndex in 1:size(newUploadDataTable.cells, 1)
+                    if enumInfo.defaultValue !== nothing && isempty(strip(newUploadDataTable.cells[rowIndex, columnIndex]))
+                        newUploadDataTable.cells[rowIndex, columnIndex] = enumInfo.defaultValue
+                    end
+                end
+            end
+        end
+        
+        newUploadDataTable
+    end
+
+    function save(outputStream::IO, uploadDataTable::UploadDataTable)
         local buffer = IOBuffer()
         local dataFrame = DataFrame(
             uploadDataTable.cells, 

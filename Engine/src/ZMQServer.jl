@@ -1,10 +1,12 @@
 module ZMQServer
 
 using ZMQ, JSON3, MLStyle, Main.Ebay, Main.Money
+using Main.Model: DataTable
+using Main.Ebay: UploadDataTable
 
 mutable struct ServerState
-    uploadDataTable::Union{Nothing, Ebay.UploadDataTable}
-    moneyDataTable::Union{Nothing, Main.Model.DataTable}
+    uploadDataTable::Union{Nothing, UploadDataTable}
+    moneyDataTable::Union{Nothing, DataTable}
 end
 
 const state = ServerState(nothing, nothing)
@@ -29,7 +31,7 @@ end
 function handleLoadUploadTemplate(path::String)
     try
         open(path) do templateStream
-            @match Ebay.UploadTemplate.tryGetHeader(templateStream) begin
+            @match UploadTemplate.tryGetHeader(templateStream) begin
                 nothing => begin
                     Dict(
                         "success" => false,
@@ -37,7 +39,7 @@ function handleLoadUploadTemplate(path::String)
                     )
                 end
                 _ => begin
-                    state.uploadDataTable = Ebay.UploadTemplate.load(templateStream)
+                    state.uploadDataTable = UploadTemplate.load(templateStream)
                     Dict(
                         "success" => true,
                         "message" => "Upload template loaded successfully from: $path"
@@ -64,11 +66,11 @@ function handleLoadDocument(path::String)
         else
             open(path) do documentStream
                 local currentPosition = position(documentStream)
-                if Ebay.UploadTemplate.tryReadHeader(documentStream) === nothing 
+                if UploadTemplate.tryReadHeader(documentStream) === nothing 
                     seek(documentStream, currentPosition)
                 end
                 local document = Ebay.Document.load(documentStream)
-                state.uploadDataTable = Ebay.UploadTemplate.withCells(document, state.uploadDataTable)
+                state.uploadDataTable = UploadTemplate.withCells(document, state.uploadDataTable) |> UploadTemplate.withDefaults
                 Dict(
                     "success" => true,
                     "message" => "Document added successfully from: $path"
@@ -84,7 +86,7 @@ function handleLoadDocument(path::String)
     end
 end
 
-function handleSaveUploadTemplate(path::String, uploadDataTable::Main.Ebay.UploadDataTable)
+function handleSaveUploadTemplate(path::String, uploadDataTable::UploadDataTable)
     try
         state.uploadDataTable = uploadDataTable
 
@@ -96,7 +98,7 @@ function handleSaveUploadTemplate(path::String, uploadDataTable::Main.Ebay.Uploa
         end
 
         open(path, "w") do outputStream
-            Ebay.UploadTemplate.save(outputStream, state.uploadDataTable)
+            UploadTemplate.save(outputStream, state.uploadDataTable)
         end
         
         return Dict(
@@ -203,7 +205,7 @@ end
 
 function handleMoneyDocumentSave(path::String, dataTableDict)
     try
-        local dataTable = Main.Model.DataTable(
+        local dataTable = DataTable(
             columns = dataTableDict["columns"],
             cells = dataTableDict["cells"]
         )
@@ -247,7 +249,7 @@ function handleCommand(commandData::Dict)
                 return Dict("success" => false, "error" => "Path parameter required")
             end
 
-            local uploadDataTable = Main.Ebay.UploadDataTable(
+            local uploadDataTable = UploadDataTable(
                 id = uploadDataTableDict["id"],
                 columns = uploadDataTableDict["columns"],
                 enums = uploadDataTableDict["enums"],

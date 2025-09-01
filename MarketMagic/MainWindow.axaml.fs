@@ -157,8 +157,11 @@ and MainWindow (
     let showFailedToLoadMoneyDocument_invalidPath (path : string) = 
         showError $"Failed to load money document.\nThe file \"{path}\" was not found."
 
+    let showErrorResponse (moneyDocument_loadInfo : CommandMessageResponse) =
+        showError $"{moneyDocument_loadInfo.Error}\n{moneyDocument_loadInfo.InternalError}"
+
     let processError (moneyDocument_loadInfo : CommandMessageResponse) = task {
-        do! showError $"{moneyDocument_loadInfo.Error}\n{moneyDocument_loadInfo.InternalError}"
+        do! showErrorResponse moneyDocument_loadInfo
         windowConfig.MoneyDocument.DocumentPath <- ""
         displayMoneyDataInTable()
     }
@@ -338,7 +341,7 @@ and MainWindow (
                     if document_loadInfo.Success then
                         displayDataInTable()
                     else
-                        do! showError document_loadInfo.Error
+                        do! showErrorResponse document_loadInfo
                         windowConfig.UploadTemplate.DocumentPath <- ""
                         displayDataInTable()
                 | documentPath when not <| String.IsNullOrWhiteSpace(documentPath) ->
@@ -346,7 +349,7 @@ and MainWindow (
                     displayDataInTable()
                 | _ -> ()
             else
-                do! showError uploadTemplate_loadInfo.Error
+                do! showErrorResponse uploadTemplate_loadInfo
                 windowConfig.UploadTemplate.SourcePath <- ""
                 windowConfig.UploadTemplate.DocumentPath <- ""
                 displayDataInTable()

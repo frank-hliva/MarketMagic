@@ -25,6 +25,9 @@ if abspath(PROGRAM_FILE) == @__FILE__
     main()
 end
 
+# ZMQServer.handleLoadUploadTemplate("b:/VikingTekDIY/2025-08-30/eBay-category-listing-template-Aug-31-2025-1-17-35.csv")
+# ZMQServer.handleLoadDocument("b:/VikingTekDIY/2025-08-30/eBay-all-active-listings-report-2025-08-30-13247128645.csv")
+
 # open("b:/VikingTekDIY/2025-08-30/eBay-category-listing-template-Aug-31-2025-1-17-35.csv") do stream
 #     template = Main.Ebay.UploadTemplate.load(stream)
 #     output = template.enums
