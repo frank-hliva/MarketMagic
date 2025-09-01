@@ -1,5 +1,7 @@
 ﻿- Command: Add, Revise, Relist, End
+    - defaultne vybrat Add
 - ListingType: FixedPriceItem, Chinese, StoresFixedPrice
+    - defaultne vybrat FixedPriceItem
 
 ------------------------------------------------------------------------------------------------------
 - opened file history
