@@ -54,9 +54,6 @@ type CommandDataResponse<'t>(success : bool, data : 't) =
     inherit CommandResponse(success)
     member self.Data = data
 
-type CommandSaveResponse(success : bool) = 
-    inherit CommandResponse(success)
-
 type ZMQCommandManager(zmqServerConfig : ZMQServerConfig) =
     let serverAddress = zmqServerConfig.FullAddress
 

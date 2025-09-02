@@ -136,14 +136,14 @@ module UploadTemplate
         "*Format" => 
             Enumeration(
                 values = [
-                    "AdType",
-                    "Auction",
-                    "Chinese",
-                    "CustomCode",
-                    "FixedPriceItem",
-                    "LeadGeneration",
-                    "PersonalOffer",
-                    "Unknown"
+                    "AD_TYPE", # AdType
+                    "AUCTION", # Auction
+                    "CHINESE", # Chinese
+                    "CUSTOM_CODE", # CustomCode
+                    "FIXED_PRICE", # FixedPriceItem
+                    "LEAD_GENERATION", # LeadGeneration
+                    "PERSONAL_OFFER", # PersonalOffer
+                    "UNKNOWN", # Unknown
                 ],
                 isFixed = true,
                 defaultValue = "FixedPriceItem"

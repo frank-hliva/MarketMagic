@@ -151,9 +151,6 @@ and MainWindow (
     let showUploadTemplateFailedToChange () = 
         showError "Upload template failed to change."
 
-    let showUploadTemplateFailedToSave () = 
-        showError "Upload template failed to save."
-
     let showFailedToLoadMoneyDocument_invalidPath (path : string) = 
         showError $"Failed to load money document.\nThe file \"{path}\" was not found."
 
@@ -197,9 +194,10 @@ and MainWindow (
     let rec saveDocumentToFile (path : string) = task {
         match windowViewModel.UploadTable.TryExportToUploadDataTable() with
         | Ok uploadDataTable ->
-            if uploadTemplateManager.Save(path, uploadDataTable).Success
+            let result = uploadTemplateManager.Save(path, uploadDataTable)
+            if result.Success
             then windowConfig.UploadTemplate.DocumentPath <- path
-            else do! showUploadTemplateFailedToSave ()
+            else do! showErrorResponse result
         | Error errMsg -> do! Dialogs.showErrorU errMsg self
     }
 
