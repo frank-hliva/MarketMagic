@@ -2,7 +2,7 @@ module ZMQServer
 
 using ZMQ, JSON3, MLStyle, Main.Ebay, Main.Money
 using Main.Model: DataTable
-using Main.Ebay: UploadDataTable
+using Main.Ebay: UploadDataTable, ReceivedData
 
 mutable struct ServerState
     uploadDataTable::Union{Nothing, UploadDataTable}
@@ -299,32 +299,9 @@ function handleCommand(commandData::Dict)
     end
 end
 
-function hasUploadDataTableEnums(input::Dict{String, Any})::Bool
-    haskey(input, "uploadDataTable") && 
-    isa(input["uploadDataTable"], Dict) && 
-    haskey(input["uploadDataTable"], "enums")
-end
-
-function unboxEnums(input::Dict{String, Any})
-    if hasUploadDataTableEnums(input)
-        input["uploadDataTable"]["enums"] = Dict{String, Main.Ebay.Enumeration}(
-            key => Main.Ebay.Enumeration(
-                values = value["values"],
-                isFixed = value["isFixed"]
-            )
-            for (key, value) in input["uploadDataTable"]["enums"]
-        )
-    end
-    input
-end
-
-function parseReceivedData(requestString)
-    JSON3.read(requestString, Dict{String, Any}) |> unboxEnums
-end
-
 function startServer(port::Int = 7333)
-    context = Context()
-    socket = Socket(context, REP)
+    local context = Context()
+    local socket = Socket(context, REP)
     
     try
         bind(socket, "tcp://*:$port")
@@ -337,28 +314,22 @@ function startServer(port::Int = 7333)
         println("\nWaiting for requests...\n")
 
         while true
-            requestBytes = recv(socket)
-            requestString = String(requestBytes)
-            
-            println("\e[38;5;75mReceived request\e[0m: $requestString")
+            local receivedData = socket |> recv |> String
+            println("\e[38;5;75mReceived request\e[0m: $receivedData")
             
             try
-                commandData = parseReceivedData(requestString)
-                response = handleCommand(commandData)
-                responseString = JSON3.write(response)
+                local responseString = receivedData |> ReceivedData.parse |> handleCommand |> JSON3.write
+
                 send(socket, responseString)
-                
                 println("\e[38;5;43mSent response\e[0m: \e[93m$responseString\e[0m")
-                
             catch e
-                errorResponse = Dict(
+                local responseString = Dict(
                     "success" => false,
                     "error" => "Invalid request format",
                     "internalError" => string(e)
-                )
-                responseString = JSON3.write(errorResponse)
+                ) |> JSON3.write
+
                 send(socket, responseString)
-                
                 println("\e[91mSent error response\e[0m: $responseString")
             end
         end

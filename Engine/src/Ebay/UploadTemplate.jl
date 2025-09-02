@@ -304,6 +304,8 @@ module Document
     export load
 end
 
-export UploadTemplate, Document, DataTable
+include("ReceivedData.jl")
+
+export UploadTemplate, ReceivedData, Document, DataTable
 
 end #module Ebay
