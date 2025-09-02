@@ -56,7 +56,7 @@ and EngineConfig(appConfig : AppConfig) =
         appConfig.GetOr("Engine.Path", "../../../../Engine/src/MarketMagic.jl")
 
     member self.Start =
-        appConfig.GetOr("Engine.Start", true)
+        appConfig.GetOr("Engine.Autorun", true)
 
     member private self.Address =
         appConfig.GetOr("Engine.Server.Address", "tcp://localhost")

@@ -1,7 +1,22 @@
-﻿- Command: Add, Revise, Relist, End
-    - defaultne vybrat Add
-- ListingType: FixedPriceItem, Chinese, StoresFixedPrice
-    - defaultne vybrat FixedPriceItem
+﻿x - pri Save Chyba
+    x - opravit
+        x - Invalid Request Format
+        Method Error(
+            convert,
+            Main.Ebay.Enumeration(Dict{String, Any}(values => Any[], isFixed => false)),
+            0x00000000000068f0
+        )
+    x - test Save
+    x - test Save AS
+ 
+- TESTy
+    - Command: Add, Revise, Relist, End
+        - defaultne vybrat Add
+    - ListingType: FixedPriceItem, Chinese, StoresFixedPrice
+        - defaultne vybrat FixedPriceItem 
+    - Upload
+
+- pri spusteni appky daky loading dialog
 
 ------------------------------------------------------------------------------------------------------
 - opened file history
@@ -11,6 +26,11 @@
 - ukladanie konfigu po kazdej zmene
 - zatvaranie suboru
      
+------------------------------------------------------------------------------------------------------
+
+- "*Action(SiteID=Germany|Country=DE|Currency=EUR|Version=1193|CC=UTF-8)"
+    - aj pre ine verzie (US, EN)
+
 ------------------------------------------------------------------------------------------------------
 
 - json nahradit MessagePackom

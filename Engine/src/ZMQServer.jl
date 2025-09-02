@@ -255,6 +255,7 @@ function handleCommand(commandData::Dict)
                 enums = uploadDataTableDict["enums"],
                 cells = nestedArrayToMatrix(Vector{Vector{String}}(uploadDataTableDict["cells"]))
             )
+
             handleSaveUploadTemplate(path, uploadDataTable)
         end
 
@@ -298,6 +299,29 @@ function handleCommand(commandData::Dict)
     end
 end
 
+function hasUploadDataTableEnums(input::Dict{String, Any})::Bool
+    haskey(input, "uploadDataTable") && 
+    isa(input["uploadDataTable"], Dict) && 
+    haskey(input["uploadDataTable"], "enums")
+end
+
+function unboxEnums(input::Dict{String, Any})
+    if hasUploadDataTableEnums(input)
+        input["uploadDataTable"]["enums"] = Dict{String, Main.Ebay.Enumeration}(
+            key => Main.Ebay.Enumeration(
+                values = value["values"],
+                isFixed = value["isFixed"]
+            )
+            for (key, value) in input["uploadDataTable"]["enums"]
+        )
+    end
+    input
+end
+
+function parseReceivedData(requestString)
+    JSON3.read(requestString, Dict{String, Any}) |> unboxEnums
+end
+
 function startServer(port::Int = 7333)
     context = Context()
     socket = Socket(context, REP)
@@ -311,7 +335,7 @@ function startServer(port::Int = 7333)
         println("  • \e[38;5;43msaveUploadTemplate\e[0m")
         println("  • \e[38;5;43mfetchUploadTemplate\e[0m")
         println("\nWaiting for requests...\n")
-        
+
         while true
             requestBytes = recv(socket)
             requestString = String(requestBytes)
@@ -319,10 +343,8 @@ function startServer(port::Int = 7333)
             println("\e[38;5;75mReceived request\e[0m: $requestString")
             
             try
-                commandData = JSON3.read(requestString, Dict{String, Any})
-                
+                commandData = parseReceivedData(requestString)
                 response = handleCommand(commandData)
-                
                 responseString = JSON3.write(response)
                 send(socket, responseString)
                 
