@@ -1,13 +1,4 @@
-﻿x - pri Save Chyba
-    x - opravit
-        x - Invalid Request Format
-        Method Error(
-            convert,
-            Main.Ebay.Enumeration(Dict{String, Any}(values => Any[], isFixed => false)),
-            0x00000000000068f0
-        )
-    x - test Save
-    x - test Save AS
+﻿
  
 - TESTy
     - Command: Add, Revise, Relist, End
@@ -23,7 +14,7 @@
 - MarketMagic.jl ma tiez precitat port z config.toml
 - moznost zavriet UploadTemplate.Document
 - po prvom nacitani appky (ak neexistuje config.toml) spravit setup zo zipu config.toml
-- ukladanie konfigu po kazdej zmene
+x - ukladanie konfigu po kazdej zmene
 - zatvaranie suboru
      
 ------------------------------------------------------------------------------------------------------

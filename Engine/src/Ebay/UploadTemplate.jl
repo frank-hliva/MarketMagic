@@ -1,17 +1,7 @@
 module Ebay
 
-@kwdef struct Enumeration
-    values::Vector{String}
-    isFixed::Bool
-    defaultValue::Union{Nothing, String} = nothing
-end
-
-@kwdef struct UploadDataTable
-    id::Int64
-    columns::Vector{String}
-    enums::Dict{String, Enumeration}
-    cells::Matrix{String}
-end
+include("../Model/UploadDataTable.jl")
+include("../Model/Enumeration.jl")
 
 module UploadTemplate
     module File
