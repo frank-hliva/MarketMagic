@@ -76,8 +76,8 @@ and WindowViewModel(
     windowConfig : WindowConfig,
     uploadTemplateConfig : UploadTemplateConfig,
     moneyDocumentConfig : MoneyDocumentConfig,
-    uploadTableViewModel : UploadTableViewModel,
-    moneyTableViewModel : MoneyTableViewModel
+    uploadTableViewModel : TableViewModel,
+    moneyTableViewModel : TableViewModel
 ) as self =
     inherit BasicViewModel()
 
@@ -187,11 +187,6 @@ and MainWindow (
     let tryPickFileToLoadDocument () = tryPickFileToOpen "Open document" "Documents (*.csv)"
     let tryPickFileToSaveDocument () = tryPickFileToSave "Save document" "Documents (*.csv)"
 
-    let displayDataGridCellInfo(dataGrid : DataGrid) =
-        let cellInfo, keyboardInfo = dataGrid.GetDataGridCellInfo(windowViewModel.UploadTable.IsInEditMode)
-        windowViewModel.UploadTable.CursorYXHelp <- cellInfo
-        windowViewModel.UploadTable.KeyboardHelp <- keyboardInfo
-
     let rec saveDocumentToFile (path : string) = task {
         match windowViewModel.UploadTable.TryExportToDataTable() with
         | Ok uploadDataTable ->
@@ -220,24 +215,6 @@ and MainWindow (
         self.Opened.Add(self.Window_Opened)
         self.Closing.Add(self.Window_Closing)
 
-        uploadTableDataGrid.BeginningEdit.Add(fun _ ->
-            windowViewModel.UploadTable.IsInEditMode <- true
-            displayDataGridCellInfo <| uploadTableDataGrid
-        )
-        uploadTableDataGrid.CellEditEnded.Add(fun _ ->
-            windowViewModel.UploadTable.IsInEditMode <- false
-            displayDataGridCellInfo <| uploadTableDataGrid
-        )
-
-        uploadTableDataGrid.AddHandler(
-            InputElement.KeyDownEvent,
-            EventHandler<KeyEventArgs>(
-                fun sender event ->
-                    self.UploadTableDataGrid_KeyDown(sender, event)
-            ),
-            RoutingStrategies.Tunnel
-        )
-
     member private self.InitializeComponent() =
 #if DEBUG
         self.AttachDevTools()
@@ -248,15 +225,15 @@ and MainWindow (
         moneyDocumentDataGrid <- self.FindControl<DataGrid>("MoneyTable")
 
     member private self.SetupDataGrids() =
-        windowViewModel.UploadTable.PropertyChanged.Add(fun args ->
-            match args.PropertyName with
-            | "Columns" -> uploadTableDataGrid.SetupColumns(windowViewModel.UploadTable)
-            | _ -> ()
-        )
-        windowViewModel.MoneyTable.PropertyChanged.Add(fun args ->
-            match args.PropertyName with
-            | "Columns" -> moneyDocumentDataGrid.SetupColumns(windowViewModel.MoneyTable)
-            | _ -> ()
+        [
+            uploadTableDataGrid => windowViewModel.UploadTable
+            moneyDocumentDataGrid => windowViewModel.MoneyTable
+        ]
+        |> List.iter(
+            fun (dataGrid, viewModel) ->
+                viewModel
+                |> unbox<TableViewModel>
+                |> dataGrid.Setup
         )
 
     member private self.Window_Opened(event : EventArgs) =
@@ -302,22 +279,7 @@ and MainWindow (
             do! showFailedToLoadUploadTemplate_invalidPath uploadTemplatePath
     }
 
-    member private self.TryLoadMoneyDocument() = task {
-        match windowConfig.MoneyDocument.DocumentPath with
-        | "" | null ->
-            let moneyDocument_loadInfo = moneyDocumentManager.New()
-            if moneyDocument_loadInfo.Success
-            then displayMoneyDataInTable()
-            else do! processError moneyDocument_loadInfo
-        | moneyDocumentPath when IO.Path.Exists(moneyDocumentPath) ->
-            let moneyDocument_loadInfo = moneyDocumentManager.Load moneyDocumentPath
-            if moneyDocument_loadInfo.Success
-            then displayMoneyDataInTable()
-            else do! processError moneyDocument_loadInfo
-        | moneyDocumentPath ->
-            do! showFailedToLoadMoneyDocument_invalidPath moneyDocumentPath
-    }
-
+    (* Upload Template *)
     member private self.LoadUploadTemplateButton_Click(sender : obj, event : RoutedEventArgs) =
         task {
             match! tryPickFileToLoadUploadTemplate() with
@@ -343,38 +305,26 @@ and MainWindow (
     member private self.SaveAsDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
         saveAsDocument () |> ignore
 
-    member private self.UploadTableDataGrid_CurrentCellChanged(sender : obj, e : EventArgs) =
-        sender
-        :?> DataGrid
-        |> displayDataGridCellInfo
-
-    member private self.MoneyTableDataGrid_CurrentCellChanged(sender : obj, e : EventArgs) =
-        ()
-
-    member this.UploadTableDataGrid_KeyDown(sender : obj, e : KeyEventArgs) =
-        let dataGrid = sender :?> DataGrid
-        if not dataGrid.IsReadOnly then
-            match e.Key with
-            | Key.Enter | Key.F2 | Key.Insert when not windowViewModel.UploadTable.IsInEditMode ->
-                if dataGrid.SelectedItem <> null && dataGrid.CurrentColumn <> null then
-                    dataGrid.BeginEdit() |> ignore
-                    e.Handled <- true
-            | Key.Enter when e.KeyModifiers.HasFlag KeyModifiers.Shift ->
-                e.Handled <- true
-            | Key.Enter | Key.Tab | Key.Escape when windowViewModel.UploadTable.IsInEditMode ->
-                if dataGrid.SelectedItem <> null && dataGrid.CurrentColumn <> null then
-                    dataGrid.CommitEdit() |> ignore
-                    dataGrid.Reselect()
-                    e.Handled <- true
-            | Key.Delete when not dataGrid.IsReadOnly ->
-                e.Handled <- true
-            | _ -> ()
-
     member private self.DeleteRowsButton_Click(sender : obj, event : RoutedEventArgs) =
         windowViewModel.UploadTable.DeleteSelected()
 
-
     (* Money Document *)
+    member private self.TryLoadMoneyDocument() = task {
+        match windowConfig.MoneyDocument.DocumentPath with
+        | "" | null ->
+            let moneyDocument_loadInfo = moneyDocumentManager.New()
+            if moneyDocument_loadInfo.Success
+            then displayMoneyDataInTable()
+            else do! processError moneyDocument_loadInfo
+        | moneyDocumentPath when IO.Path.Exists(moneyDocumentPath) ->
+            let moneyDocument_loadInfo = moneyDocumentManager.Load moneyDocumentPath
+            if moneyDocument_loadInfo.Success
+            then displayMoneyDataInTable()
+            else do! processError moneyDocument_loadInfo
+        | moneyDocumentPath ->
+            do! showFailedToLoadMoneyDocument_invalidPath moneyDocumentPath
+    }
+
     member private self.NewMoneyDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
         windowConfig.MoneyDocument.DocumentPath <- ""
         self.TryLoadMoneyDocument() |> ignore

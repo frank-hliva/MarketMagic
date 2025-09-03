@@ -11,6 +11,8 @@ open Avalonia.Markup.Xaml
 open Avalonia.Threading
 open Avalonia.Controls.Templates
 open MarketMagic
+open Avalonia.Input
+open Avalonia.Interactivity
 
 [<Extension>]
 type DataGridExtensions() =
@@ -74,6 +76,59 @@ type DataGridExtensions() =
                     ) :> DataGridColumn
             )
 
+    static let displayDataGridCellInfo (tableViewModel : TableViewModel) (dataGrid : DataGrid) =
+        let cellInfo, keyboardInfo = dataGrid.GetDataGridCellInfo(tableViewModel.IsInEditMode)
+        tableViewModel.CursorYXHelp <- cellInfo
+        tableViewModel.KeyboardHelp <- keyboardInfo
+
+    static let dataGrid_handleKeyDown (viewModel : TableViewModel) (sender : obj) (e : KeyEventArgs) =
+        let dataGrid = sender :?> DataGrid
+        if not dataGrid.IsReadOnly then
+            match e.Key with
+            | Key.Enter | Key.F2 | Key.Insert when not viewModel.IsInEditMode ->
+                if dataGrid.SelectedItem <> null && dataGrid.CurrentColumn <> null then
+                    dataGrid.BeginEdit() |> ignore
+                    e.Handled <- true
+            | Key.Enter when e.KeyModifiers.HasFlag KeyModifiers.Shift ->
+                e.Handled <- true
+            | Key.Enter | Key.Tab | Key.Escape when viewModel.IsInEditMode ->
+                if dataGrid.SelectedItem <> null && dataGrid.CurrentColumn <> null then
+                    dataGrid.CommitEdit() |> ignore
+                    dataGrid.Reselect()
+                    e.Handled <- true
+            | Key.Delete when not dataGrid.IsReadOnly ->
+                e.Handled <- true
+            | _ -> ()
+
+    static let dataGrid_handleCurrentCellChanged (viewModel : TableViewModel) (sender : obj) (e : EventArgs) =
+        sender
+        :?> DataGrid
+        |> displayDataGridCellInfo viewModel
+
+    static let setupDataGrid (tableViewModel : TableViewModel) (dataGrid : DataGrid) =
+        let displayDataGridCellInfo = displayDataGridCellInfo tableViewModel
+        tableViewModel.PropertyChanged.Add(fun args ->
+            match args.PropertyName with
+            | "Columns" -> dataGrid |> setupColumns tableViewModel
+            | _ -> ()
+        )
+        dataGrid.BeginningEdit.Add(fun _ ->
+            tableViewModel.IsInEditMode <- true
+            displayDataGridCellInfo <| dataGrid
+        )
+        dataGrid.CellEditEnded.Add(fun _ ->
+            tableViewModel.IsInEditMode <- false
+            displayDataGridCellInfo <| dataGrid
+        )
+        dataGrid.AddHandler(
+            InputElement.KeyDownEvent,
+            EventHandler<KeyEventArgs>(dataGrid_handleKeyDown tableViewModel),
+            RoutingStrategies.Tunnel
+        )
+        dataGrid.CurrentCellChanged.AddHandler(
+            EventHandler<EventArgs>(dataGrid_handleCurrentCellChanged tableViewModel)
+        )
+
     [<Extension>]
     static member GetDataGridCellInfo(self : DataGrid, isInEditMode : bool) =
         let rowIndex = self.SelectedIndex
@@ -99,5 +154,5 @@ type DataGridExtensions() =
         self.CurrentColumn <- currentCol
 
     [<Extension>]
-    static member SetupColumns (self : DataGrid, tableViewModel : TableViewModel) =
-        self |> setupColumns tableViewModel
+    static member Setup (self : DataGrid, tableViewModel : TableViewModel) =
+        self |> setupDataGrid tableViewModel

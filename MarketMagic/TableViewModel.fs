@@ -4,7 +4,7 @@ open System
 open System.Collections.ObjectModel
 open System.ComponentModel
 
-type [<AbstractClass>] TableViewModel() =
+type TableViewModel() =
     inherit BasicViewModel()
 
     let mutable dataTable : DataTable option = None

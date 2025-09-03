@@ -58,12 +58,13 @@
                     BorderBrush="Gray"
                     IsReadOnly="False"
                     HeadersVisibility="All"
-                    CurrentCellChanged="UploadTableDataGrid_CurrentCellChanged"
                 />
-                <StackPanel Classes="StatusBar" Grid.Row="2">
-                    <TextBlock Text="{Binding UploadTable.CursorYXHelp}" />
-                    <TextBlock Text="{Binding UploadTable.KeyboardHelp}" />
-                </StackPanel>
+                <Border Grid.Row="2">
+                    <StackPanel Classes="StatusBar">
+                        <TextBlock Text="{Binding UploadTable.CursorYXHelp}" />
+                        <TextBlock Text="{Binding UploadTable.KeyboardHelp}" />
+                    </StackPanel>
+                </Border>
             </Grid>
         </TabItem>
         <TabItem Header="Money">
@@ -111,12 +112,13 @@
                     BorderBrush="Gray"
                     IsReadOnly="False"
                     HeadersVisibility="All"
-                    CurrentCellChanged="MoneyTableDataGrid_CurrentCellChanged"
                 />
-                <StackPanel Classes="StatusBar" Grid.Row="2">
-                    <TextBlock Text="{Binding MoneyTable.CursorYXHelp}" />
-                    <TextBlock Text="{Binding MoneyTable.KeyboardHelp}" />
-                </StackPanel>
+                <Border Grid.Row="2">
+                    <StackPanel Classes="StatusBar">
+                        <TextBlock Text="{Binding MoneyTable.CursorYXHelp}" />
+                        <TextBlock Text="{Binding MoneyTable.KeyboardHelp}" />
+                    </StackPanel>
+                </Border>
             </Grid>
         </TabItem>
     </TabControl>
