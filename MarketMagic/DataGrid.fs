@@ -3,15 +3,76 @@
 open System
 open System.IO
 open System.Runtime.CompilerServices
-open System.Collections.Generic
+open System.Collections.ObjectModel
 open Avalonia
 open Avalonia.Controls
 open Avalonia.Data
 open Avalonia.Markup.Xaml
 open Avalonia.Threading
+open Avalonia.Controls.Templates
+open MarketMagic
 
 [<Extension>]
 type DataGridExtensions() =
+
+    static let setupColumns (tableViewModel : TableViewModel) (dataGrid : DataGrid) =
+        dataGrid.Columns.Clear()
+        DataGridCheckBoxColumn(
+            Header = "#",
+            Binding = Binding("IsMarked"),
+            Width = DataGridLength(40.0, DataGridLengthUnitType.Pixel)
+        ) |> dataGrid.Columns.Add
+
+        let enums =
+            tableViewModel.DataTable
+            |> Option.map _.enums
+            |> Option.defaultValue Map.empty
+
+        for i in 0 .. tableViewModel.Columns.Count - 1 do
+            let column = tableViewModel.Columns[i]
+            dataGrid.Columns.Add(
+                match enums.TryFind column with
+                | Some enumInfo when not enumInfo.values.IsEmpty ->
+                    DataGridTemplateColumn(
+                        Header = column,
+                        CellTemplate = FuncDataTemplate(
+                            typeof<RowViewModel>,
+                            Func<obj, INameScope, Control>(fun item _ ->
+                                let row = item :?> RowViewModel
+                                let textBlock = TextBlock(Text = row[i]) 
+                                textBlock.Classes.Add("EnumValue")
+                                textBlock :> Control
+                            ),
+                            false
+                        ),
+                        CellEditingTemplate = FuncDataTemplate(
+                            typeof<RowViewModel>,
+                            Func<obj, INameScope, Control>(fun item _ ->
+                                let row = item :?> RowViewModel
+                                if enumInfo.isFixed then
+                                    let comboBox = ComboBox(ItemsSource = enumInfo.values)
+                                    comboBox.Bind(
+                                        ComboBox.SelectedItemProperty,
+                                        Binding($"[{i}]")
+                                    ) |> ignore
+                                    comboBox :> Control
+                                else
+                                    let autoCompleteBox = AutoCompleteBox(ItemsSource = enumInfo.values)
+                                    autoCompleteBox.Bind(
+                                        AutoCompleteBox.TextProperty,
+                                        Binding($"[{i}]")
+                                    ) |> ignore
+                                    autoCompleteBox :> Control
+                            ),
+                            false
+                        )
+                    ) :> DataGridColumn
+                | _ ->
+                    DataGridTextColumn(
+                        Header = column,
+                        Binding = Binding($"[{i}]")
+                    ) :> DataGridColumn
+            )
 
     [<Extension>]
     static member GetDataGridCellInfo(self : DataGrid, isInEditMode : bool) =
@@ -36,3 +97,7 @@ type DataGridExtensions() =
         self.SelectedIndex <- -1
         self.SelectedIndex <- currentRow
         self.CurrentColumn <- currentCol
+
+    [<Extension>]
+    static member SetupColumns (self : DataGrid, tableViewModel : TableViewModel) =
+        self |> setupColumns tableViewModel

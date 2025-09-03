@@ -193,7 +193,7 @@ and MainWindow (
         windowViewModel.UploadTable.KeyboardHelp <- keyboardInfo
 
     let rec saveDocumentToFile (path : string) = task {
-        match windowViewModel.UploadTable.TryExportToUploadDataTable() with
+        match windowViewModel.UploadTable.TryExportToDataTable() with
         | Ok uploadDataTable ->
             let result = uploadTemplateManager.Save(path, uploadDataTable)
             if result.Success
@@ -216,7 +216,7 @@ and MainWindow (
 
     do
         self.InitializeComponent()
-        self.SetupDataGrid()
+        self.SetupDataGrids()
         self.Opened.Add(self.Window_Opened)
         self.Closing.Add(self.Window_Closing)
 
@@ -247,71 +247,17 @@ and MainWindow (
         uploadTableDataGrid <- self.FindControl<DataGrid>("UploadTable")
         moneyDocumentDataGrid <- self.FindControl<DataGrid>("MoneyTable")
 
-    member private self.SetupDataGrid() =
+    member private self.SetupDataGrids() =
         windowViewModel.UploadTable.PropertyChanged.Add(fun args ->
             match args.PropertyName with
-            | "Columns" -> self.SetupDataGridColumns()
+            | "Columns" -> uploadTableDataGrid.SetupColumns(windowViewModel.UploadTable)
             | _ -> ()
         )
-
-    member private self.SetupDataGridColumns() =
-        uploadTableDataGrid.Columns.Clear()
-        DataGridCheckBoxColumn(
-            Header = "#",
-            Binding = Binding("IsMarked"),
-            Width = DataGridLength(40.0, DataGridLengthUnitType.Pixel)
-        ) |> uploadTableDataGrid.Columns.Add
-
-        let enums =
-            windowViewModel.UploadTable.UploadDataTable
-            |> Option.map _.enums
-            |> Option.defaultValue Map.empty
-
-        for i in 0 .. windowViewModel.UploadTable.Columns.Count - 1 do
-            let column = windowViewModel.UploadTable.Columns[i]
-            uploadTableDataGrid.Columns.Add(
-                match enums.TryFind column with
-                | Some enumInfo when not enumInfo.values.IsEmpty ->
-                    DataGridTemplateColumn(
-                        Header = column,
-                        CellTemplate = FuncDataTemplate(
-                            typeof<RowViewModel>,
-                            Func<obj, INameScope, Control>(fun item _ ->
-                                let row = item :?> RowViewModel
-                                let textBlock = TextBlock(Text = row[i]) 
-                                textBlock.Classes.Add("EnumValue")
-                                textBlock :> Control
-                            ),
-                            false
-                        ),
-                        CellEditingTemplate = FuncDataTemplate(
-                            typeof<RowViewModel>,
-                            Func<obj, INameScope, Control>(fun item _ ->
-                                let row = item :?> RowViewModel
-                                if enumInfo.isFixed then
-                                    let comboBox = ComboBox(ItemsSource = enumInfo.values)
-                                    comboBox.Bind(
-                                        ComboBox.SelectedItemProperty,
-                                        Binding($"[{i}]")
-                                    ) |> ignore
-                                    comboBox :> Control
-                                else
-                                    let autoCompleteBox = AutoCompleteBox(ItemsSource = enumInfo.values)
-                                    autoCompleteBox.Bind(
-                                        AutoCompleteBox.TextProperty,
-                                        Binding($"[{i}]")
-                                    ) |> ignore
-                                    autoCompleteBox :> Control
-                            ),
-                            false
-                        )
-                    ) :> DataGridColumn
-                | _ ->
-                    DataGridTextColumn(
-                        Header = column,
-                        Binding = Binding($"[{i}]")
-                    ) :> DataGridColumn
-            )
+        windowViewModel.MoneyTable.PropertyChanged.Add(fun args ->
+            match args.PropertyName with
+            | "Columns" -> moneyDocumentDataGrid.SetupColumns(windowViewModel.MoneyTable)
+            | _ -> ()
+        )
 
     member private self.Window_Opened(event : EventArgs) =
         self.WindowState <- windowConfig.State

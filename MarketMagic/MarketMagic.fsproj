@@ -19,7 +19,6 @@
     <Compile Include="MarketMagicApp.fs" />
     <Compile Include="TomlTable.fs" />
     <Compile Include="AppConfigProvider.fs" />
-    <Compile Include="DataGrid.fs" />
     <Compile Include="ZMQCommand.fs" />
     <Compile Include="Ebay.UploadTemplateManager.fs" />
     <Compile Include="Money.MoneyDocumentManager.fs" />
@@ -27,6 +26,8 @@
     <Compile Include="BasicViewModel.fs" />
     <Compile Include="RowViewModel.fs" />
     <Compile Include="Cells.fs" />
+    <Compile Include="TableViewModel.fs" />
+    <Compile Include="DataGrid.fs" />
     <Compile Include="UploadTableViewModel.fs" />
     <Compile Include="MoneyTableViewModel.fs" />
     <Compile Include="Engine.fs" />
