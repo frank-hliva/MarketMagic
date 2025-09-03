@@ -122,12 +122,13 @@ and MainWindow (
     let mutable moneyDocumentDataGrid : DataGrid = null
 
     let displayDataInTable() =
-        windowViewModel.UploadTable.SetData <| uploadTemplateManager.Fetch().Data
+        uploadTemplateManager.Fetch().Data
+        |> windowViewModel.UploadTable.SetData
         uploadTableDataGrid.Focus() |> ignore
 
     let displayMoneyDataInTable() =
-        let data = moneyDocumentManager.Fetch().Data
-        windowViewModel.MoneyTable.SetData data
+        moneyDocumentManager.Fetch().Data
+        |> windowViewModel.MoneyTable.SetData
         moneyDocumentDataGrid.Focus() |> ignore
 
     let showError (msg : string) = 

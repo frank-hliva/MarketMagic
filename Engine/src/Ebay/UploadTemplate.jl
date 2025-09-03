@@ -1,7 +1,7 @@
 module Ebay
 
-include("../Model/UploadDataTable.jl")
 include("../Model/Enumeration.jl")
+include("../Model/UploadDataTable.jl")
 
 module UploadTemplate
     module File
