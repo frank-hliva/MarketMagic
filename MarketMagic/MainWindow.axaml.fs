@@ -353,13 +353,19 @@ and MainWindow (
         ()
 
     member private self.LoadMoneyDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
-        ()
+        task {
+            match! tryPickFileToLoadDocument() with
+            | Some path ->
+                windowConfig.MoneyDocument.DocumentPath <- path
+                self.TryLoadMoneyDocument() |> ignore
+            | _ -> ()
+        } |> ignore
 
     member private self.SaveMoneyDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
-        ()
+        saveMoneyDocument () |> ignore
 
     member private self.SaveAsMoneyDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
-        ()
+        saveAsMoneyDocument () |> ignore
 
     member private self.DeleteMoneyDocumentRowsButton_Click(sender : obj, event : RoutedEventArgs) =
         windowViewModel.MoneyTable.DeleteSelected()
