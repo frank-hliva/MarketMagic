@@ -3,19 +3,19 @@ module ReceivedData
 using ZMQ, JSON3, MLStyle, Main.Ebay
 
 function hasUploadDataTableEnums(input::Dict{String, Any})::Bool
-    haskey(input, "uploadDataTable") && 
-    isa(input["uploadDataTable"], Dict) && 
-    haskey(input["uploadDataTable"], "enums")
+    haskey(input, "dataTable") && 
+    isa(input["dataTable"], Dict) && 
+    haskey(input["dataTable"], "enums")
 end
 
 function unboxEnums(input::Dict{String, Any})
     if hasUploadDataTableEnums(input)
-        input["uploadDataTable"]["enums"] = Dict{String, Main.Ebay.Enumeration}(
+        input["dataTable"]["enums"] = Dict{String, Main.Ebay.Enumeration}(
             key => Main.Ebay.Enumeration(
                 values = value["values"],
                 isFixed = value["isFixed"]
             )
-            for (key, value) in input["uploadDataTable"]["enums"]
+            for (key, value) in input["dataTable"]["enums"]
         )
     end
     input

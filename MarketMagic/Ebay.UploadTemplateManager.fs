@@ -11,8 +11,8 @@ type UploadTemplateManager(zmqServerConfig : ZMQServerConfig) =
         {| command = "eBay.UploadTemplate.load"; path = path |}
         |> self.SendCommand<CommandMessageResponse>
 
-    member self.Save (path : string, uploadDataTable : DataTable) =
-        {| command = "eBay.UploadTemplate.save"; path = path; uploadDataTable = uploadDataTable |}
+    member self.Save (path : string, dataTable : DataTable) =
+        {| command = "eBay.UploadTemplate.save"; path = path; dataTable = dataTable |}
         |> self.SendCommand<CommandMessageResponse>
 
     member self.LoadDocument (path : string) =

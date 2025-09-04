@@ -203,12 +203,8 @@ function handleMoneyDocumentLoad(path::String)
     end
 end
 
-function handleMoneyDocumentSave(path::String, dataTableDict)
+function handleMoneyDocumentSave(path::String, dataTable::DataTable)
     try
-        local dataTable = DataTable(
-            columns = dataTableDict["columns"],
-            cells = dataTableDict["cells"]
-        )
         open(path, "w") do stream
             Money.File.save(stream, dataTable)
         end
@@ -230,12 +226,12 @@ function handleCommand(commandData::Dict)
     command = get(commandData, "command", "")
     
     @match command begin
-        # UPLOAD TEMPLATE 
+        ### UPLOAD TEMPLATE ###
 
         "eBay.UploadTemplate.fetch" => handleFetchUploadTemplate()
 
         "eBay.UploadTemplate.load" => begin
-            path = get(commandData, "path", "")
+            local path = get(commandData, "path", "")
             if isempty(path)
                 return Dict("success" => false, "error" => "Path parameter required")
             end
@@ -243,31 +239,29 @@ function handleCommand(commandData::Dict)
         end
 
         "eBay.UploadTemplate.save" => begin
-            path = get(commandData, "path", "")
-            uploadDataTableDict = get(commandData, "uploadDataTable", "")
+            local path = get(commandData, "path", "")
+            local rawDataTable = get(commandData, "dataTable", "")
             if isempty(path)
                 return Dict("success" => false, "error" => "Path parameter required")
             end
 
-            local uploadDataTable = UploadDataTable(
-                id = uploadDataTableDict["id"],
-                columns = uploadDataTableDict["columns"],
-                enums = uploadDataTableDict["enums"],
-                cells = nestedArrayToMatrix(Vector{Vector{String}}(uploadDataTableDict["cells"]))
-            )
-
-            handleSaveUploadTemplate(path, uploadDataTable)
+            handleSaveUploadTemplate(path, UploadDataTable(
+                id = rawDataTable["id"],
+                columns = rawDataTable["columns"],
+                enums = rawDataTable["enums"],
+                cells = nestedArrayToMatrix(Vector{Vector{String}}(rawDataTable["cells"]))
+            ))
         end
 
         "eBay.Document.load" => begin
-            path = get(commandData, "path", "")
+            local path = get(commandData, "path", "")
             if isempty(path)
                 return Dict("success" => false, "error" => "Path parameter required")
             end
             handleLoadDocument(path)
         end
 
-        # MONEY DOCUMENT
+        ### MONEY DOCUMENT ###
 
         "Money.Document.fetch" => handleMoneyDocumentFetch()
 
@@ -276,7 +270,7 @@ function handleCommand(commandData::Dict)
         end
 
         "Money.Document.load" => begin
-            path = get(commandData, "path", "")
+            local path = get(commandData, "path", "")
             if isempty(path)
                 return Dict("success" => false, "error" => "Path parameter required")
             end
@@ -284,12 +278,17 @@ function handleCommand(commandData::Dict)
         end
         
         "Money.Document.save" => begin
-            path = get(commandData, "path", "")
-            dataTableDict = get(commandData, "dataTable", nothing)
-            if isempty(path) || dataTableDict === nothing
+            local path = get(commandData, "path", "")
+            local rawDataTable = get(commandData, "dataTable", nothing)
+            println("path ", path, ' ',  isempty(path))
+            println("rawDataTable ", rawDataTable)
+            if isempty(path) || rawDataTable === nothing
                 return Dict("success" => false, "error" => "Path and dataTable required")
             end
-            handleMoneyDocumentSave(path, dataTableDict)
+            handleMoneyDocumentSave(path, DataTable(
+                columns = rawDataTable["columns"],
+                cells = nestedArrayToMatrix(Vector{Vector{String}}(rawDataTable["cells"]))
+            ))
         end
         
         _ => Dict(

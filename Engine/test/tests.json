@@ -1,7 +1,7 @@
 {
     "command": "eBay.UploadTemplate.save",
     "path": "B:\\VikingTekDIY\\2025-08-30\\save.csv",
-    "uploadDataTable": {
+    "dataTable": {
         "id": 65507,
         "columns": [
             "*Action(SiteID=Germany|Country=DE|Currency=EUR|Version=1193|CC=UTF-8)",

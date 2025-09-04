@@ -15,6 +15,6 @@ type MoneyDocumentManager(zmqServerConfig : ZMQServerConfig) =
         {| command = "Money.Document.load"; path = path |}
         |> self.SendCommand<CommandMessageResponse>
 
-    member self.Save (path : string, uploadDataTable : DataTable) =
-        {| command = "Money.Document.save"; path = path; uploadDataTable = uploadDataTable |}
+    member self.Save (path : string, dataTable : DataTable) =
+        {| command = "Money.Document.save"; path = path; dataTable = dataTable |}
         |> self.SendCommand<CommandMessageResponse>

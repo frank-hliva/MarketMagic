@@ -2,8 +2,10 @@ module Money
     module File
 
         using CSV, DataFrames, Main.Cells
+        using Main.Model: DataTable
 
-        function load(inputStream::IO)::Main.Model.DataTable
+
+        function load(inputStream::IO)::DataTable
             local dataFrame = CSV.read(
                 inputStream,
                 DataFrame;
@@ -16,13 +18,13 @@ module Money
                 silencewarnings = true
             )
             
-            Main.Model.DataTable(
+            DataTable(
                 columns = string.(names(dataFrame)),
                 cells = Cells.removeNothing(Matrix(dataFrame))
             )
         end
 
-        function new()::Main.Model.DataTable
+        function new()::DataTable
             dataFrame = DataFrame(
                 Subject = String[],
                 Note = String[],
@@ -42,7 +44,7 @@ module Money
             return load(inputStream)
         end
 
-        function save(outputStream::IO, dataTable::Main.Model.DataTable)
+        function save(outputStream::IO, dataTable::DataTable)
             local dataFrame = DataFrame(
                 dataTable.cells, 
                 dataTable.columns
