@@ -230,7 +230,7 @@ function handleCommand(commandData::Dict)
     command = get(commandData, "command", "")
     
     @match command begin
-        # UPLOAD TEMPLATE
+        # UPLOAD TEMPLATE 
 
         "eBay.UploadTemplate.fetch" => handleFetchUploadTemplate()
 
@@ -299,20 +299,47 @@ function handleCommand(commandData::Dict)
     end
 end
 
+function formatIdentifier(identifier::String)
+    local parts = split(identifier, ".")
+    local len = length(parts)
+    local io = IOBuffer()
+    write(io, "  • ");
+    for (index, identifier) in enumerate(parts)
+        if index === len
+            write(io, "\e[93m$(identifier)\e[0m")
+        else
+            write(io, "\e[38;5;43m$(identifier)\e[0m.")
+        end
+    end
+    io |> take! |> String
+end
+
+function displayAllAvailableCommands(commands::Vector{String})
+    for command in commands
+        command |> formatIdentifier |> println
+    end
+end
+
 function startServer(port::Int = 7333)
     local context = Context()
     local socket = Socket(context, REP)
-    
+
     try
         bind(socket, "tcp://*:$port")
         println("\n\e[38;5;183mMarketMagic\e[38;5;75m ZMQ Server\e[0m started on port \e[93m$port\e[0m ✅\n")
         println("Available commands:")
-        println("  • \e[38;5;43mloadUploadTemplate\e[0m")
-        println("  • \e[38;5;43mloadDocument\e[0m")
-        println("  • \e[38;5;43msaveUploadTemplate\e[0m")
-        println("  • \e[38;5;43mfetchUploadTemplate\e[0m")
+        [
+            "eBay.UploadTemplate.fetch"
+            "eBay.UploadTemplate.load"
+            "eBay.UploadTemplate.save"
+            "eBay.Document.load"
+            "Money.Document.fetch"
+            "Money.Document.new"
+            "Money.Document.load"
+            "Money.Document.save"
+        ] |> displayAllAvailableCommands
         println("\nWaiting for requests...\n")
-
+        
         while true
             local receivedData = socket |> recv |> String
             println("\e[38;5;75mReceived request\e[0m: $receivedData")

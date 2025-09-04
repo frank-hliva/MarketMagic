@@ -197,16 +197,14 @@ and MainWindow (
         | Error errMsg -> do! Dialogs.showErrorU errMsg self
     }
 
-    and saveDocument () = task {
-        let path = windowConfig.UploadTemplate.DocumentPath
-        if IO.File.Exists path then do! saveDocumentToFile path
-        else do! saveAsDocument ()
-    }
-
-    and saveAsDocument () = task {
-        match! tryPickFileToSaveDocument() with
-        | Some path -> do! saveDocumentToFile path
-        | _ -> ()
+    let rec saveMoneyDocumentToFile (path : string) = task {
+        match windowViewModel.MoneyTable.TryExportToDataTable() with
+        | Ok moneyDataTable ->
+            let result = moneyDocumentManager.Save(path, moneyDataTable)
+            if result.Success
+            then windowConfig.MoneyDocument.DocumentPath <- path
+            else do! showErrorResponse result
+        | Error errMsg -> do! Dialogs.showErrorU errMsg self
     }
 
     do
@@ -214,6 +212,8 @@ and MainWindow (
         self.SetupDataGrids()
         self.Opened.Add(self.Window_Opened)
         self.Closing.Add(self.Window_Closing)
+
+    let startTaskImmediate = Async.AwaitTask >> Async.StartImmediate
 
     member private self.InitializeComponent() =
 #if DEBUG
@@ -288,7 +288,7 @@ and MainWindow (
                 windowConfig.UploadTemplate.DocumentPath <- ""
                 self.TryLoadTemplateWithDocument() |> ignore
             | _ -> ()
-        } |> ignore
+        } |> startTaskImmediate
 
     member private self.LoadDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
         task {
@@ -297,13 +297,21 @@ and MainWindow (
                 windowConfig.UploadTemplate.DocumentPath <- path
                 self.TryLoadTemplateWithDocument() |> ignore
             | _ -> ()
-        } |> ignore
+        } |> startTaskImmediate
 
     member private self.SaveDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
-        saveDocument () |> ignore
+        task {
+            let path = windowConfig.UploadTemplate.DocumentPath
+            if IO.File.Exists path then do! saveDocumentToFile path
+            else self.SaveAsDocumentButton_Click(sender, event)
+        } |> startTaskImmediate
 
     member private self.SaveAsDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
-        saveAsDocument () |> ignore
+        task {
+            match! tryPickFileToSaveDocument() with
+            | Some path -> do! saveDocumentToFile path
+            | _ -> return ()
+        } |> startTaskImmediate
 
     member private self.DeleteRowsButton_Click(sender : obj, event : RoutedEventArgs) =
         windowViewModel.UploadTable.DeleteSelected()
@@ -331,13 +339,27 @@ and MainWindow (
         ()
 
     member private self.LoadMoneyDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
-        ()
+        task {
+            match! tryPickFileToLoadDocument() with
+            | Some path ->
+                windowConfig.MoneyDocument.DocumentPath <- path
+                self.TryLoadMoneyDocument() |> ignore
+            | _ -> ()
+        } |> startTaskImmediate
 
     member private self.SaveMoneyDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
-        ()
+        task {
+            let path = windowConfig.MoneyDocument.DocumentPath
+            if IO.File.Exists path then do! saveMoneyDocumentToFile path
+            else self.SaveAsMoneyDocumentButton_Click(sender, event)
+        } |> startTaskImmediate
 
     member private self.SaveAsMoneyDocumentButton_Click(sender : obj, event : RoutedEventArgs) =
-        ()
+        task {
+            match! tryPickFileToSaveDocument() with
+            | Some path -> do! saveMoneyDocumentToFile path
+            | _ -> return ()
+        } |> startTaskImmediate
 
     member private self.DeleteMoneyDocumentRowsButton_Click(sender : obj, event : RoutedEventArgs) =
         windowViewModel.MoneyTable.DeleteSelected()
