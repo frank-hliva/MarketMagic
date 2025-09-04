@@ -129,3 +129,15 @@ type TableViewModel() =
                     |> Cells.ofObservable self.Columns
             } |> Ok
         | _ -> Error "The table has not been loaded."
+
+type MoneyTableViewModel() =
+    inherit TableViewModel()
+
+    let mutable sum = "0.0"
+
+    member self.Sum
+        with get() = sum
+        and set(value) =
+            if sum <> value then
+                sum <- value
+                self.OnPropertyChanged("Sum")

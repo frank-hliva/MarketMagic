@@ -222,6 +222,21 @@ function handleMoneyDocumentSave(path::String, dataTable::DataTable)
     end
 end
 
+function handleMoneyDocumentSum(dataTable::DataTable)
+    try
+        return Dict(
+            "success" => true,
+            "value" => dataTable |> Money.File.sum
+        )
+    catch e
+        return Dict(
+            "success" => false,
+            "error" => "Failed to use the sum function",
+            "internalError" => string(e)
+        )
+    end
+end
+
 function handleCommand(commandData::Dict)
     command = get(commandData, "command", "")
     
@@ -290,6 +305,14 @@ function handleCommand(commandData::Dict)
                 cells = nestedArrayToMatrix(Vector{Vector{String}}(rawDataTable["cells"]))
             ))
         end
+
+        "Money.Document.sum" => begin
+            local rawDataTable = get(commandData, "dataTable", "")
+            handleMoneyDocumentSum(DataTable(
+                columns = rawDataTable["columns"],
+                cells = nestedArrayToMatrix(Vector{Vector{String}}(rawDataTable["cells"]))
+            ))
+        end
         
         _ => Dict(
             "success" => false,
@@ -336,6 +359,7 @@ function startServer(port::Int = 7333)
             "Money.Document.new"
             "Money.Document.load"
             "Money.Document.save"
+            "Money.Document.sum"
         ] |> displayAllAvailableCommands
         println("\nWaiting for requests...\n")
         

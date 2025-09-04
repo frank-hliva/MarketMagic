@@ -77,7 +77,7 @@ and WindowViewModel(
     uploadTemplateConfig : UploadTemplateConfig,
     moneyDocumentConfig : MoneyDocumentConfig,
     uploadTableViewModel : TableViewModel,
-    moneyTableViewModel : TableViewModel
+    moneyTableViewModel : MoneyTableViewModel
 ) as self =
     inherit BasicViewModel()
 
@@ -129,6 +129,17 @@ and MainWindow (
     let displayMoneyDataInTable() =
         moneyDocumentManager.Fetch().Data
         |> windowViewModel.MoneyTable.SetData
+
+        match windowViewModel.MoneyTable.TryExportToDataTable() with
+        | Ok dataTable ->
+            let sumResult = dataTable |> moneyDocumentManager.Sum
+            windowViewModel.MoneyTable.Sum <- (
+                if sumResult.Success
+                then String.Format("{0:N2} €", sumResult.Value)
+                else "#,## €"
+            )
+        | Error message ->
+            ()
         moneyDocumentDataGrid.Focus() |> ignore
 
     let showError (msg : string) = 

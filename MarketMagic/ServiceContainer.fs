@@ -22,6 +22,6 @@ type ServiceCollectionExtensions() =
             .AddSingleton<MoneyDocumentConfig>()
             .AddSingleton<WindowConfig>()
             .AddTransient<TableViewModel>()
-            //.AddSingleton<TableViewModel>()
+            .AddSingleton<MoneyTableViewModel>()
             .AddSingleton<WindowViewModel>()
             .AddSingleton<MainWindow>()

@@ -117,6 +117,7 @@
                     <StackPanel Classes="StatusBar">
                         <TextBlock Text="{Binding MoneyTable.CursorYXHelp}" />
                         <TextBlock Text="{Binding MoneyTable.KeyboardHelp}" />
+                        <TextBlock Text="{Binding MoneyTable.Sum}" />
                     </StackPanel>
                 </Border>
             </Grid>

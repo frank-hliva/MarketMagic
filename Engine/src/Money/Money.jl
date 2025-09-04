@@ -61,5 +61,21 @@ module Money
             )
         end
 
+        function sum(dataTable::DataTable)
+            local priceColumnIndex = findfirst(==("Price"), dataTable.columns)
+            if priceColumnIndex === -1
+                -1
+            else
+                local total = 0.0
+                for row in 1:size(dataTable.cells, 1)
+                    local price = dataTable.cells[row, priceColumnIndex]
+                    if !isempty(price)
+                        total += parse(Float64, price)
+                    end
+                end
+                return total
+            end
+        end
+
     end
 end

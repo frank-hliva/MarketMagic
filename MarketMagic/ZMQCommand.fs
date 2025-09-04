@@ -50,6 +50,17 @@ type CommandMessageResponse(
     member self.Error = error
     member self.InternalError = internalError
 
+type CommandValueResponse<'t>(
+    success : bool,
+    value : 't,
+    error : string,
+    internalError : string
+) = 
+    inherit CommandResponse(success)
+    member self.Value = value
+    member self.Error = error
+    member self.InternalError = internalError
+
 type CommandDataResponse<'t>(success : bool, data : 't) = 
     inherit CommandResponse(success)
     member self.Data = data

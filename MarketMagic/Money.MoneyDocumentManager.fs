@@ -18,3 +18,7 @@ type MoneyDocumentManager(zmqServerConfig : ZMQServerConfig) =
     member self.Save (path : string, dataTable : DataTable) =
         {| command = "Money.Document.save"; path = path; dataTable = dataTable |}
         |> self.SendCommand<CommandMessageResponse>
+
+    member self.Sum (dataTable : DataTable) =
+        {| command = "Money.Document.sum"; dataTable = dataTable |}
+        |> self.SendCommand<CommandValueResponse<decimal>>
