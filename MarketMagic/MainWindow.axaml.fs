@@ -237,7 +237,7 @@ and MainWindow (
         | Ok dataTable ->
             match moneyDocumentManager.Sum <| dataTable with
             | result when result.Success = true ->
-                Some <| String.Format(CultureInfo("sk-SK"), "{0:N2}", result.Value)
+                Some <| String.Format("{0:N2}", result.Value)
             | _ -> None
         | _ -> None)
         |> function
@@ -250,7 +250,7 @@ and MainWindow (
         self.Opened.Add(self.Window_Opened)
         self.Closing.Add(self.Window_Closing)
         windowViewModel.MoneyTable.ProcessTableEvent.Add(fun moneyTableViewModel ->
-            moneyTableViewModel.Sum <- sum moneyTableViewModel
+            moneyTableViewModel.Sum <- $"Sum: {sum moneyTableViewModel}€"
         )
 
     member private self.InitializeComponent() =
