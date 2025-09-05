@@ -62,20 +62,19 @@ module Money
         end
 
         function sum(dataTable::DataTable)
-            local priceColumnIndex = findfirst(==("Price"), dataTable.columns)
-            if priceColumnIndex === -1
-                -1
+            local priceColumnNames = ["price", "prices", "value", "amount"]
+            local priceColumnIndex = findfirst(name -> lowercase(name) in priceColumnNames, dataTable.columns)
+            if priceColumnIndex === nothing
+                nothing
             else
-                local total = 0.0
-                for row in 1:size(dataTable.cells, 1)
-                    local price = dataTable.cells[row, priceColumnIndex]
-                    if !isempty(price)
-                        total += parse(Float64, price)
-                    end
-                end
-                return total
+                Base.sum(
+                    !isempty(price) ? parse(Float64, price) : 0.0
+                    for price in dataTable.cells[:, priceColumnIndex]
+                )
             end
         end
+
+        export load, new, save, sum
 
     end
 end
