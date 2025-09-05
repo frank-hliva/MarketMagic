@@ -14,6 +14,7 @@ open Lime
 open MarketMagic
 open Avalonia.Markup.Xaml.Templates
 open Avalonia.Controls.Templates
+open System.Globalization
 
 type WindowConfig(
     appConfig : AppConfig,
@@ -129,17 +130,6 @@ and MainWindow (
     let displayMoneyDataInTable() =
         moneyDocumentManager.Fetch().Data
         |> windowViewModel.MoneyTable.SetData
-
-        match windowViewModel.MoneyTable.TryExportToDataTable() with
-        | Ok dataTable ->
-            let sumResult = dataTable |> moneyDocumentManager.Sum
-            windowViewModel.MoneyTable.Sum <- (
-                if sumResult.Success
-                then String.Format("{0:N2} €", sumResult.Value)
-                else "#,## €"
-            )
-        | Error message ->
-            ()
         moneyDocumentDataGrid.Focus() |> ignore
 
     let showError (msg : string) = 
@@ -242,11 +232,26 @@ and MainWindow (
         | _ -> ()
     }
 
+    let sum (moneyTableViewModel : MoneyTableViewModel) =
+        (match moneyTableViewModel.TryExportToDataTable() with
+        | Ok dataTable ->
+            match moneyDocumentManager.Sum <| dataTable with
+            | result when result.Success = true ->
+                Some <| String.Format(CultureInfo("sk-SK"), "{0:N2}", result.Value)
+            | _ -> None
+        | _ -> None)
+        |> function
+        | Some value -> value
+        | _ -> "#,##"
+
     do
         self.InitializeComponent()
         self.SetupDataGrids()
         self.Opened.Add(self.Window_Opened)
         self.Closing.Add(self.Window_Closing)
+        windowViewModel.MoneyTable.ProcessTableEvent.Add(fun moneyTableViewModel ->
+            moneyTableViewModel.Sum <- sum moneyTableViewModel
+        )
 
     member private self.InitializeComponent() =
 #if DEBUG

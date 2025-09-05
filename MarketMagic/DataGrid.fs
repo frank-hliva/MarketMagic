@@ -80,6 +80,10 @@ type DataGridExtensions() =
         let cellInfo, keyboardInfo = dataGrid.GetDataGridCellInfo(tableViewModel.IsInEditMode)
         tableViewModel.CursorYXHelp <- cellInfo
         tableViewModel.KeyboardHelp <- keyboardInfo
+        match tableViewModel with
+        | :? MoneyTableViewModel as moneyTableViewModel ->
+            moneyTableViewModel.OnProcessTableEvent(moneyTableViewModel)
+        | _ -> ()
 
     static let dataGrid_handleKeyDown (viewModel : TableViewModel) (sender : obj) (e : KeyEventArgs) =
         let dataGrid = sender :?> DataGrid

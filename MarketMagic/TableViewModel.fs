@@ -133,6 +133,8 @@ type TableViewModel() =
 type MoneyTableViewModel() =
     inherit TableViewModel()
 
+    let processTableEvent = new Event<MoneyTableViewModel>()
+
     let mutable sum = "0.0"
 
     member self.Sum
@@ -141,3 +143,8 @@ type MoneyTableViewModel() =
             if sum <> value then
                 sum <- value
                 self.OnPropertyChanged("Sum")
+
+    member self.ProcessTableEvent = processTableEvent.Publish
+
+    member self.OnProcessTableEvent(viewModel : MoneyTableViewModel) =
+        processTableEvent.Trigger(viewModel)
