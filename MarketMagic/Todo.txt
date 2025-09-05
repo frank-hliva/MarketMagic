@@ -1,5 +1,9 @@
-﻿
- 
+﻿- pri money table spojazdnit Save
+- sum vypisat aj inde
+- povolit iba cisla do stlpca price
+
+------------------------------------------------------------------------------------------------------
+
 - TESTy
     - Command: Add, Revise, Relist, End
         - defaultne vybrat Add
